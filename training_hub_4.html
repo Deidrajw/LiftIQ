@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Training Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0f11;--bg2:#18181b;--bg3:#222226;
+  --bd:#2a2a2f;--bd2:#3a3a42;
+  --tx:#f4f4f6;--t2:#8b8b96;--t3:#4a4a54;
+  --or:#e8673a;--bl:#2d6ef5;--gr:#1db87a;--re:#ff453a;--am:#ffd60a;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Outfit",sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-height:100vh}
+
+/* TOP BAR */
+.topbar{display:flex;background:var(--bg2);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:99}
+.tb{flex:1;padding:13px 4px;font-size:12px;font-weight:700;letter-spacing:.03em;border:none;background:0;color:var(--t3);cursor:pointer;transition:color .15s}
+.tb.on{color:var(--or);border-bottom:2px solid var(--or)}
+.imp-banner{display:none;align-items:center;gap:8px;padding:8px 14px;background:#1db87a12;border-bottom:1px solid #1db87a30;font-size:11px;color:var(--gr)}
+
+/* COACH STATUS CARD */
+.coach-card{margin:14px 16px 10px;background:linear-gradient(160deg,#1e1e24 0%,var(--bg2) 100%);border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+.cc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0}
+.cc-meso{font-size:11px;font-weight:700;color:var(--or);letter-spacing:.06em;text-transform:uppercase}
+.cc-week{font-size:11px;font-weight:600;color:var(--t2)}
+.cc-phase{font-size:20px;font-weight:800;color:var(--tx);padding:6px 16px 2px;letter-spacing:-.02em}
+.cc-focus{font-size:13px;color:var(--t2);padding:0 16px 12px;line-height:1.5}
+.cc-chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--bd)}
+.chip{font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px}
+.chip-r{background:#ff453a14;border:1px solid #ff453a30;color:var(--re)}
+.chip-a{background:#ffd60a14;border:1px solid #ffd60a30;color:var(--am)}
+.chip-b{background:#2d6ef514;border:1px solid #2d6ef530;color:var(--bl)}
+.chip-g{background:#1db87a14;border:1px solid #1db87a30;color:var(--gr)}
+
+/* GYM */
+.sp{padding:10px 16px 12px;border-bottom:1px solid var(--bd)}
+.sp-l{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.sp-w{display:flex;flex-wrap:wrap;gap:6px}
+.sb{font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;border:1px solid var(--bd);background:var(--bg3);color:var(--t2);cursor:pointer;transition:all .15s}
+.sb.on{background:var(--or);border-color:var(--or);color:#fff}
+.el{padding:10px 16px;display:flex;flex-direction:column;gap:8px}
+
+/* EXERCISE CARD */
+.ec{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.ec-h{display:flex;align-items:center;justify-content:space-between;padding:13px 14px 10px;cursor:pointer;user-select:none}
+.ec-n{font-size:14px;font-weight:700}
+.ec-s{font-size:11px;color:var(--t2);margin-top:1px}
+.ec-rec{font-size:10px;font-weight:700;margin-top:2px;display:block}
+.ec-a{color:var(--t3);font-size:20px;transition:transform .2s;line-height:1}
+.ec.open .ec-a{transform:rotate(90deg)}
+.ec-b{display:none;border-top:1px solid var(--bd)}.ec.open .ec-b{display:block}
+.ec-timer{font-size:10px;font-weight:700;color:var(--bl);padding:3px 8px;border-radius:8px;background:#2d6ef512;border:1px solid #2d6ef525;cursor:pointer;white-space:nowrap}
+
+/* SET TABLE */
+.sth{display:grid;grid-template-columns:40px 1fr 1fr 52px 40px;padding:7px 14px;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--bd)}
+.sr{display:grid;grid-template-columns:40px 1fr 1fr 52px 40px;padding:9px 14px;font-size:12px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04)}
+.sr:last-child{border-bottom:none}
+.sr.wu{color:var(--t2)}.sr.top{background:#1db87a08;font-weight:600}.sr.bo{background:#2d6ef508}.sr.dr{background:#e8673a08}
+.sn{font-size:11px;font-weight:700}
+.sn.wu{color:var(--t3)}.sn.top{color:var(--gr)}.sn.bo{color:var(--bl)}.sn.dr{color:var(--or)}
+.pv{color:var(--t3);font-size:11px}.tv{color:var(--tx);font-weight:600;font-size:12px}.rv{font-size:10px;color:var(--t2)}
+.ck{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--bd2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;margin:0 auto;transition:all .18s}
+.ck.done{background:var(--or);border-color:var(--or)}
+.fgr{margin:7px 14px 10px;padding:7px 10px;background:#ffd60a0e;border-radius:9px;font-size:11px;color:var(--am);line-height:1.5}
+.act-btn{font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer}
+.swap-btn{border:1px solid var(--bd2);background:var(--bg3);color:var(--t2)}
+.rem-btn{border:1px solid #ff453a30;background:#ff453a0a;color:var(--re)}
+
+/* POOL */
+.pool-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 6px}
+.pool-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg3);margin-bottom:6px;cursor:pointer;user-select:none;transition:border-color .15s}
+.pool-item.pool-on{border-color:var(--or);background:#e8673a0a}
+.pool-wu{border-color:#1db87a30;background:#1db87a0a;cursor:default}
+.pchk{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--bd2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0;transition:all .15s}
+.pchk.on{background:var(--or);border-color:var(--or)}
+.pinfo{flex:1;min-width:0}
+.pname{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.plast{font-size:10px;color:var(--t3);display:block;margin-bottom:2px}
+.pflag{font-size:10px;color:var(--am);margin-top:2px}
+.ptimer{font-size:11px;font-weight:700;color:var(--bl);flex-shrink:0;padding:4px 8px;border-radius:8px;background:#2d6ef512;border:1px solid #2d6ef530;cursor:pointer;white-space:nowrap}
+.start-btn{width:100%;margin-top:14px;padding:14px;background:var(--or);border:none;border-radius:12px;font-size:14px;font-weight:800;color:#fff;cursor:pointer}
+
+/* COACH BRIEF */
+.coach-brief{margin:10px 16px 4px;background:var(--bg2);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.coach-brief-hd{padding:10px 14px;font-size:10px;font-weight:700;color:var(--or);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bd)}
+.cbrow{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.cbrow:last-child{border-bottom:none}
+.cbbadge{font-size:9px;font-weight:700;flex-shrink:0;margin-top:2px}
+.cbname{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.cbreason{font-size:11px;color:var(--t2);line-height:1.5}
+.cbcaution{font-size:10px;color:var(--am);margin-top:4px}
+
+/* TIMER BAR */
+.stoggle-row{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px 12px}
+.stoggle{font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg3);color:var(--t2);cursor:pointer;transition:all .15s}
+.stoggle-on{background:#ffd60a18;border-color:#ffd60a50;color:var(--am)}
+.stoggle-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:10px 16px 4px}
+.ins-win-card{background:var(--bg2);border:1px solid #1db87a30;border-radius:13px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+.ins-win-icon{font-size:22px;flex-shrink:0}
+.ins-win-title{font-size:13px;font-weight:800;color:var(--tx);margin-bottom:3px}
+.ins-win-body{font-size:11px;color:var(--t2);line-height:1.5}
+.ins-card{border-radius:12px;border:1px solid var(--bd);border-left-width:3px;padding:11px 14px;margin-bottom:8px}
+.ins-head{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.ins-icn{font-size:14px;flex-shrink:0}
+.ins-title{font-size:12px;font-weight:800;color:var(--tx)}
+.ins-body{font-size:11px;color:var(--t2);line-height:1.6}
+.meso-level{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.meso-badge{font-size:8px;font-weight:800;padding:3px 7px;border-radius:4px;letter-spacing:.08em;flex-shrink:0;margin-top:2px;white-space:nowrap}
+.meso-micro{background:#2d6ef520;color:var(--bl)}
+.meso-meso{background:#e8673a20;color:var(--or)}
+.meso-macro{background:#ffd60a18;color:var(--am)}
+.meso-level-name{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.meso-level-body{font-size:11px;color:var(--t2);line-height:1.5}
+#timerBar{display:none;align-items:center;gap:10px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--bd);position:sticky;top:46px;z-index:90}
+
+/* INTELLIGENCE */
+.iw{padding:14px}
+.its{display:flex;gap:2px;margin-bottom:14px;background:var(--bg2);border:1px solid var(--bd);border-radius:11px;padding:3px;overflow-x:auto}
+.it{flex:1;font-size:10px;font-weight:700;padding:8px 4px;border-radius:8px;border:none;background:0;color:var(--t3);cursor:pointer;text-align:center;white-space:nowrap;min-width:0}
+.it.on{background:var(--or);color:#fff}
+.ip{display:none}.ip.on{display:block}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.dash-sec{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 6px}
+.dash-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.dash-card.win{border-color:#1db87a30;background:#1db87a08}
+.dash-card.warn{border-color:#ffd60a30;background:#ffd60a08}
+.dash-card.coach{border-color:#e8673a30;background:#e8673a08}
+.dash-card.suggest{border-color:#2d6ef530;background:#2d6ef508}
+.dash-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.dash-title{font-size:12px;font-weight:800;color:var(--tx);margin-bottom:3px}
+.dash-body{font-size:11px;color:var(--t2);line-height:1.5}
+
+/* WHAT CHANGED */
+.change-list{background:var(--bg2);border:1px solid var(--bd);border-radius:13px;margin-bottom:10px;overflow:hidden}
+.change-row{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.change-row:last-child{border-bottom:none}
+.change-icon{font-size:16px;font-weight:800;flex-shrink:0}
+.change-name{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.change-reason{font-size:11px;color:var(--t2);line-height:1.5}
+
+/* NEXT WEEK */
+.nx-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.nx-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--bd)}
+.nx-name{font-size:14px;font-weight:800;color:var(--tx)}
+.nx-badge{font-size:9px;font-weight:700;padding:4px 9px;border-radius:20px}
+.nx-stats{display:grid;grid-template-columns:1fr 1fr;padding:10px 14px;gap:8px;border-bottom:1px solid var(--bd)}
+.nx-stat-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.nx-stat-v{font-size:12px;color:var(--t2)}
+.nx-reason{padding:10px 14px;font-size:11px;color:var(--tx);line-height:1.5}
+.nx-caution{padding:0 14px 10px;font-size:11px;color:var(--am);display:flex;gap:6px}
+.nx-vol-warn{background:#ffd60a0a;border:1px solid #ffd60a30;border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:11px;color:var(--am);line-height:1.5;display:flex;gap:8px}
+
+/* TRAINING MAP */
+.phase-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.phase-card{flex:1;min-width:80px;background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:10px}
+.phase-active{border-color:var(--or)}
+.phase-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.phase-name{font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px}
+.phase-period{font-size:10px;color:var(--t3)}
+.week-row{display:flex;gap:3px}
+.wdot{flex:1;height:28px;border-radius:5px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--t3)}
+.wdot-active{background:var(--or);color:#fff}
+.wdot-done{background:#1db87a33;color:var(--gr)}
+.map-lift{margin-bottom:12px}
+.map-lift-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.map-lift-name{color:var(--tx);font-weight:600}
+.map-lift-vals{color:var(--t2)}
+.map-bar-bg{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.map-bar-fill{height:100%;background:linear-gradient(90deg,var(--bl),var(--or));border-radius:3px;transition:width .4s}
+.map-bar-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--t3)}
+
+/* AUDIT */
+.vol-row{margin-bottom:8px}
+.vol-bar-bg{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.vol-bar-fill{height:100%;border-radius:3px}
+.apill{display:inline-block;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;margin:3px 3px 3px 0}
+.apill.g{background:#1db87a20;color:var(--gr)}.apill.a{background:#ffd60a18;color:var(--am)}
+
+/* SHARED */
+.cc{background:var(--bg2);border:1px solid var(--bd);border-radius:13px;padding:13px;margin-bottom:10px}
+.cl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.bx{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:11px 13px}
+.bl2{font-size:10px;color:var(--t3);margin-bottom:3px}.bv{font-size:19px;font-weight:800}.bs{font-size:10px;color:var(--t2);margin-top:2px}
+.ib{background:var(--bg2);border:1px solid var(--bd);border-radius:13px;padding:4px 13px;margin-bottom:10px}
+.ir{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:11px;color:var(--t2);line-height:1.6}
+.ir:last-child{border-bottom:none}.ir strong{color:var(--tx)}
+.g{color:var(--gr)}.r{color:var(--re)}.a{color:var(--am)}.b{color:var(--bl)}
+.irb{font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg3);color:var(--t2);cursor:pointer;transition:all .15s}
+.irb.on{background:var(--or);border-color:var(--or);color:#fff}
+.empty-state{text-align:center;padding:48px 20px;color:var(--t3);font-size:13px;line-height:1.6}
+
+/* EXERCISE MODAL */
+.ex-grp{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:10px 14px 4px}
+.ex-item{padding:12px 14px;border-bottom:1px solid #2a2a2f33;cursor:pointer}
+.ex-item:active{background:var(--bg3)}
+</style>
+</head>
+<body>
+<input type="file" id="csvIn" accept=".csv" style="display:none" onchange="onFileSelect(event)">
+
+<div class="topbar">
+  <button class="tb on" onclick="setMode('gym',this)">&#127947; GYM</button>
+  <button class="tb" onclick="setMode('ana',this)">&#129504; INTELLIGENCE</button>
+</div>
+
+<div class="imp-banner" id="importBanner"></div>
+
+<!-- ═══ GYM MODE ═══ -->
+<div id="gym">
+  <!-- Coach Status Card -->
+  <div class="coach-card" id="coachCard"></div>
+
+  <!-- Status toggles -->
+  <div class="stoggle-label">Today&#8217;s status</div>
+  <div class="stoggle-row" id="statusToggles"></div>
+
+  <!-- Next Session Coach -->
+  <div style="padding:0 16px" id="nextSessionCoachWrap"><div id="nextSessionCoach"></div></div>
+
+  <!-- Session Picker -->
+  <div class="sp">
+    <div class="sp-l">Session</div>
+    <div class="sp-w">
+      <button class="sb" onclick="pick('post',this)">Posterior Chain</button>
+      <button class="sb" onclick="pick('gq',this)">Glute &amp; Quad</button>
+      <button class="sb" onclick="pick('uni',this)">Unilateral (Apt)</button>
+      <button class="sb" onclick="pick('pull',this)">Upper Pull</button>
+      <button class="sb" onclick="pick('push',this)">Upper Push</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Exercise Pool -->
+  <div id="exPool" style="display:none;padding:12px 16px">
+    <div id="poolList"></div>
+  </div>
+
+  <!-- Step 3: Active Session -->
+  <div id="activeSess" style="display:none">
+    <div id="timerBar">
+      <div style="flex:1;background:#2a2a2f;border-radius:4px;height:4px;overflow:hidden">
+        <div id="timerFill" style="height:100%;background:var(--or);width:100%;transition:width 1s linear;border-radius:4px"></div>
+      </div>
+      <span id="timerCount" style="font-size:20px;font-weight:800;font-family:monospace;color:var(--or);min-width:44px">0:00</span>
+      <button onclick="dismissTimer()" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="el" id="el"></div>
+  </div>
+</div>
+
+<!-- ═══ INTELLIGENCE MODE ═══ -->
+<div id="ana" style="display:none">
+  <div class="iw">
+    <div class="its">
+      <button class="it on" onclick="iTab('dash',this)">Home</button>
+      <button class="it" onclick="iTab('changed',this)">Changed</button>
+      <button class="it" onclick="iTab('next',this)">Next</button>
+      <button class="it" onclick="iTab('map',this)">Map</button>
+      <button class="it" onclick="iTab('insights',this)">Insights</button>
+      <button class="it" onclick="iTab('import',this)">Import</button>
+    </div>
+    <div id="t-dash"     class="ip on"></div>
+    <div id="t-changed"  class="ip"></div>
+    <div id="t-next"     class="ip"></div>
+    <div id="t-map"      class="ip"></div>
+    <div id="t-insights" class="ip"></div>
+    <div id="t-import"   class="ip"></div>
+  </div>
+</div>
+
+<!-- EXERCISE SELECTOR MODAL -->
+<div id="exModal" style="display:none;position:fixed;inset:0;background:#000a;z-index:200;align-items:flex-end;justify-content:center">
+  <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;border-bottom:1px solid var(--bd)">
+      <div id="exModalTitle" style="font-size:16px;font-weight:800">Add exercise</div>
+      <button onclick="closeExModal()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer">&#10005;</button>
+    </div>
+    <div style="padding:10px 14px;border-bottom:1px solid var(--bd)">
+      <input id="exSearch" type="text" placeholder="Search exercises..." oninput="renderExList(this.value)"
+        style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:13px">
+    </div>
+    <div id="exModalList" style="overflow-y:auto;flex:1;padding:6px 0"></div>
+  </div>
+</div>
+<script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ═══════════════════════════════════════
+// LAYER 1: TRAINING PROFILE (static, never changes)
+// ═══════════════════════════════════════
+var PROFILE = {
+  goal: "Glute growth, posterior chain strength, visible definition",
+  avoidExcess: ["Back","Lats","Shoulders","Chest"],
+  priorityMuscles: ["Glutes","Hamstrings","Glute Med"],
+  maintenanceMuscles: ["Back","Shoulders","Chest"],
+  injuryFlags: {knee:true, ankle:true, back:false},
+  safetyRules: [
+    "No failure on RDL, BSS, or back extensions",
+    "Avoid sled and jumping during ankle issues",
+    "Pause BSS progression when knee pain is active",
+    "Keep upper pull volume controlled — definition, not width"
+  ],
+  priorityLifts: [
+    "Glute Drive","Romanian Deadlift (Barbell)",
+    "Bulgarian Split Squat (Smith Machine)","Rear Kick (Machine)",
+    "Seated Leg Curl (Machine)","Hip Thrust (Machine)",
+    "Lying Leg Curl (Machine)","Lat Pulldown (Cable)"
+  ],
+  liftTargets: {
+    "Glute Drive":                           {targetR:8, M8e:490, M9e:540, goale:560},
+    "Romanian Deadlift (Barbell)":           {targetR:8, M8e:210, M9e:225, goale:245},
+    "Bulgarian Split Squat (Smith Machine)": {targetR:8, M8e:140, M9e:155, goale:165},
+    "Rear Kick (Machine)":                   {targetR:10,M8e:230, M9e:255, goale:270},
+    "Seated Leg Curl (Machine)":             {targetR:8, M8e:140, M9e:165, goale:187},
+    "Hip Thrust (Machine)":                  {targetR:8, M8e:130, M9e:145, goale:155},
+    "Lying Leg Curl (Machine)":              {targetR:8, M8e:115, M9e:130, goale:145},
+    "Lat Pulldown (Cable)":                  {targetR:8, M8e:158, M9e:170, goale:180}
+  },
+  muscleMap: {
+    "Glute Drive":"Glutes","Hip Thrust (Machine)":"Glutes","Hip Thrust (Barbell)":"Glutes",
+    "Rear Kick (Machine)":"Glutes","Cable Kickback":"Glutes","45-Degree Hip Extension":"Glutes",
+    "Romanian Deadlift (Barbell)":"Hamstrings","Seated Leg Curl (Machine)":"Hamstrings",
+    "Lying Leg Curl (Machine)":"Hamstrings","Back Extension (Weighted Hyperextension)":"Hamstrings",
+    "B-stance RDL":"Hamstrings","Nordic Curl":"Hamstrings",
+    "Bulgarian Split Squat (Smith Machine)":"Quads","Belt Squat (Machine)":"Quads",
+    "Leg Extension (Machine)":"Quads","Goblet Squat":"Quads",
+    "Standing Abductor":"Glute Med","Lying Hip Abduction":"Glute Med",
+    "Hip Abduction (Machine)":"Glute Med","Lateral Band Walks":"Glute Med",
+    "Lat Pulldown (Cable)":"Back","Iso-Lateral Row (Machine)":"Back",
+    "Seated Row (Machine)":"Back","Face Pull":"Back",
+    "Rear Delt Reverse Fly":"Shoulders","Shoulder Press (Machine Plates)":"Shoulders",
+    "Shoulder Press (Dumbbell)":"Shoulders","Lateral Raise":"Shoulders",
+    "Bench Press (Smith Machine)":"Chest","Cable Fly Crossovers":"Chest"
+  }
+};
+
+// ═══════════════════════════════════════
+// MESO PLAN (static periodization config)
+// ═══════════════════════════════════════
+var MESO_PLAN = [
+  {label:"M8",name:"Hypertrophy",start:"2026-06-01",end:"2026-07-31",rpe:"7.5–8.5",reps:"8–12",
+   weeks:[
+     {w:1,phase:"Accumulate",focus:"Establish baseline loads. Reps should feel achievable."},
+     {w:2,phase:"Accumulate",focus:"Add 1–2 reps or tighten RPE. Same loads."},
+     {w:3,phase:"Load",      focus:"Increase top set weight. First time at new load."},
+     {w:4,phase:"Load",      focus:"Repeat new load. Match reps or better."},
+     {w:5,phase:"Strength",  focus:"Push loads up hard. Top sets should feel like RPE 8.5–9."},
+     {w:6,phase:"Strength",  focus:"Match week 5 reps. Add weight next session if you do."},
+     {w:7,phase:"Peak",      focus:"Max effort. Best reps at best weight this meso."},
+     {w:8,phase:"Deload",    focus:"50–60% loads. Flush fatigue. Protect the joints."}
+   ]},
+  {label:"M9",name:"Strength",start:"2026-08-01",end:"2026-09-30",rpe:"8.0–9.0",reps:"4–8",
+   weeks:[
+     {w:1,phase:"Intro",  focus:"Drop to 4–6 reps at M8 top weight."},
+     {w:2,phase:"Build",  focus:"Add weight if last session felt clean."},
+     {w:3,phase:"Build",  focus:"Keep pushing. Strength adaptations happening."},
+     {w:4,phase:"Peak",   focus:"Max strength attempt this block."},
+     {w:5,phase:"Deload", focus:"Half volume, 60% loads. Recover fully."}
+   ]},
+  {label:"M10",name:"Deload",start:"2026-10-01",end:"2026-10-31",rpe:"5–6",reps:"10–15",
+   weeks:[
+     {w:1,phase:"Deload",  focus:"Full reset. 50% loads, no failure ever."},
+     {w:2,phase:"Deload",  focus:"Mobility and movement quality. Let the body recover."},
+     {w:3,phase:"Reintro", focus:"Start building back. 70% loads."},
+     {w:4,phase:"Reintro", focus:"Assess lifts. Set M11 opening loads."}
+   ]},
+  {label:"M11",name:"Accumulation 2.0",start:"2026-11-01",end:"2026-12-31",rpe:"7.5–8.5",reps:"8–12",
+   weeks:[
+     {w:1,phase:"Accumulate",focus:"Start heavier than M8 week 1. You have the base."},
+     {w:2,phase:"Accumulate",focus:"Push reps. Accumulation block."},
+     {w:3,phase:"Load",focus:"Increase loads. Recapture Dec 2023 numbers."},
+     {w:4,phase:"Load",focus:"Match or beat previous load."}
+   ]}
+];
+
+// ═══════════════════════════════════════
+// LAYER 2: IMPORTED TRAINING STATE (starts empty)
+// ═══════════════════════════════════════
+var STATE = {
+  imported: false,
+  dateRange: {start:null, end:null},
+  sessions: 0,
+  exercisesAnalyzed: 0,
+  avgRPE: null,
+  lifts: {},       // liftName -> {lastW,lastR,lastRPE,lastE,sessionsAtWeight,d,ts}
+  prevLifts: {},   // snapshot before last import (for What Changed)
+  muscleVolume: {},// muscle -> hard set count
+  dailyLog: {},    // dateKey -> {sets, rpes[], ex:{name:{w,r,e1,rpe}}} — powers Map week detail
+  improved: [],
+  stalled: [],
+  warnings: [],
+  wins: [],
+  recommendations: {}
+};
+
+// ═══════════════════════════════════════
+// HEVY NAME MAP
+// ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
+// CURRENT STATUS (active today — not permanent history)
+// ═══════════════════════════════════════
+var CURRENT_STATUS = {
+  kneePain:     false,
+  ankleIssue:   false,
+  backTightness:false,
+  lowRecovery:  false
+};
+
+// ═══════════════════════════════════════
+// IMPORT HISTORY (persistent across sessions)
+// ═══════════════════════════════════════
+var IMPORT_HISTORY = [];
+
+function saveImportHistory() {
+  var snapshot = {
+    importedAt: Date.now(),
+    dateRange: STATE.dateRange,
+    sessions: STATE.sessions,
+    avgRPE: STATE.avgRPE,
+    exercisesAnalyzed: STATE.exercisesAnalyzed,
+    lifts: JSON.parse(JSON.stringify(STATE.lifts)),
+    muscleVolume: JSON.parse(JSON.stringify(STATE.muscleVolume)),
+    warnings: STATE.warnings.slice(),
+    wins: STATE.wins.slice()
+  };
+  IMPORT_HISTORY.unshift(snapshot);
+  if (IMPORT_HISTORY.length > 10) IMPORT_HISTORY.length = 10;
+  try { localStorage.setItem("ti_history", JSON.stringify(IMPORT_HISTORY)); }
+  catch(e) { console.warn("Could not save history:", e); }
+}
+
+function restoreImportHistory() {
+  try {
+    var raw = localStorage.getItem("ti_history");
+    if (!raw) return;
+    var arr = JSON.parse(raw);
+    if (Array.isArray(arr)) IMPORT_HISTORY = arr;
+  } catch(e) { console.warn("Could not restore history:", e); }
+}
+
+
+
+// ─────
+var HMAP = {
+  "Romanian Deadlift (Barbell)":"Romanian Deadlift (Barbell)",
+  "Romanian Deadlift":"Romanian Deadlift (Barbell)",
+  "RDL":"Romanian Deadlift (Barbell)",
+  "Glute Drive":"Glute Drive",
+  "Belt Squat (Machine)":"Belt Squat (Machine)",
+  "Belt Squat":"Belt Squat (Machine)",
+  "Rear Kick (Machine)":"Rear Kick (Machine)",
+  "Rear Kick":"Rear Kick (Machine)",
+  "Hip Thrust (Machine)":"Hip Thrust (Machine)",
+  "Hip Thrust":"Hip Thrust (Machine)",
+  "Standing Abductor":"Standing Abductor",
+  "Seated Leg Curl (Machine)":"Seated Leg Curl (Machine)",
+  "Seated Leg Curl":"Seated Leg Curl (Machine)",
+  "Lying Leg Curl (Machine)":"Lying Leg Curl (Machine)",
+  "Lying Leg Curl":"Lying Leg Curl (Machine)",
+  "Back Extension (Weighted Hyperextension)":"Back Extension (Weighted Hyperextension)",
+  "Back Extension":"Back Extension (Weighted Hyperextension)",
+  "Bulgarian Split Squat (Smith Machine)":"Bulgarian Split Squat (Smith Machine)",
+  "Bulgarian Split Squat":"Bulgarian Split Squat (Smith Machine)",
+  "Lat Pulldown (Cable)":"Lat Pulldown (Cable)",
+  "Lat Pulldown":"Lat Pulldown (Cable)",
+  "Shoulder Press (Machine Plates)":"Shoulder Press (Machine Plates)",
+  "Shoulder Press":"Shoulder Press (Machine Plates)",
+  "Iso-Lateral Row (Machine)":"Iso-Lateral Row (Machine)",
+  "Iso-Lateral Row":"Iso-Lateral Row (Machine)",
+  "Reverse Lunge (Smith Machine)":"Reverse Lunge (Smith Machine)",
+  "Leg Extension (Machine)":"Leg Extension (Machine)",
+  "Leg Extension":"Leg Extension (Machine)",
+  "Goblet Squat":"Goblet Squat",
+  "Cable Kickback":"Cable Kickback",
+  "B-stance RDL":"B-stance RDL",
+  "Lying Hip Abduction":"Lying Hip Abduction",
+  "Single Leg RDL":"Single Leg RDL"
+};
+
+// ═══════════════════════════════════════
+// EXERCISE NAME NORMALIZATION (single source of truth)
+// normalizeExerciseName(): raw Hevy name -> canonical key
+//   used by: imports, muscle mapping, recommendations,
+//   safety rules, comparisons, target matching.
+// shortName(): canonical key -> compact display name.
+// ═══════════════════════════════════════
+var _HMAP_CI = null;
+function normalizeExerciseName(name) {
+  name = String(name || "").replace(/"/g, "").replace(/\s+/g, " ").trim();
+  if (!name) return "";
+  if (HMAP[name]) return HMAP[name];
+  if (!_HMAP_CI) {
+    _HMAP_CI = {};
+    Object.keys(HMAP).forEach(function(k){ _HMAP_CI[k.toLowerCase()] = HMAP[k]; });
+  }
+  return _HMAP_CI[name.toLowerCase()] || name;
+}
+function shortName(name) {
+  return String(name || "").replace(/ \([^)]+\)/g, "");
+}
+
+// ═══════════════════════════════════════
+// BANNER: calcBanner + renderCoachCard
+// ═══════════════════════════════════════
+function calcBanner() {
+  var today = new Date();
+  var result = {label:"M8",name:"Hypertrophy",week:1,totalWeeks:8,
+    phase:"Accumulate",focus:"Establish baseline loads.",rpe:"7.5–8.5",reps:"8–12"};
+  for (var mi = 0; mi < MESO_PLAN.length; mi++) {
+    var m = MESO_PLAN[mi];
+    var s = new Date(m.start), e = new Date(m.end);
+    if (today >= s && today <= e) {
+      var wk = Math.min(Math.floor((today-s)/604800000)+1, m.weeks.length);
+      var wd = m.weeks[wk-1] || m.weeks[0];
+      result = {label:m.label,name:m.name,week:wk,totalWeeks:m.weeks.length,
+        phase:wd.phase,focus:wd.focus,rpe:m.rpe,reps:m.reps};
+      break;
+    }
+  }
+  return result;
+}
+
+function renderCoachCard() {
+  var el = document.getElementById("coachCard");
+  if (!el) return;
+  var b = calcBanner();
+  var chips = "<span class='chip chip-b'>RPE " + b.rpe + " &middot; " + b.reps + " reps</span>";
+  var anyFlag = false;
+  if (CURRENT_STATUS.kneePain)      { chips += "<span class='chip chip-a'>&#9888; Knee &mdash; BSS locked</span>"; anyFlag=true; }
+  if (CURRENT_STATUS.ankleIssue)    { chips += "<span class='chip chip-r'>&#9888; No sled/impact</span>"; anyFlag=true; }
+  if (CURRENT_STATUS.backTightness) { chips += "<span class='chip chip-r'>&#9888; No RDL failure</span>"; anyFlag=true; }
+  if (CURRENT_STATUS.lowRecovery)   { chips += "<span class='chip chip-a'>&#9888; Cap top sets RPE 8</span>"; anyFlag=true; }
+  if (!anyFlag) chips += "<span class='chip chip-g'>&#10003; Ready &mdash; no active cautions</span>";
+  el.innerHTML =
+    "<div class='cc-header'>" +
+      "<span class='cc-meso'>" + b.label + " &middot; " + b.name + "</span>" +
+      "<span class='cc-week'>Week " + b.week + " of " + b.totalWeeks + "</span>" +
+    "</div>" +
+    "<div class='cc-phase'>" + b.phase + "</div>" +
+    "<div class='cc-focus'>" + b.focus + "</div>" +
+    "<div class='cc-chips'>" + chips + "</div>";
+}
+
+
+// ═══════════════════════════════════════
+// LAYER 3: COACH ENGINE
+// ═══════════════════════════════════════
+function runEngine() {
+  STATE.improved = []; STATE.stalled = []; STATE.warnings = [];
+  STATE.wins = []; STATE.recommendations = {};
+
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var d = STATE.lifts[lk];
+    if (!d || !d.lastW) return;
+    var tgt = PROFILE.liftTargets[lk] || {targetR:8};
+    var targetR = tgt.targetR;
+    var jump = (lk.indexOf("Split Squat")!==-1||lk.indexOf("Belt")!==-1) ? 10 : 5;
+    var rec = {lift:lk,lastW:d.lastW,lastR:d.lastR,lastRPE:d.lastRPE,lastE:d.lastE,
+               sessionsAtWeight:d.sessionsAtWeight||0,target:d.lastW};
+
+    // Injury rules — driven by CURRENT_STATUS (today), not PROFILE history
+    if (CURRENT_STATUS.kneePain && lk.indexOf("Split Squat")!==-1) {
+      rec.action="injury"; rec.badge="INJURY — HOLD";
+      rec.reason="Knee pain active. Hold at " + d.lastW + " lbs, modified depth.";
+      rec.caution="Two pain-free sessions before attempting " + (d.lastW+jump) + " lbs.";
+    } else if (CURRENT_STATUS.backTightness && lk.indexOf("Romanian")!==-1) {
+      rec.action="reduce"; rec.badge="BACK CAUTION"; rec.target=Math.max(d.lastW-10,95);
+      rec.reason="Back tightness active. Reduce RDL intensity.";
+      rec.caution="Shift volume to B-stance RDL and leg curl this week.";
+    } else if (CURRENT_STATUS.ankleIssue && (lk.indexOf("Lunge")!==-1||lk.indexOf("Sled")!==-1)) {
+      rec.action="substitute"; rec.badge="AVOID — ANKLE";
+      rec.reason="Ankle issue active. Skip impact/instability movements.";
+      rec.caution="Substitute with BSS at reduced depth or B-stance RDL.";
+    } else if (d.sessionsAtWeight >= 3) {
+      rec.action="stall"; rec.badge="STALLED"; rec.target=d.lastW;
+      rec.reason=d.sessionsAtWeight + " sessions at " + d.lastW + " lbs with no rep improvement.";
+      rec.caution="Add drop set at " + Math.round(d.lastW*0.7/5)*5 + " lbs AMRAP, or run a 5x5 block.";
+      STATE.stalled.push(lk);
+      STATE.warnings.push({type:"stall",lift:lk,msg:d.lastW+" lbs for "+d.sessionsAtWeight+" sessions"});
+    } else if (d.lastR >= targetR+2 && (d.lastRPE===null||d.lastRPE<=8.5)) {
+      rec.action="increase"; rec.badge="INCREASE"; rec.target=d.lastW+jump;
+      rec.reason="Hit "+d.lastR+" reps (target "+targetR+") at RPE "+(d.lastRPE||"—")+". Overflowed.";
+      rec.caution=null;
+      STATE.improved.push(lk);
+      STATE.wins.push({lift:lk,msg:shortName(lk)+" ready for "+(d.lastW+jump)+" lbs"});
+    } else if (d.lastRPE!==null && d.lastRPE>=9.0) {
+      rec.action="hold"; rec.badge="HOLD — CEILING"; rec.target=d.lastW;
+      rec.reason="RPE "+d.lastRPE+" at "+d.lastW+" lbs — at ceiling. More reps first.";
+      rec.caution="Hit "+(targetR+1)+" clean reps, then earn "+(d.lastW+jump)+" lbs.";
+    } else if (d.lastR >= targetR-1 && d.lastR < targetR+2) {
+      rec.action="hold"; rec.badge="ON TARGET"; rec.target=d.lastW;
+      rec.reason="On target: "+d.lastW+"×"+d.lastR+". Add 1 rep or tighten RPE, then increase.";
+      rec.caution=null;
+    } else if (d.lastR < targetR-2) {
+      rec.action="reduce"; rec.badge="REDUCE"; rec.target=d.lastW-jump;
+      rec.reason="Only "+d.lastR+" reps vs target "+targetR+". Drop to "+(d.lastW-jump)+" lbs.";
+      rec.caution="Rebuild reps to "+targetR+"+ before going back up.";
+      STATE.warnings.push({type:"regress",lift:lk,msg:shortName(lk)+" missed target"});
+    } else {
+      rec.action="building"; rec.badge="BUILDING"; rec.target=d.lastW;
+      rec.reason="Building reps at "+d.lastW+" lbs. Keep going."; rec.caution=null;
+    }
+    // Post-processing: low recovery caps increases
+    if (CURRENT_STATUS.lowRecovery && rec.action==="increase") {
+      rec.action="hold"; rec.badge="HOLD — RECOVERY";
+      rec.reason="Low recovery today. Hold load, chase reps instead.";
+      rec.caution="Re-evaluate next session when recovery improves.";
+    }
+    STATE.recommendations[lk] = rec;
+  });
+
+  // Volume rules — only when real data exists
+  if (!STATE.imported || STATE.exercisesAnalyzed === 0) return;
+  var g=STATE.muscleVolume["Glutes"]||0, h=STATE.muscleVolume["Hamstrings"]||0;
+  var b=STATE.muscleVolume["Back"]||0, gm=STATE.muscleVolume["Glute Med"]||0;
+  if (g>0 && h < g*0.55)
+    STATE.warnings.push({type:"volume",flag:"hamstring_gap",
+      msg:"Hamstrings "+h+" sets vs Glutes "+g+" sets. Add 2–4 RDL or leg curl sets."});
+  if (b < 6)
+    STATE.warnings.push({type:"volume",flag:"pull_low",
+      msg:"Back volume low ("+b+" sets). One pull session per week minimum."});
+  if (gm < 6)
+    STATE.warnings.push({type:"volume",flag:"glute_med",
+      msg:"Glute medius "+gm+" sets. Banded abduction every session."});
+}
+
+// ═══════════════════════════════════════
+// INTELLIGENCE RENDERERS
+// ═══════════════════════════════════════
+
+function suggestedSession() {
+  var days = ["Rest","Posterior Chain","Glute & Quad","Unilateral","Upper Pull","Glute & Quad","Rest"];
+  return days[new Date().getDay()];
+}
+
+// ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
+function renderNextSessionCoach() {
+  var el = document.getElementById("nextSessionCoach");
+  if (!el) return;
+  if (!STATE.imported) {
+    el.innerHTML = "<div class='coach-brief'>" +
+      "<div class='coach-brief-hd'>&#9889; Next Session Coach</div>" +
+      "<div style='padding:12px 14px;font-size:11px;color:var(--t2);line-height:1.6'>" +
+      "Import your Hevy CSV (Intelligence &rarr; Import) and this card will tell you what to push, hold, and protect before you walk in.</div></div>";
+    return;
+  }
+
+  var push=[], hold=[], protect=[];
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var r = STATE.recommendations[lk];
+    if (!r) return;
+    if (r.action==="increase") push.push(r);
+    else if (r.action==="hold"||r.action==="stall"||r.action==="building") hold.push(r);
+    else if (r.action==="injury"||r.action==="reduce"||r.action==="substitute") protect.push(r);
+  });
+
+  // Top 3 recommendations, ranked by urgency (same signal the Next tab shows)
+  var rank = {injury:0, substitute:1, stall:2, reduce:3, increase:4, hold:5, building:6};
+  var top3 = PROFILE.priorityLifts
+    .map(function(lk){ return STATE.recommendations[lk]; })
+    .filter(function(r){ return r && r.action !== "building"; })
+    .sort(function(a,b){ return (rank[a.action]||9)-(rank[b.action]||9); })
+    .slice(0,3);
+  var aC = {increase:"var(--gr)",hold:"var(--bl)",reduce:"var(--re)",
+            stall:"var(--am)",injury:"var(--re)",substitute:"var(--re)"};
+
+  function nameRow(list, col) {
+    return list.length
+      ? list.map(function(r){ return "<span style='color:"+col+";font-weight:600'>"+shortName(r.lift)+"</span>"; }).join(", ")
+      : "<span style='color:var(--t3)'>None</span>";
+  }
+
+  el.innerHTML = "<div class='coach-brief'>" +
+    "<div class='coach-brief-hd'>&#9889; Next Session Coach</div>" +
+    "<div style='padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04)'>" +
+      "<div style='font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px'>Suggested session</div>" +
+      "<div style='font-size:14px;font-weight:800;color:var(--or)'>"+suggestedSession()+"</div>" +
+    "</div>" +
+    "<div style='padding:10px 14px;font-size:11px;line-height:2;border-bottom:1px solid rgba(255,255,255,0.04)'>" +
+      "<span style='color:var(--t3)'>Push:</span> "+nameRow(push,"var(--gr)")+"<br>" +
+      "<span style='color:var(--t3)'>Hold:</span> "+nameRow(hold,"var(--bl)")+"<br>" +
+      "<span style='color:var(--t3)'>Protect:</span> "+nameRow(protect,"var(--re)") +
+    "</div>" +
+    top3.map(function(r){
+      var col = aC[r.action]||"var(--t2)";
+      return "<div class='cbrow'><span class='cbbadge' style='color:"+col+"'>"+r.badge+"</span>" +
+        "<div><div class='cbname'>"+shortName(r.lift)+" &rarr; "+r.target+" lbs</div>" +
+        "<div class='cbreason'>"+r.reason+"</div></div></div>";
+    }).join("") +
+  "</div>";
+}
+
+// ── Dashboard ──
+function renderDashboard() {
+  var el = document.getElementById("t-dash");
+  if (!el) return;
+  var b = calcBanner();
+  if (!STATE.imported) {
+    el.innerHTML = "<div class='empty-state'>" +"<div style='font-size:32px;margin-bottom:10px'>&#129504;</div>" +"<div style='font-size:14px;font-weight:700;color:var(--tx);margin-bottom:8px'>Your personal trainer is ready.</div>" +"<div style='font-size:12px;color:var(--t2);margin-bottom:16px;line-height:1.7'>After import, I'll show what improved, what stalled, what to push next, and what to protect.</div>" +"<div style='font-size:11px;color:var(--t3);line-height:1.9'>&#8593; Improved lifts &bull; next target load<br>&#9632; Stalled lifts &bull; plateau-break suggestions<br>&#9658; Load recommendations per lift<br>&#9888; Injury and caution flags</div>" +"</div>";
+    return;
+  }
+  var notes = {
+    Accumulate:"Volume day. Prioritise reps over load. Leave 1–2 reps in reserve.",
+    Load:"Increase top set weight. First time at new load — aim for same rep count.",
+    Strength:"Heavy day. Push the load. Top sets should feel like a hard 8.5–9.",
+    Peak:"Max effort. Leave nothing. Rep PR attempt for this meso.",
+    Deload:"Easy day. 50–60% loads. Move well, recover fully.",
+    Intro:"Light intro at new rep range.", Build:"Add weight if last session felt clean.",
+    Reintro:"Return from deload. 70% loads, focus on movement quality."
+  };
+  var note = notes[b.phase] || "Beat one metric from last session.";
+  var suggested = suggestedSession();
+  var win = deriveBiggestWin(STATE, STATE.recommendations), warn = STATE.warnings[0];
+
+  el.innerHTML =
+    // Stat row
+    "<div class='dash-grid'>" +
+      statBox("Meso Block",b.label+" &middot; "+b.name,"Week "+b.week+"/"+b.totalWeeks) +
+      statBox("Sessions",STATE.sessions+"","This period") +
+      statBox("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1):"—","Target 7.5–8.5") +
+      statBox("Improved",STATE.improved.length+"","lifts this period") +
+    "</div>" +
+    // Biggest win
+    "<div class='dash-sec'>Biggest win</div>" +
+    (win
+      ? dashCard("win",win.icon,win.title,win.body)
+      : "<div class='dash-card'><div class='dash-card-body'>No wins yet this period.</div></div>") +
+    // Warning
+    (warn ? "<div class='dash-sec'>Watch this</div>" +
+      dashCard("warn","&#9888;",warn.lift||warn.flag||"Volume",warn.msg) : "") +
+    // Coach note
+    "<div class='dash-sec'>Today</div>" +
+    dashCard("coach","&#127947;",b.phase + " phase",note) +
+    "<div class='dash-sec'>Suggested session</div>" +
+    dashCard("suggest","&#128197;",suggested,"Switch to Gym tab to build your session.");
+}
+
+// ── What Changed ──
+function renderWhatChanged() {
+  var el = document.getElementById("t-changed");
+  if (!el) return;
+  if (!STATE.imported) {
+    el.innerHTML = emptyState("Import Hevy CSV to see what changed.",""); return;
+  }
+  // Use IMPORT_HISTORY for comparison — prev = history[1] (import before latest)
+  var curr = STATE.lifts;
+  var prev = IMPORT_HISTORY.length >= 2 ? IMPORT_HISTORY[1].lifts : STATE.prevLifts;
+  var hasPrev = prev && Object.keys(prev).length > 0;
+  var allKeys = Object.keys(curr);
+
+  if (!allKeys.length) {
+    el.innerHTML = emptyState("No lift data in this import.","Try a wider date range."); return;
+  }
+  if (!hasPrev) {
+    el.innerHTML = "<div class='cc'>" +
+      "<div class='cl'>First import recorded</div>" +
+      "<div style='font-size:12px;color:var(--t2);line-height:1.6'>" +
+      "Baseline saved with "+allKeys.length+" exercises across "+STATE.sessions+" sessions.<br>" +
+      "Import again after your next training week to see what changed." +
+      "</div></div>" +
+      "<div class='cc' style='margin-top:0'><div class='cl'>This import</div>" +
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>" +
+      impStat("Sessions",STATE.sessions+"") +
+      impStat("Exercises",allKeys.length+"") +
+      impStat("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1):"—") +
+      impStat("Date range",STATE.dateRange.start+" \u2192 "+STATE.dateRange.end) +
+      "</div></div>";
+    return;
+  }
+
+  var improved=[],held=[],regressed=[],newLifts=[];
+  allKeys.forEach(function(lk) {
+    var c=curr[lk], p=prev[lk];
+    var name=shortName(lk);
+    if (!p) { newLifts.push({name:name,c:c}); return; }
+    var eDiff=c.lastE-(p.lastE||0);
+    var rpeDiff=(c.lastRPE!==null&&p.lastRPE!==null)?(p.lastRPE-c.lastRPE):0;
+    if (c.lastW>p.lastW)
+      improved.push({name:name,c:c,p:p,reason:"Load up: "+p.lastW+" \u2192 "+c.lastW+" lbs."});
+    else if (c.lastW===p.lastW&&c.lastR>p.lastR)
+      improved.push({name:name,c:c,p:p,reason:"More reps: "+p.lastR+" \u2192 "+c.lastR+" at "+c.lastW+" lbs."});
+    else if (c.lastW===p.lastW&&c.lastR===p.lastR&&rpeDiff>=0.5)
+      held.push({name:name,c:c,p:p,reason:"Same load/reps. RPE eased by "+rpeDiff.toFixed(1)+" \u2014 getting stronger at this weight."});
+    else if (c.lastW===p.lastW&&c.lastR===p.lastR)
+      held.push({name:name,c:c,p:p,reason:"Held: "+c.lastW+" lbs \u00d7"+c.lastR+(c.sessionsAtWeight>=3?" ("+c.sessionsAtWeight+" sessions \u2014 stall risk)":"")+"."});
+    else if (c.lastR<p.lastR||c.lastW<p.lastW)
+      regressed.push({name:name,c:c,p:p,reason:"Dropped: "+p.lastW+"\u00d7"+p.lastR+" \u2192 "+c.lastW+"\u00d7"+c.lastR+"."});
+  });
+
+  function changeList(items,col,icon) {
+    return "<div class='change-list'>" + items.map(function(item) {
+      return "<div class='change-row'><span class='change-icon "+col+"'>"+icon+"</span>" +
+        "<div><div class='change-name'>"+item.name+"</div><div class='change-reason'>"+item.reason+"</div></div></div>";
+    }).join("") + "</div>";
+  }
+
+  var html = "";
+
+  // Session / RPE summary comparison
+  var prevH = IMPORT_HISTORY.length>=2 ? IMPORT_HISTORY[1] : null;
+  if (prevH) {
+    var sessDiff = STATE.sessions - prevH.sessions;
+    var rpeDiff2 = STATE.avgRPE && prevH.avgRPE ? (STATE.avgRPE-prevH.avgRPE).toFixed(1) : null;
+    html += "<div class='cc'><div class='cl'>Import comparison</div>" +
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>" +
+      impStat("Sessions",STATE.sessions+(sessDiff!==0?" ("+(sessDiff>0?"+":"")+sessDiff+")":"")) +
+      impStat("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1)+(rpeDiff2?" ("+(parseFloat(rpeDiff2)>0?"+":"")+rpeDiff2+")":""):"—") +
+      impStat("Exercises",STATE.exercisesAnalyzed+"") +
+      impStat("vs import",IMPORT_HISTORY.length>=2?new Date(prevH.importedAt).toLocaleDateString("en-CA",{month:"short",day:"numeric"}):"—") +
+      "</div></div>";
+  }
+
+  if (improved.length) html += "<div class='dash-sec'>Improved</div>"+changeList(improved,"g","&#8593;");
+  if (held.length) html += "<div class='dash-sec'>Held / Steady</div>"+changeList(held,"b","&#8594;");
+  if (regressed.length) html += "<div class='dash-sec'>Regressed</div>"+changeList(regressed,"r","&#8595;");
+  if (newLifts.length) {
+    html += "<div class='dash-sec'>New this period</div><div class='change-list'>" +
+      newLifts.slice(0,5).map(function(item) {
+        return "<div class='change-row'><span class='change-icon b'>&#9679;</span>" +
+          "<div><div class='change-name'>"+item.name+"</div>" +
+          "<div class='change-reason'>First logged in this import period.</div></div></div>";
+      }).join("") + "</div>";
+  }
+
+  // Volume note
+  var gv=STATE.muscleVolume["Glutes"]||0, hv=STATE.muscleVolume["Hamstrings"]||0;
+  if (gv>0&&hv<gv*0.6)
+    html += "<div class='dash-sec'>Volume shift needed</div><div class='change-list'>" +
+      "<div class='change-row'><span class='change-icon a'>&#9888;</span>" +
+      "<div><div class='change-name'>Hamstrings trailing</div>" +
+      "<div class='change-reason'>"+hv+" sets vs "+gv+" glute sets. Add 2\u20134 hard sets next week.</div></div></div></div>";
+
+  if (!html) html = "<div style='padding:16px;color:var(--t2);font-size:12px'>Not enough data to compare. Import again after your next training week.</div>";
+  el.innerHTML = html;
+}
+
+
+function renderNextWeek() {
+  var el = document.getElementById("t-next");
+  if (!el) return;
+  if (!STATE.imported) {
+    el.innerHTML = emptyState("Import Hevy CSV to generate next-week prescriptions.",""); return;
+  }
+  var aC = {increase:"var(--gr)",hold:"var(--bl)",reduce:"var(--re)",
+             stall:"var(--am)",injury:"var(--re)",building:"var(--t2)"};
+  var aBg = {increase:"#30d15812",hold:"#0a84ff10",reduce:"#ff453a10",
+              stall:"#ffd60a10",injury:"#ff453a10",building:"#ffffff06"};
+  var html = "<div style='font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Generated from your last import &bull; "+STATE.dateRange.end+". Keep logging in Hevy.</div>";
+
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var rec = STATE.recommendations[lk];
+    if (!rec) return;
+    var col = aC[rec.action]||"var(--t2)";
+    var bg  = aBg[rec.action]||"var(--bg3)";
+    var name = shortName(lk);
+    html += "<div class='nx-card'>" +
+      "<div class='nx-head'>" +
+        "<div class='nx-name'>"+name+"</div>" +
+        "<span class='nx-badge' style='background:"+bg+";color:"+col+"'>"+rec.badge+"</span>" +
+      "</div>" +
+      "<div class='nx-stats'>" +
+        nxStat("Last top set", rec.lastW ? rec.lastW+" lbs &times;"+rec.lastR+(rec.lastRPE?" @RPE"+rec.lastRPE:"") : "—") +
+        nxStat("Next target","<span style='color:"+col+";font-weight:700'>"+rec.target+" lbs</span>") +
+      "</div>" +
+      "<div class='nx-reason'>"+rec.reason+"</div>" +
+      (rec.caution?"<div class='nx-caution'>&#9876; "+rec.caution+"</div>":"") +
+    "</div>";
+  });
+
+  STATE.warnings.filter(function(w){return w.type==="volume";}).forEach(function(w) {
+    html += "<div class='nx-vol-warn'>&#128202; "+w.msg+"</div>";
+  });
+
+  el.innerHTML = html;
+}
+
+// ── Training Map ──
+function renderMap() {
+  var el = document.getElementById("t-map");
+  if (!el) return;
+  var b = calcBanner();
+
+  var PHASES = [
+    {label:"M8",name:"Hypertrophy",period:"Jun\u2013Jul '26",color:"var(--bl)",active:b.label==="M8",
+     purpose:"Rebuild glute and hamstring strength through 8\u201312 rep work at RPE 7.5\u20138.5.",
+     emphasis:"Volume and rep quality over max loads.",
+     keyLifts:["Glute Drive","RDL","Hip Thrust","Leg Curl"],
+     success:"Glute Drive toward 490 e1RM, RDL toward 210, Leg Curl toward 140."},
+    {label:"M9",name:"Strength",   period:"Aug\u2013Sep '26",color:"#bf5af2",active:b.label==="M9",
+     purpose:"Convert hypertrophy base into top-end strength at 4\u20138 reps.",
+     emphasis:"Load progression. Every session should feel like a new record attempt.",
+     keyLifts:["Glute Drive","RDL","BSS","Rear Kick"],
+     success:"Glute Drive toward 540 e1RM, RDL toward 225, BSS toward 155."},
+    {label:"M10",name:"Deload",    period:"Oct '26",color:"var(--t3)",active:b.label==="M10",
+     purpose:"Full nervous system and connective tissue recovery.",
+     emphasis:"50\u201360% loads. Movement quality only. No failure.",
+     keyLifts:["All \u2014 reduced"],
+     success:"No new pain. Ready to accumulate again."},
+    {label:"M11",name:"Accum. 2.0",period:"Nov\u2013Dec '26",color:"var(--or)",active:b.label==="M11",
+     purpose:"Accumulation at heavier loads than M8, targeting Dec 2023 peak recapture.",
+     emphasis:"Start heavier than M8 week 1. The base is built. Use it.",
+     keyLifts:["Glute Drive","RDL","Hip Thrust","BSS","Leg Curl"],
+     success:"Recapture Dec 2023 peaks: RDL 205 lbs, BSS 140 lbs, Glute Drive 540+ e1RM."}
+  ];
+
+  // Phase cards — clickable
+  var phaseRow = "<div class='phase-row'>" + PHASES.map(function(p) {
+    return "<div class='phase-card"+(p.active?" phase-active":"")+"' style='border-top:3px solid "+p.color+"' "+
+      "data-mapphase='"+p.label+"'>" +
+      "<div class='phase-label' style='color:"+p.color+"'>"+p.label+(p.active?" \u25cf":"")+"</div>" +
+      "<div class='phase-name'>"+p.name+"</div>" +
+      "<div class='phase-period'>"+p.period+"</div></div>";
+  }).join("") + "</div>";
+
+  // Phase detail card (hidden by default)
+  var phaseDetail = "<div id='phaseDetail' style='display:none;margin-bottom:10px'></div>";
+
+  // Week dots — clickable
+  var weekDots = "<div class='week-row'>" +
+    Array.from({length:b.totalWeeks}, function(_,i) {
+      var w=i+1, act=w===b.week, done=w<b.week;
+      var wkData = MESO_PLAN.reduce(function(acc,m){return acc||((m.label===b.label)?m.weeks[w-1]:null);},null);
+      var ph = wkData?wkData.phase:"";
+      return "<div class='wdot"+(act?" wdot-active":done?" wdot-done":"")+"' data-mapweek='"+w+"' title='Week "+w+(ph?" \u2014 "+ph:"")+"'>W"+w+"</div>";
+    }).join("") +
+  "</div>";
+
+  // Week detail card
+  var weekDetail = "<div id='weekDetail' style='display:none;margin-bottom:0'></div>";
+
+  // Lift progress
+  var liftRows = PROFILE.priorityLifts.slice(0,6).map(function(lk) {
+    var t=PROFILE.liftTargets[lk], d=STATE.lifts[lk];
+    var cur=d?d.lastE:null;
+    var pct=(cur&&t.M8e)?Math.min(Math.round(cur/t.M8e*100),100):0;
+    var n=shortName(lk);
+    return "<div class='map-lift'>" +
+      "<div class='map-lift-row'>" +
+        "<span class='map-lift-name'>"+n+"</span>" +
+        "<span class='map-lift-vals'>"+(cur||"\u2014")+" \u2192 <span class='g'>"+t.M8e+"</span> \u2192 <span style='color:var(--or)'>"+t.goale+"</span></span>" +
+      "</div>" +
+      "<div class='map-bar-bg'><div class='map-bar-fill' style='width:"+pct+"%'></div></div>" +
+      "<div class='map-bar-labels'><span>Now"+(cur?" ("+cur+")":"")+"</span><span>M8: "+t.M8e+"</span><span>Goal: "+t.goale+"</span></div>" +
+    "</div>";
+  }).join("");
+
+  el.innerHTML =
+    phaseRow + phaseDetail +
+    "<div class='cc'><div class='cl'>Week in block</div>" +
+      weekDots +
+      "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" \u00b7 "+b.phase+"</div>" +
+      weekDetail +
+    "</div>" +
+    "<div class='cc'><div class='cl'>Lift targets \u2192 e1RM (Now \u2192 M8 target \u2192 Dec 2026 goal)</div>"+liftRows+"</div>" +
+    "<div class='ib'>" +
+      ir("\u2728","<strong>Dec 2026 goal:</strong> Recapture Dec 2023 peaks \u2014 RDL 205 lbs, BSS 140 lbs, Glute Drive 540+ lbs e1RM.") +
+      ir("\u2659","<strong>Back health:</strong> Hamstring:Glute ratio 1.5:1 or better is the single biggest lever for glute development and back health.") +
+    "</div>";
+
+  // Store PHASES for click handler access
+  el._phases = PHASES;
+}
+
+// ── Map click helpers ──
+function showPhaseDetail(label) {
+  var el = document.getElementById("t-map");
+  if (!el) return;
+  var detail = document.getElementById("phaseDetail");
+  if (!detail) return;
+  var phases = el._phases;
+  if (!phases) return;
+  var p = null;
+  for (var i=0;i<phases.length;i++){if(phases[i].label===label){p=phases[i];break;}}
+  if (!p) return;
+
+  var cur = document.getElementById("phaseDetail").dataset.open;
+  if (cur===label) { detail.style.display="none"; detail.dataset.open=""; return; }
+  detail.dataset.open = label;
+  detail.innerHTML =
+    "<div class='cc' style='border-color:"+p.color+"30;margin:0 0 10px'>" +
+      "<div class='cl' style='color:"+p.color+"'>"+p.label+" \u2014 "+p.name+" ("+p.period+")</div>" +
+      "<div style='font-size:11px;color:var(--t2);line-height:1.8'>" +
+        "<strong style='color:var(--tx)'>Purpose:</strong> "+p.purpose+"<br>" +
+        "<strong style='color:var(--tx)'>Emphasis:</strong> "+p.emphasis+"<br>" +
+        "<strong style='color:var(--tx)'>Key lifts:</strong> "+p.keyLifts.join(", ")+"<br>" +
+        "<strong style='color:var(--tx)'>Success:</strong> "+p.success +
+      "</div>" +
+    "</div>";
+  detail.style.display = "block";
+}
+
+function showWeekDetail(w) {
+  var b = calcBanner();
+  var detail = document.getElementById("weekDetail");
+  if (!detail) return;
+  var cur = detail.dataset.open;
+  if (cur===String(w)) { detail.style.display="none"; detail.dataset.open=""; return; }
+  detail.dataset.open = String(w);
+
+  var meso = null, wkData = null;
+  MESO_PLAN.forEach(function(m){ if(m.label===b.label){ meso=m; if(m.weeks[w-1]) wkData=m.weeks[w-1]; } });
+  if (!wkData) return;
+
+  var phaseColors = {Accumulate:"var(--bl)",Load:"var(--or)",Strength:"#bf5af2",
+                     Peak:"var(--re)",Deload:"var(--t3)",Intro:"var(--bl)",
+                     Build:"var(--or)",Reintro:"var(--gr)"};
+  var col = phaseColors[wkData.phase]||"var(--t2)";
+
+  // ── Aggregate imported data for this calendar week ──
+  var mesoStart = new Date(meso.start+"T12:00:00");
+  var wkStart = new Date(mesoStart.getTime() + (w-1)*604800000);
+  var wkEnd   = new Date(wkStart.getTime() + 604800000);
+  function inWeek(dk){ var t=new Date(dk+"T12:00:00").getTime(); return t>=wkStart.getTime() && t<wkEnd.getTime(); }
+
+  var dates = Object.keys(STATE.dailyLog||{}).sort();
+  var wkDates = dates.filter(inWeek);
+  var priorDates = dates.filter(function(dk){ return new Date(dk+"T12:00:00").getTime() < wkStart.getTime(); });
+
+  var dataHtml = "";
+  if (wkDates.length) {
+    var sets=0, rpes=[], bestByLift={}, mVol={};
+    wkDates.forEach(function(dk){
+      var d = STATE.dailyLog[dk];
+      sets += d.sets; rpes = rpes.concat(d.rpes);
+      Object.keys(d.ex).forEach(function(lk){
+        var e = d.ex[lk];
+        if (!bestByLift[lk] || e.e1 > bestByLift[lk].e1) bestByLift[lk] = e;
+        var m = PROFILE.muscleMap[lk];
+        if (m) mVol[m] = (mVol[m]||0) + 1;
+      });
+    });
+    var avgRPE = rpes.length ? (rpes.reduce(function(a,x){return a+x;},0)/rpes.length).toFixed(1) : "\u2014";
+
+    // Top lifts by e1RM this week
+    var top = Object.keys(bestByLift).sort(function(a,c){return bestByLift[c].e1-bestByLift[a].e1;}).slice(0,3)
+      .map(function(lk){ var e=bestByLift[lk]; return shortName(lk)+" "+e.w+"\u00d7"+e.r+" (e1RM "+e.e1+")"; });
+
+    // Best e1RM changes vs before this week
+    var deltas = [];
+    Object.keys(bestByLift).forEach(function(lk){
+      var priorBest = 0;
+      priorDates.forEach(function(dk){
+        var e = STATE.dailyLog[dk].ex[lk];
+        if (e && e.e1 > priorBest) priorBest = e.e1;
+      });
+      if (priorBest > 0) deltas.push({lk:lk, d:bestByLift[lk].e1 - priorBest});
+    });
+    deltas.sort(function(a,c){return c.d-a.d;});
+    var deltaStr = deltas.slice(0,2).map(function(x){
+      return shortName(x.lk)+" "+(x.d>=0?"+":"")+x.d+" lbs e1RM";
+    }).join(" \u00b7 ");
+
+    var volStr = Object.keys(mVol).sort(function(a,c){return mVol[c]-mVol[a];})
+      .map(function(m){return m+" "+mVol[m];}).join(" \u00b7 ");
+
+    // Dynamic coach note for the week
+    var note;
+    if (deltas.length && deltas[0].d >= 5) note = shortName(deltas[0].lk)+" moved "+deltas[0].d+" lbs e1RM \u2014 momentum. Ride it, don\u2019t chase every lift at once.";
+    else if (rpes.length && parseFloat(avgRPE) > 8.7) note = "Avg RPE "+avgRPE+" is hot for "+wkData.phase+". Watch recovery before adding load.";
+    else if (rpes.length && parseFloat(avgRPE) < 7.0 && wkData.phase!=="Deload") note = "Avg RPE "+avgRPE+" is soft \u2014 working sets should live at 7.5+ this phase.";
+    else note = wkDates.length+" session"+(wkDates.length>1?"s":"")+" banked. "+wkData.focus;
+
+    dataHtml =
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px'>" +
+        impStat("Sessions", wkDates.length+"") +
+        impStat("Avg RPE", avgRPE) +
+      "</div>" +
+      (top.length ? "<div style='font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6'><strong style='color:var(--tx)'>Top lifts:</strong> "+top.join("<br>")+"</div>" : "") +
+      (deltaStr ? "<div style='font-size:11px;color:var(--gr);margin-top:6px'>&#8593; "+deltaStr+"</div>" : "") +
+      (volStr ? "<div style='font-size:11px;color:var(--t2);margin-top:6px'><strong style='color:var(--tx)'>Volume:</strong> "+volStr+" sets</div>" : "") +
+      "<div style='font-size:11px;color:var(--am);margin-top:8px;line-height:1.6'>&#127947; "+note+"</div>";
+  } else {
+    dataHtml = "<div style='font-size:11px;color:var(--t3);margin-top:8px'>" +
+      (w > b.week ? "Upcoming \u2014 no data yet. "+wkData.focus
+                  : "No Hevy sessions imported for this week.") + "</div>";
+  }
+
+  detail.innerHTML = "<div style='margin:10px 0 0;padding:10px 14px;background:var(--bg3);border-radius:10px;border-left:3px solid "+col+"'>" +
+    "<div style='font-size:10px;font-weight:700;color:"+col+";text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px'>Week "+w+" \u2014 "+wkData.phase+"</div>" +
+    "<div style='font-size:12px;color:var(--tx);font-weight:600;margin-bottom:4px'>"+b.name+", "+b.rpe+" RPE \u00b7 "+b.reps+" reps</div>" +
+    "<div style='font-size:11px;color:var(--t2);line-height:1.6'>"+wkData.focus+"</div>" +
+    dataHtml +
+    "</div>";
+  detail.style.display = "block";
+}
+
+
+// ═══════════════════════════════════════
+// DERIVE BIGGEST WIN
+// ═══════════════════════════════════════
+function deriveBiggestWin(state, recs) {
+  var b = calcBanner();
+  state = state || STATE;
+  recs = recs || state.recommendations || {};
+  if (!state.imported) return null;
+
+  // Previous import snapshot — same source Changed uses
+  var prevSnap = IMPORT_HISTORY.length >= 2 ? IMPORT_HISTORY[1] : null;
+  var prevLifts = prevSnap ? prevSnap.lifts : (state.prevLifts || {});
+  var hasPrev = prevLifts && Object.keys(prevLifts).length > 0;
+
+  // 1. Stalled lift resolved — the hardest win to earn
+  if (prevSnap && prevSnap.warnings) {
+    var prevStalls = prevSnap.warnings.filter(function(w){return w.type==="stall";}).map(function(w){return w.lift;});
+    var resolved = prevStalls.filter(function(lk){ return state.stalled.indexOf(lk)===-1 && state.lifts[lk]; });
+    if (resolved.length) {
+      var rl = resolved[0], rd = state.lifts[rl];
+      return {icon:"&#128165;", title:"Stall broken: "+shortName(rl),
+        body:"This lift was flagged stalled last import. Now moving again"+(rd?" at "+rd.lastW+" lbs \u00d7"+rd.lastR:"")+". Breaking a plateau beats any single PR."};
+    }
+  }
+
+  // 2. e1RM improvement on priority lift
+  var bestE = null, bestDelta = 0;
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var cur = state.lifts[lk], prev = prevLifts[lk];
+    if (!cur || !prev || !cur.lastE || !prev.lastE) return;
+    var d = cur.lastE - prev.lastE;
+    if (d > bestDelta) { bestDelta = d; bestE = {lk:lk, cur:cur, prev:prev, d:d}; }
+  });
+  if (bestE) {
+    return {icon:"&#128200;", title:"Strength win: "+shortName(bestE.lk),
+      body:"e1RM up "+bestE.d+" lbs ("+bestE.prev.lastE+" \u2192 "+bestE.cur.lastE+" lbs). Momentum is real."};
+  }
+
+  // 3. More reps at same weight
+  var bestR = null, bestRg = 0;
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var cur = state.lifts[lk], prev = prevLifts[lk];
+    if (!cur||!prev||cur.lastW!==prev.lastW) return;
+    var g = cur.lastR - prev.lastR;
+    if (g > bestRg) { bestRg=g; bestR={lk:lk,cur:cur,prev:prev,g:g}; }
+  });
+  if (bestR) {
+    return {icon:"&#127919;", title:"Rep win: "+shortName(bestR.lk),
+      body:bestR.prev.lastR+" \u2192 "+bestR.cur.lastR+" reps at "+bestR.cur.lastW+" lbs. That rep is the signal to step up."};
+  }
+
+  // 4. RPE improvement at same load+reps
+  var bestRPE = null;
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var cur = state.lifts[lk], prev = prevLifts[lk];
+    if (!cur||!prev||!cur.lastRPE||!prev.lastRPE) return;
+    if (cur.lastW===prev.lastW && cur.lastR===prev.lastR && prev.lastRPE-cur.lastRPE >= 0.5)
+      bestRPE = {lk:lk,cur:cur,prev:prev};
+  });
+  if (bestRPE) {
+    return {icon:"&#127775;", title:"Efficiency win: "+shortName(bestRPE.lk),
+      body:"RPE dropped "+bestRPE.prev.lastRPE+" \u2192 "+bestRPE.cur.lastRPE+" at same load and reps. The weight is getting easier \u2014 step up when ready."};
+  }
+
+  // 5. Lift ready to increase (from coaching recommendations)
+  var readyLk = null;
+  PROFILE.priorityLifts.forEach(function(lk) {
+    if (!readyLk && recs[lk] && recs[lk].action==="increase") readyLk = lk;
+  });
+  if (readyLk) {
+    var rr2 = recs[readyLk];
+    return {icon:"&#127942;", title:shortName(readyLk)+" ready to increase",
+      body:rr2.lastW+" \u00d7"+rr2.lastR+(rr2.lastRPE?" @RPE "+rr2.lastRPE:"")+" overflowed the target. Next session: "+rr2.target+" lbs."};
+  }
+
+  // 6. Priority muscle volume improved vs last import
+  if (prevSnap && prevSnap.muscleVolume) {
+    var bestVol = null, bestVolGain = 0;
+    PROFILE.priorityMuscles.forEach(function(m) {
+      var c = state.muscleVolume[m]||0, p = prevSnap.muscleVolume[m]||0;
+      if (p > 0 && c - p >= 3 && c - p > bestVolGain) { bestVolGain = c-p; bestVol = {m:m,c:c,p:p}; }
+    });
+    if (bestVol) return {icon:"&#128170;", title:bestVol.m+" volume up",
+      body:bestVol.p+" \u2192 "+bestVol.c+" hard sets vs last import. Priority muscle getting priority treatment."};
+  }
+
+  // 7. Hamstring:glute ratio improved vs last import
+  var g=state.muscleVolume["Glutes"]||0, h=state.muscleVolume["Hamstrings"]||0;
+  if (prevSnap && prevSnap.muscleVolume) {
+    var pg=prevSnap.muscleVolume["Glutes"]||0, ph=prevSnap.muscleVolume["Hamstrings"]||0;
+    if (g>0 && pg>0 && ph/pg < h/g && h/g >= 0.5)
+      return {icon:"&#9878;", title:"Hamstring:glute ratio improving",
+        body:"Ratio moved "+(ph/pg).toFixed(2)+" \u2192 "+(h/g).toFixed(2)+". This is the single biggest lever for glute development and back health."};
+  }
+
+  // 8. Avg RPE in target zone
+  if (state.avgRPE) {
+    var rr = b.rpe.split("\u2013").map(parseFloat);
+    if (rr.length===2 && state.avgRPE>=rr[0] && state.avgRPE<=rr[1])
+      return {icon:"&#127919;", title:"Intensity aligned",
+        body:"Avg RPE "+state.avgRPE.toFixed(1)+" sits inside the "+b.label+" target range ("+b.rpe+"). Training intensity is calibrated correctly."};
+  }
+
+  // 9. Progress toward block target e1RM
+  var bestPct = 0, bestProg = null;
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var d = state.lifts[lk], t = PROFILE.liftTargets[lk];
+    if (!d||!t||!t.M8e) return;
+    var pct = d.lastE/t.M8e;
+    if (pct > bestPct) { bestPct=pct; bestProg={lk:lk,d:d,t:t,pct:Math.round(pct*100)}; }
+  });
+  if (bestProg && bestProg.pct >= 70) {
+    return {icon:"&#127775;", title:"Map win: "+shortName(bestProg.lk),
+      body:bestProg.d.lastE+" lbs e1RM \u2014 "+bestProg.pct+"% toward M8 target of "+bestProg.t.M8e+" lbs."};
+  }
+
+  // 10. Consistency
+  if (state.sessions >= 10)
+    return {icon:"&#9989;", title:"Consistency win",
+      body:state.sessions+" sessions this period. Showing up is compounding. Most people don\u2019t."};
+
+  // 11. Hamstring volume healthy (absolute)
+  if (h>0&&g>0&&h/g>=0.6)
+    return {icon:"&#128200;", title:"Volume balance",
+      body:"Hamstrings at "+h+" sets vs glutes at "+g+". Ratio is healthy. Back health and glute development both depend on this."};
+
+  // 12. No active flags
+  if (!CURRENT_STATUS.kneePain&&!CURRENT_STATUS.ankleIssue&&!CURRENT_STATUS.backTightness)
+    return {icon:"&#9989;", title:"Clean training block",
+      body:"No active injury flags. Full movement capacity available. This is when real strength gains happen \u2014 don\u2019t waste it."};
+
+  // 13. Fallback: on the plan
+  return {icon:"&#127947;", title:"Week "+b.week+" of "+b.totalWeeks,
+    body:"In "+b.name+", "+b.phase+" phase. The plan itself is the advantage \u2014 most people just react."};
+}
+
+// ═══════════════════════════════════════
+// HISTORICAL LENS — picked from current data, not random rotation
+// ═══════════════════════════════════════
+function pickHistoricalLens(state) {
+  state = state || STATE;
+  var hasData = state.imported && state.exercisesAnalyzed > 0;
+  var g = state.muscleVolume["Glutes"]||0, h = state.muscleVolume["Hamstrings"]||0;
+  var back = state.muscleVolume["Back"]||0;
+
+  if (hasData) {
+    // 1. Glute Drive / Hip Thrust stalled → recapture framing
+    var recapStall = state.stalled.filter(function(lk){
+      return lk.indexOf("Glute Drive")!==-1 || lk.indexOf("Hip Thrust")!==-1;
+    });
+    if (recapStall.length)
+      return {title:"Recapture, not plateau", body:shortName(recapStall[0])+" is stalled \u2014 but historically this is the lift where the most ground was lost since Dec 2023 and the most can be recovered. A stall here usually breaks with a rep reset, not more weight."};
+
+    // 2. Hamstring gap active → the known limiter
+    if (g>0 && h < g*0.55)
+      return {title:"The old pattern is back", body:"Hamstrings trailing glutes ("+h+" vs "+g+" sets) is the exact pattern that historically caused back tightness and capped glute output. This limiter has bitten before \u2014 fix it before it fixes you."};
+
+    // 3. Ratio healthy → the correction is holding
+    if (g>0 && h/g >= 0.6)
+      return {title:"Hamstring balance holding", body:"Historically, hamstrings trailing glutes limited glute development and back health. The current ratio ("+(h/g).toFixed(2)+") shows the correction is holding \u2014 this is quietly the biggest structural win of the rebuild."};
+
+    // 4. Back volume low → the gym-switch drop
+    if (back < 6)
+      return {title:"Gym-switch echo: back volume", body:"Back volume dropped after the gym switch and it\u2019s low again ("+back+" sets). One dedicated pull session per week reverses this \u2014 definition, not width."};
+
+    // 5. Glute Drive being trained → recapture opportunity
+    if (state.lifts["Glute Drive"])
+      return {title:"Glute Drive: biggest recapture opportunity", body:"Dec 2023 was the all-time peak. Glute Drive at "+state.lifts["Glute Drive"].lastE+" lbs e1RM is where the most ground was lost and the most can be recovered. Every session here is compound interest on the rebuild."};
+
+    // 6. Consistent sessions → rebuild framing
+    if (state.sessions >= 8)
+      return {title:"The rebuild is tracking", body:"Sep 2025 was peak performance but also peak risk. The gym switch reset volume and RPE normally. "+state.sessions+" consistent sessions at controlled RPE is exactly the recapture process \u2014 this is not starting over."};
+  }
+
+  // Fallback — only when there is truly no current signal
+  return {title:"Context", body:"Dec 2023 was the all-time strength peak. Sep 2025 was peak performance and peak risk. The gym switch caused a normal reset. This is a recapture phase, not a restart."};
+}
+
+// ═══════════════════════════════════════
+// DERIVE INSIGHTS
+// ═══════════════════════════════════════
+function deriveInsights() {
+  var ins = [], b = calcBanner(), S = STATE;
+  var g=S.muscleVolume["Glutes"]||0, h=S.muscleVolume["Hamstrings"]||0;
+  var hasData = S.imported && S.exercisesAnalyzed > 0;
+
+  // 1. Training read — always show
+  var rpeNote = "";
+  if (hasData && S.avgRPE) {
+    var rr = b.rpe.split("\u2013").map(parseFloat);
+    if (rr.length===2) {
+      if (S.avgRPE < rr[0]) rpeNote=" Avg RPE "+S.avgRPE.toFixed(1)+" is below target \u2014 push harder on working sets.";
+      else if (S.avgRPE > rr[1]) rpeNote=" Avg RPE "+S.avgRPE.toFixed(1)+" is above target \u2014 watch recovery this week.";
+      else rpeNote=" Avg RPE "+S.avgRPE.toFixed(1)+" is right inside the M8 target range. Calibrated.";
+    }
+  }
+  ins.push({type:"pattern", severity:"blue",
+    title:"Week "+b.week+" of "+b.totalWeeks+" \u2014 "+b.phase,
+    body:b.focus+(hasData?rpeNote:" Import your Hevy CSV to see how training compares.")});
+
+  if (!hasData) return ins;
+
+  // 2. Stalled lifts
+  if (S.stalled.length) {
+    var sn = S.stalled.map(function(lk){return shortName(lk);}).join(", ");
+    ins.push({type:"risk", severity:"yellow",
+      title:S.stalled.length===1?"Stall detected":S.stalled.length+" lifts stalled",
+      body:sn+". Same load, 3+ sessions, no rep improvement. Drop set at 70%, rep reset, or technique audit before adding weight."});
+  }
+
+  // 3. Hamstring gap
+  if (g>0 && h<g*0.55)
+    ins.push({type:"risk", severity:"yellow", title:"Hamstrings trailing glutes",
+      body:h+" hamstring sets vs "+g+" glute sets. Hamstrings are the single biggest limiter for glute development and back health. Add 2\u20134 hard sets."});
+
+  // 4. RPE aligned
+  if (S.avgRPE) {
+    var rr2 = b.rpe.split("\u2013").map(parseFloat);
+    if (rr2.length===2 && S.avgRPE>=rr2[0] && S.avgRPE<=rr2[1])
+      ins.push({type:"win", severity:"green", title:"Intensity on target",
+        body:"Avg RPE "+S.avgRPE.toFixed(1)+" matches M8 target ("+b.rpe+"). Periodization works when intensity is dialled \u2014 you\u2019re loading correctly."});
+  }
+
+  // 5. High frequency
+  if (S.sessions > 20)
+    ins.push({type:"risk", severity:"orange", title:"High session count",
+      body:S.sessions+" sessions is on the high side. Watch for accumulated fatigue. RPE climbing week-over-week is the first signal."});
+
+  // 6. Priority lift near or past M8 target
+  PROFILE.priorityLifts.forEach(function(lk) {
+    var d=S.lifts[lk], t=PROFILE.liftTargets[lk];
+    if (!d||!t||!t.M8e||!d.lastE) return;
+    var pct=d.lastE/t.M8e, n=shortName(lk);
+    if (pct>=1.0) ins.push({type:"win", severity:"green",
+      title:n+" hit M8 target",
+      body:d.lastE+" lbs e1RM \u2014 M8 target was "+t.M8e+". Set sights on M9: "+t.M9e+" lbs e1RM."});
+    else if (pct>=0.85) ins.push({type:"win", severity:"green",
+      title:n+" approaching M8 target",
+      body:d.lastE+" lbs e1RM \u2014 "+Math.round(pct*100)+"% of M8 target. "+(t.M8e-d.lastE)+" lbs to go."});
+  });
+
+  // 7. Upper pull check
+  var backSets = S.muscleVolume["Back"]||0;
+  if (backSets===0) ins.push({type:"risk", severity:"orange",
+    title:"No upper pull volume",
+    body:"Back sets: 0 this period. At minimum one pull session per week \u2014 back definition without width comes from rowing, not lat isolation."});
+  else if (backSets>=6) ins.push({type:"win", severity:"green",
+    title:"Pull volume maintained",
+    body:backSets+" back sets this period. Upper pull for definition, not width. Rows over pulldowns."});
+
+  // 8. Historical lens is rendered as its own dedicated card in renderInsights
+  // via pickHistoricalLens() — not duplicated here.
+
+  // 9. Priority recommendation
+  var rec;
+  if (S.stalled.length) {
+    var fn2 = shortName(S.stalled[0]);
+    rec = {type:"priority", severity:"orange", title:"Priority: break the "+fn2+" stall",
+      body:"Don\u2019t add weight. Add a drop set at 70% AMRAP, or run 3\u00d75 with controlled tempo. Progression resumes when reps open up again."};
+  } else if (g>0&&h<g*0.55) {
+    rec = {type:"priority", severity:"orange", title:"Priority: add hamstring volume",
+      body:"2\u20134 sets of RDL or Seated Leg Curl before your next posterior chain session. Don\u2019t skip Lying Leg Curl \u2014 it hits the angle RDL doesn\u2019t."};
+  } else if (b.phase==="Strength"||b.phase==="Load"||b.phase==="Peak") {
+    rec = {type:"priority", severity:"blue", title:"Priority: load progression",
+      body:"Week "+b.week+" is a push week. Move heavier, not longer. Hit your top set, hit your back-offs, and move on. Quality of overload beats quantity of exercises."};
+  } else {
+    rec = {type:"priority", severity:"green", title:"Priority: protect the cadence",
+      body:"Everything is on track. The highest-leverage action right now is consistent attendance. Session quality compounds \u2014 don\u2019t let perfect block frequent."};
+  }
+  ins.push(rec);
+
+  return ins;
+}
+
+// ═══════════════════════════════════════
+// RENDER INSIGHTS TAB
+// ═══════════════════════════════════════
+function renderInsights() {
+  var el = document.getElementById("t-insights");
+  if (!el) return;
+  var b = calcBanner();
+
+  var colMap = {green:"var(--gr)",blue:"var(--bl)",yellow:"var(--am)",orange:"var(--or)",red:"var(--re)"};
+  var bgMap  = {green:"#1db87a0d",blue:"#2d6ef50d",yellow:"#ffd60a0d",orange:"#e8673a0d",red:"#ff453a0d"};
+  var icnMap = {pattern:"&#128202;",risk:"&#9888;",win:"&#127942;",priority:"&#9658;",historical:"&#128336;"};
+
+  var html = "";
+
+  // Biggest win card
+  var win = deriveBiggestWin(STATE, STATE.recommendations);
+  if (win && STATE.imported) {
+    html += "<div class='ins-win-card'>" +
+      "<div class='ins-win-icon'>"+win.icon+"</div>" +
+      "<div><div class='ins-win-title'>"+win.title+"</div><div class='ins-win-body'>"+win.body+"</div></div>" +
+    "</div>";
+  }
+
+  // Micro / Meso / Macro section
+  html += "<div class='cc' style='margin-bottom:10px'>" +
+    "<div class='cl'>Training context</div>" +
+    // Micro
+    "<div class='meso-level'><span class='meso-badge meso-micro'>MICRO</span>" +
+    "<div><div class='meso-level-name'>Week "+b.week+" \u2014 "+b.phase+"</div>" +
+    "<div class='meso-level-body'>"+b.focus+"</div></div></div>" +
+    // Meso
+    "<div class='meso-level'><span class='meso-badge meso-meso'>MESO</span>" +
+    "<div><div class='meso-level-name'>"+b.label+" "+b.name+"</div>" +
+    "<div class='meso-level-body'>RPE "+b.rpe+" \u00b7 "+b.reps+" reps \u00b7 "+b.totalWeeks+" week block</div></div></div>" +
+    // Macro
+    "<div class='meso-level' style='border-bottom:none'><span class='meso-badge meso-macro'>MACRO</span>" +
+    "<div><div class='meso-level-name'>Jun \u2192 Dec 2026</div>" +
+    "<div class='meso-level-body'>" +
+    "<span style='color:var(--bl)'>M8</span> Hypertrophy \u2192 " +
+    "<span style='color:#bf5af2'>M9</span> Strength \u2192 " +
+    "<span style='color:var(--t3)'>M10</span> Deload \u2192 " +
+    "<span style='color:var(--or)'>M11</span> Accumulation 2.0 \u2192 Dec 2026 goal" +
+    "</div></div></div>" +
+  "</div>";
+
+  // Historical lens — picked from current data, random fallback only with no signal
+  var lens2 = pickHistoricalLens(STATE);
+  html += "<div class='cc' style='margin-bottom:10px'>" +
+    "<div class='cl'>Historical lens</div>" +
+    "<div style='font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px'>"+lens2.title+"</div>" +
+    "<div style='font-size:11px;color:var(--t2);line-height:1.75'>"+lens2.body+"</div>" +
+    "</div>";
+
+  // Dynamic insights
+  var insights = deriveInsights();
+  insights.forEach(function(ins) {
+    var col=colMap[ins.severity]||"var(--t2)";
+    var bg=bgMap[ins.severity]||"transparent";
+    var icn=icnMap[ins.type]||"\u25cf";
+    html += "<div class='ins-card' style='border-left-color:"+col+";background:"+bg+"'>" +
+      "<div class='ins-head'><span class='ins-icn'>"+icn+"</span><span class='ins-title'>"+ins.title+"</span></div>" +
+      "<div class='ins-body'>"+ins.body+"</div>" +
+    "</div>";
+  });
+
+  if (!STATE.imported)
+    html += "<div class='empty-state' style='margin-top:8px'>Import Hevy CSV to generate personalised insights.</div>";
+
+  el.innerHTML = html;
+}
+
+function renderAudit() {
+  var el = document.getElementById("t-audit");
+  if (!el) return;
+  if (!STATE.imported) {
+    el.innerHTML = emptyState("Import Hevy CSV to generate a training audit.",""); return;
+  }
+  var S = STATE;
+  var volRows = Object.keys(S.muscleVolume).sort(function(a,b){return S.muscleVolume[b]-S.muscleVolume[a];}).map(function(m) {
+    var sets=S.muscleVolume[m], isPri=PROFILE.priorityMuscles.indexOf(m)!==-1;
+    var col = isPri?"var(--or)":"var(--bl)";
+    return "<div class='vol-row'>" +
+      "<div style='display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px'>" +
+        "<span style='color:var(--tx);font-weight:600'>"+m+(isPri?" &#11088;":"")+"</span>" +
+        "<span style='color:var(--t2)'>"+sets+" sets</span></div>" +
+      "<div class='vol-bar-bg'><div class='vol-bar-fill' style='width:"+Math.min(sets/25*100,100)+"%;background:"+col+"'></div></div>" +
+    "</div>";
+  }).join("");
+
+  var pills = function(list, cls) {
+    return list.length ? list.map(function(l){
+      return "<span class='apill "+cls+"'>"+shortName(l)+"</span>";
+    }).join("") : "<span style='color:var(--t3);font-size:11px'>None</span>";
+  };
+
+  el.innerHTML =
+    "<div class='cc'><div class='cl'>Improved lifts</div>"+pills(S.improved,"g")+"</div>" +
+    "<div class='cc'><div class='cl'>Stalled lifts</div>"+pills(S.stalled,"a")+"</div>" +
+    "<div class='cc'><div class='cl'>Volume by muscle group</div>"+volRows+"</div>" +
+    "<div class='ib'>" +
+      ir("&#128202;","<strong>Sessions:</strong> "+S.sessions+". Sustainable ceiling is 18–20/month.") +
+      ir("&#127919;","<strong>Avg RPE:</strong> "+(S.avgRPE?S.avgRPE.toFixed(1):"—")+". Target 7.5–8.5 on working sets. Posterior chain sessions historically run too low.") +
+      ir("&#128074;","<strong>Glute medius:</strong> Flat upper glute is a medius issue, not maximus. Abduction work every session, progressive overload on abduction past 200 lbs.") +
+    "</div>" +
+    "<div class='cc'><div class='cl'>Never / Always</div>" +
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;color:var(--t2);line-height:2'>" +
+        "<div><div style='font-size:10px;font-weight:700;color:var(--re);margin-bottom:4px'>NEVER</div>" +
+          "&#10007; Failure on RDL/BSS<br>&#10007; Sled push (ankle)<br>&#10007; Skip RDL warmup sets<br>&#10007; Add more lat volume</div>" +
+        "<div><div style='font-size:10px;font-weight:700;color:var(--gr);margin-bottom:4px'>ALWAYS</div>" +
+          "&#10003; Log Belt Squat config<br>&#10003; 2+ warmup sets on compounds<br>&#10003; Beat 1 metric vs last session<br>&#10003; Hamstring work every session</div>" +
+      "</div></div>";
+}
+
+// ── Import Tab ──
+function renderImportTab() {
+  var el = document.getElementById("t-import");
+  if (!el) return;
+  var summaryHtml = "";
+  if (STATE.imported) {
+    summaryHtml = "<div class='cc' style='border-color:#30d15830;margin-top:10px'>" +
+      "<div class='cl' style='color:var(--gr)'>Last import</div>" +
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>" +
+        impStat("Date range",STATE.dateRange.start+" &rarr; "+STATE.dateRange.end) +
+        impStat("Sessions",STATE.sessions+"") +
+        impStat("Exercises",STATE.exercisesAnalyzed+"") +
+        impStat("Improved",STATE.improved.length+"") +
+        impStat("Stalled",STATE.stalled.length+"") +
+        impStat("Warnings",STATE.warnings.length+"") +
+      "</div>" +
+      (STATE.wins.length?"<div style='font-size:11px;color:var(--gr);margin-top:8px'>&#127942; "+STATE.wins[0].msg+"</div>":"") +
+    "</div>";
+  }
+  el.innerHTML =
+    "<div style='font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Hevy is your training log. This app reads your Hevy data and acts as your personal trainer — analyzing what happened and telling you what to do next.</div>" +
+    "<div class='cc'><div class='cl'>Import Hevy CSV</div>" +
+      "<div style='font-size:11px;color:var(--t2);margin-bottom:12px'>Export from Hevy: Profile &rarr; Settings &rarr; Export Workouts. Choose a date range and upload.</div>" +
+      "<div style='font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px'>Date range:</div>" +
+      "<div style='display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px'>" +
+        "<button class='irb' data-w='4'>4 weeks</button>" +
+        "<button class='irb' data-w='8'>8 weeks</button>" +
+        "<button class='irb on' data-w='12'>12 weeks</button>" +
+        "<button class='irb' data-w='-1'>All time</button>" +
+        "<button class='irb' data-w='0'>Custom</button>" +
+      "</div>" +
+      "<div id='customWrap' style='display:none;margin-bottom:12px;gap:8px;align-items:center'>" +
+        "<input type='date' id='customStart' style='padding:8px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:12px;flex:1'>" +
+        "<button onclick='doCustomImport()' style='padding:8px 12px;border-radius:8px;border:none;background:var(--or);color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Go</button>" +
+      "</div>" +
+      "<button onclick='triggerFileImport()' style='width:100%;padding:14px;background:var(--or);border:none;border-radius:12px;font-size:14px;font-weight:800;color:#fff;cursor:pointer'>&#8593; Import Hevy CSV</button>" +
+    "</div>" +
+    summaryHtml +
+    "<div class='ib'>" +
+      ir("&#8505;","After import: <strong>Dashboard</strong> for snapshot, <strong>What Changed</strong> for diffs, <strong>Next Week</strong> for prescriptions.") +
+      ir("&#129656;","Keep logging in <strong>Hevy</strong> — this app reads your data afterward.") +
+    "</div>" +
+    (window._lastDiag ? "<div class='cc' style='border-color:#ff453a30;margin-top:10px'>" +
+      "<div class='cl' style='color:var(--re)'>Last import failed — diagnostics</div>" +
+      "<div style='font-size:11px;color:var(--t2);line-height:2'>" +
+        "Total rows read: <strong style='color:var(--tx)'>" + window._lastDiag.totalRows + "</strong><br>" +
+        "Imported: <strong style='color:var(--gr)'>" + window._lastDiag.importedRows + "</strong><br>" +
+        "Skipped — bad date: " + window._lastDiag.skippedBadDate + "<br>" +
+        "Skipped — date range: " + window._lastDiag.skippedDateRange + "<br>" +
+        "Skipped — set type: " + window._lastDiag.skippedSetType + "<br>" +
+        "Skipped — no weight: " + window._lastDiag.skippedMissingWeight + "<br>" +
+        "Skipped — zero weight: " + window._lastDiag.skippedZeroWeight + "<br>" +
+        "Skipped — no reps: " + window._lastDiag.skippedMissingReps + "<br>" +
+      "</div>" +
+    "</div>" : "");
+}
+
+// ── Helpers ──
+function emptyState(title, sub) {
+  return "<div class='empty-state'><div style='font-size:32px;margin-bottom:10px'>&#129504;</div><div style='font-size:14px;font-weight:700;color:var(--tx);margin-bottom:6px'>"+title+"</div><div style='font-size:12px'>"+sub+"</div></div>";
+}
+function dashCard(type, icon, title, body) {
+  return "<div class='dash-card "+type+"'><div class='dash-icon'>"+icon+"</div><div><div class='dash-title'>"+title+"</div><div class='dash-body'>"+body+"</div></div></div>";
+}
+function statBox(label, val, sub) {
+  return "<div class='bx'><div class='bl2'>"+label+"</div><div class='bv'>"+val+"</div><div class='bs'>"+sub+"</div></div>";
+}
+function nxStat(label, val) {
+  return "<div><div class='nx-stat-l'>"+label+"</div><div class='nx-stat-v'>"+val+"</div></div>";
+}
+function impStat(label, val) {
+  return "<div style='background:var(--bg3);border-radius:8px;padding:8px 10px'><div style='font-size:10px;color:var(--t3);margin-bottom:2px'>"+label+"</div><div style='font-weight:700;color:var(--tx)'>"+val+"</div></div>";
+}
+function ir(icon, text) {
+  return "<div class='ir'><span>"+icon+"</span><span>"+text+"</span></div>";
+}
+
+
+// ═══════════════════════════════════════
+// EXERCISE POOL (gym session templates)
+// ═══════════════════════════════════════
+var POOL = {
+  post: {nm:"Posterior Chain",nt:"RPE 8+ on working sets. Same loads regardless of session name.",exercises:[
+    {n:"Banded Glute Bridges",def:true,wu:true,timer:0,lk:null,sets:[]},
+    {n:"Romanian Deadlift (Barbell)",def:true,wu:false,timer:180,lk:"Romanian Deadlift (Barbell)",
+      sets:[{t:"wu",lb:"WU1",tw:45,tr:10},{t:"wu",lb:"WU2",tw:70,tr:8},{t:"wu",lb:"WU3",tw:95,tr:5},
+            {t:"wu",lb:"WU4",tw:115,tr:3},{t:"wu",lb:"WU5",tw:130,tr:2},
+            {t:"top",lb:"TOP",tw:145,tr:8,rpe:8.0},{t:"bo",lb:"BO1",tw:125,tr:10},{t:"bo",lb:"BO2",tw:125,tr:10}],fl:null},
+    {n:"Hip Thrust (Machine)",def:true,wu:false,timer:120,lk:"Hip Thrust (Machine)",
+      sets:[{t:"wu",lb:"WU1",tw:45,tr:12},{t:"wu",lb:"WU2",tw:60,tr:10},{t:"wu",lb:"WU3",tw:75,tr:6},
+            {t:"top",lb:"TOP",tw:95,tr:8,rpe:8.5},{t:"bo",lb:"BO1",tw:80,tr:10},{t:"bo",lb:"BO2",tw:80,tr:10},
+            {t:"dr",lb:"DROP",tw:60,tr:0,nt:"AMRAP"}],fl:null},
+    {n:"Rear Kick (Machine)",def:true,wu:false,timer:90,lk:"Rear Kick (Machine)",
+      sets:[{t:"top",lb:"TOP",tw:135,tr:10,rpe:8.0},{t:"bo",lb:"BO1",tw:115,tr:12},{t:"bo",lb:"BO2",tw:115,tr:12},
+            {t:"dr",lb:"DROP",tw:90,tr:0,nt:"AMRAP"}],fl:null},
+    {n:"Seated Leg Curl (Machine)",def:true,wu:false,timer:90,lk:"Seated Leg Curl (Machine)",
+      sets:[{t:"wu",lb:"WU",tw:70,tr:10},{t:"top",lb:"TOP",tw:95,tr:8,rpe:8.5},
+            {t:"bo",lb:"BO1",tw:80,tr:10},{t:"bo",lb:"BO2",tw:80,tr:10},{t:"dr",lb:"DROP",tw:65,tr:0,nt:"AMRAP"}],
+      fl:"Priority rebuild"},
+    {n:"Lying Leg Curl (Machine)",def:false,wu:false,timer:90,lk:"Lying Leg Curl (Machine)",
+      sets:[{t:"wu",lb:"WU",tw:55,tr:10},{t:"top",lb:"TOP",tw:80,tr:8,rpe:8.5},{t:"bo",lb:"BO",tw:65,tr:10}],fl:null},
+    {n:"Back Extension",def:true,wu:false,timer:90,lk:"Back Extension (Weighted Hyperextension)",
+      sets:[{t:"wu",lb:"WU",tw:55,tr:12},{t:"top",lb:"TOP",tw:70,tr:10,rpe:7.5},{t:"bo",lb:"BO",tw:60,tr:12}],
+      fl:"No failure — back health"}
+  ]},
+  gq: {nm:"Glute & Quad",nt:"Same 4 anchors every session. Log Belt Squat config every time.",exercises:[
+    {n:"Lateral Band Walks",def:true,wu:true,timer:0,lk:null,sets:[]},
+    {n:"Glute Drive",def:true,wu:false,timer:180,lk:"Glute Drive",
+      sets:[{t:"wu",lb:"WU1",tw:180,tr:12},{t:"wu",lb:"WU2",tw:230,tr:9},
+            {t:"top",lb:"TOP",tw:360,tr:8,rpe:8.5},{t:"bo",lb:"BO1",tw:315,tr:10},{t:"bo",lb:"BO2",tw:315,tr:10},
+            {t:"dr",lb:"DROP",tw:230,tr:0,nt:"AMRAP"}],fl:null},
+    {n:"Belt Squat (Machine)",def:true,wu:false,timer:180,lk:"Belt Squat (Machine)",
+      sets:[{t:"wu",lb:"WU",tw:140,tr:10},{t:"top",lb:"TOP",tw:230,tr:8,rpe:9.0},
+            {t:"bo",lb:"BO1",tw:205,tr:10},{t:"bo",lb:"BO2",tw:205,tr:10},
+            {t:"dr",lb:"DROP",tw:160,tr:0,nt:"AMRAP"}],fl:"LOG: notch + stance + depth"},
+    {n:"Leg Extension (Machine)",def:true,wu:false,timer:90,lk:"Leg Extension (Machine)",
+      sets:[{t:"wu",lb:"WU",tw:110,tr:10},{t:"top",lb:"TOP",tw:160,tr:8,rpe:8.0},
+            {t:"bo",lb:"BO1",tw:140,tr:10},{t:"bo",lb:"BO2",tw:140,tr:10}],fl:null},
+    {n:"Standing Abductor",def:true,wu:false,timer:60,lk:"Standing Abductor",
+      sets:[{t:"top",lb:"S1",tw:210,tr:15,rpe:8.0},{t:"bo",lb:"S2",tw:210,tr:15},{t:"bo",lb:"S3",tw:210,tr:15}],
+      fl:"Glute medius — push past 200 lbs"},
+    {n:"Dead Bug",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"bo",lb:"S1",tw:0,tr:10},{t:"bo",lb:"S2",tw:0,tr:10}],fl:null}
+  ]},
+  uni: {nm:"Unilateral (Apt Gym)",nt:"No Rear Kick Machine. BSS is the anchor. Stop if sharp knee pain.",exercises:[
+    {n:"Band Walks + BW BSS",def:true,wu:true,timer:0,lk:null,sets:[]},
+    {n:"BSS (Smith Machine)",def:true,wu:false,timer:180,lk:"Bulgarian Split Squat (Smith Machine)",
+      sets:[{t:"wu",lb:"WU1",tw:50,tr:8},{t:"wu",lb:"WU2",tw:70,tr:3},
+            {t:"top",lb:"TS1",tw:100,tr:8,rpe:8.0},{t:"top",lb:"TS2",tw:100,tr:7,rpe:8.5},
+            {t:"bo",lb:"BO",tw:90,tr:10}],
+      fl:"KNEE: stop if sharp pain. Hold at 100 lbs until 2 pain-free sessions."},
+    {n:"Cable Kickback (any)",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"top",lb:"TOP",tw:0,tr:10,rpe:8.0,nt:"Max available"},{t:"bo",lb:"BO1",tw:0,tr:12},
+            {t:"bo",lb:"BO2",tw:0,tr:12},{t:"dr",lb:"DROP",tw:0,tr:0,nt:"AMRAP"}],fl:null},
+    {n:"B-stance RDL",def:true,wu:false,timer:90,lk:null,
+      sets:[{t:"bo",lb:"S1",tw:55,tr:10},{t:"bo",lb:"S2",tw:55,tr:10},{t:"bo",lb:"S3",tw:55,tr:10}],fl:null},
+    {n:"Lying Hip Abduction",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"bo",lb:"S1",tw:45,tr:20},{t:"bo",lb:"S2",tw:45,tr:20},{t:"bo",lb:"S3",tw:45,tr:20}],
+      fl:"Glute medius — slow eccentric"}
+  ]},
+  pull: {nm:"Upper Pull",nt:"Needs to happen weekly minimum. Definition, not width.",exercises:[
+    {n:"Iso-Lateral Row (Machine)",def:true,wu:false,timer:120,lk:"Iso-Lateral Row (Machine)",
+      sets:[{t:"wu",lb:"WU1",tw:80,tr:12},{t:"wu",lb:"WU2",tw:110,tr:8},
+            {t:"top",lb:"TOP",tw:140,tr:8,rpe:8.5},{t:"bo",lb:"BO1",tw:120,tr:10},{t:"bo",lb:"BO2",tw:120,tr:10}],fl:null},
+    {n:"Lat Pulldown (Cable)",def:true,wu:false,timer:120,lk:"Lat Pulldown (Cable)",
+      sets:[{t:"wu",lb:"WU",tw:75,tr:10},{t:"top",lb:"TOP",tw:110,tr:8,rpe:8.5},
+            {t:"bo",lb:"BO1",tw:95,tr:10},{t:"bo",lb:"BO2",tw:95,tr:10},
+            {t:"dr",lb:"DROP",tw:75,tr:0,nt:"AMRAP"}],fl:null},
+    {n:"Rear Delt Reverse Fly",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"bo",lb:"S1",tw:0,tr:10,rpe:8.0},{t:"bo",lb:"S2",tw:0,tr:10},{t:"dr",lb:"FAIL",tw:0,tr:0,nt:"Failure"}],fl:null},
+    {n:"Preacher Curl (Plate)",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"top",lb:"TOP",tw:45,tr:8,rpe:8.0},{t:"bo",lb:"BO",tw:35,tr:10},{t:"dr",lb:"FAIL",tw:35,tr:0,nt:"Failure"}],fl:null}
+  ]},
+  push: {nm:"Upper Push (Home Gym)",nt:"Bench + Shoulder Press + Curl are anchors every session.",exercises:[
+    {n:"Bench Press (Smith Machine)",def:true,wu:false,timer:120,lk:null,
+      sets:[{t:"wu",lb:"WU1",tw:45,tr:10},{t:"wu",lb:"WU2",tw:55,tr:6},
+            {t:"top",lb:"TOP",tw:70,tr:6,rpe:8.5},{t:"bo",lb:"BO1",tw:60,tr:8},{t:"bo",lb:"BO2",tw:60,tr:8}],fl:null},
+    {n:"Shoulder Press (Dumbbell)",def:true,wu:false,timer:120,lk:"Shoulder Press (Machine Plates)",
+      sets:[{t:"wu",lb:"WU",tw:40,tr:10},{t:"top",lb:"TOP",tw:60,tr:8,rpe:8.5},
+            {t:"bo",lb:"BO1",tw:50,tr:10},{t:"bo",lb:"BO2",tw:50,tr:10},
+            {t:"dr",lb:"DROP",tw:40,tr:0,nt:"AMRAP"}],fl:null},
+    {n:"Seated Incline Curl",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"top",lb:"TOP",tw:0,tr:8,rpe:8.5,nt:"Max available"},{t:"bo",lb:"BO",tw:0,tr:10},{t:"dr",lb:"FAIL",tw:0,tr:0,nt:"Failure"}],fl:null},
+    {n:"Tricep Pushdown",def:true,wu:false,timer:60,lk:null,
+      sets:[{t:"top",lb:"TOP",tw:0,tr:8,rpe:8.0},{t:"bo",lb:"BO1",tw:0,tr:10},{t:"bo",lb:"BO2",tw:0,tr:10},{t:"dr",lb:"DROP",tw:0,tr:0,nt:"AMRAP"}],fl:null}
+  ]}
+};
+
+// ═══════════════════════════════════════
+// ALL EXERCISES (master list for modal)
+// ═══════════════════════════════════════
+var ALL_EX = [
+  {g:"Glute / Hip",  exs:["Glute Drive","Hip Thrust (Machine)","Hip Thrust (Barbell)","Romanian Deadlift (Barbell)","Rear Kick (Machine)","Cable Kickback","Reverse Lunge (Smith Machine)","Step Ups","Good Morning"]},
+  {g:"Quad / Leg",   exs:["Belt Squat (Machine)","Leg Extension (Machine)","Goblet Squat","Bulgarian Split Squat (Smith Machine)","Leg Press","Walking Lunges"]},
+  {g:"Hamstring",    exs:["Seated Leg Curl (Machine)","Lying Leg Curl (Machine)","Nordic Curl","B-stance RDL","Single Leg RDL","Back Extension (Weighted Hyperextension)"]},
+  {g:"Glute Med",    exs:["Standing Abductor","Lying Hip Abduction","Hip Abduction (Machine)","Lateral Band Walks","Banded Glute Bridges","Crab Walk (Band)"]},
+  {g:"Core",         exs:["Dead Bug","Bird Dog","Pallof Press","Ab Wheel","Plank","Copenhagen Plank"]},
+  {g:"Back / Pull",  exs:["Lat Pulldown (Cable)","Iso-Lateral Row (Machine)","Seated Row (Machine)","Pull Up (Assisted)","Face Pull","Rear Delt Reverse Fly"]},
+  {g:"Push / Chest", exs:["Bench Press (Smith Machine)","Cable Fly Crossovers","Incline Dumbbell Press"]},
+  {g:"Shoulders",    exs:["Shoulder Press (Machine Plates)","Shoulder Press (Dumbbell)","Lateral Raise"]},
+  {g:"Arms",         exs:["Preacher Curl (Plate)","Seated Incline Curl","Tricep Pushdown","Skull Crusher"]}
+];
+
+// ═══════════════════════════════════════
+// HEVY CSV IMPORT
+// ═══════════════════════════════════════
+function parseHevyDate(dt) {
+  dt = (dt || "").replace(/"/g,"").trim();
+  if (!dt) return null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(dt)) {
+    var dk = dt.substring(0,10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dk)) return null;
+    return {dateKey:dk, timestamp:new Date(dk+"T12:00:00").getTime()};
+  }
+  var MO = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  var m = dt.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
+  if (m) {
+    var day=parseInt(m[1],10), mon=MO[m[2]], yr=parseInt(m[3],10);
+    if (mon===undefined||isNaN(day)||isNaN(yr)) return null;
+    var p=function(n){return n<10?"0"+n:""+n;};
+    return {dateKey:yr+"-"+p(mon+1)+"-"+p(day), timestamp:new Date(yr,mon,day,12,0,0).getTime()};
+  }
+  return null;
+}
+
+function parseCSVLine(line) {
+  var res=[],cur="",inQ=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(ch==='"'){inQ=!inQ;}
+    else if(ch===","&&!inQ){res.push(cur.trim());cur="";}
+    else{cur+=ch;}
+  }
+  res.push(cur.trim());
+  return res;
+}
+
+function parseHevy(text) {
+  var lines = text.split("\n").filter(function(l){return l.trim();});
+  if (lines.length < 2) { alert("File looks empty."); return; }
+
+  var raw = parseCSVLine(lines[0]);
+  var hdr = {};
+  raw.forEach(function(h,i){ hdr[h.replace(/"/g,"").trim()] = i; });
+
+  // Required columns (weight handled flexibly below)
+  var baseNeeded = ["exercise_title","start_time","set_type","reps"];
+  for (var ni=0; ni<baseNeeded.length; ni++) {
+    if (hdr[baseNeeded[ni]] === undefined) {
+      alert("Missing column: " + baseNeeded[ni] + "\nIs this a Hevy CSV?");
+      return;
+    }
+  }
+  var hasLbs = hdr["weight_lbs"] !== undefined;
+  var hasKg  = hdr["weight_kg"]  !== undefined;
+  if (!hasLbs && !hasKg) {
+    alert("No weight column found.\nExpected weight_lbs or weight_kg.");
+    return;
+  }
+
+  // Diagnostics
+  var diag = {
+    totalRows:0, skippedBadDate:0, skippedDateRange:0,
+    skippedSetType:0, skippedMissingWeight:0,
+    skippedMissingReps:0, skippedZeroWeight:0, importedRows:0
+  };
+
+  var byEx = {}, byDate = {}, rawRPEs = [], allDates = [], cutoff = null;
+  if (_importWeeks > 0) {
+    cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - _importWeeks * 7);
+  } else if (_importCustomStart) {
+    cutoff = _importCustomStart;
+  }
+  // _importWeeks === -1 means "All time" — no cutoff
+
+  var minDate = null, maxDate = null;
+
+  for (var li = 1; li < lines.length; li++) {
+    var v = parseCSVLine(lines[li]);
+    diag.totalRows++;
+
+    var exName = (v[hdr["exercise_title"]] || "").replace(/"/g,"").trim();
+    var dt     = (v[hdr["start_time"]]     || "").replace(/"/g,"").trim();
+    var stype  = (v[hdr["set_type"]]       || "").replace(/"/g,"").trim().toLowerCase();
+    var rp     = parseInt(v[hdr["reps"]]);
+
+    // Weight: prefer lbs, fall back to kg→lbs
+    var wt;
+    if (hasLbs) {
+      wt = parseFloat((v[hdr["weight_lbs"]] || "").replace(/"/g,""));
+      if ((isNaN(wt) || wt <= 0) && hasKg) {
+        wt = parseFloat((v[hdr["weight_kg"]] || "").replace(/"/g,"")) * 2.20462;
+      }
+    } else {
+      wt = parseFloat((v[hdr["weight_kg"]] || "").replace(/"/g,"")) * 2.20462;
+    }
+
+    var rpe2 = hdr["rpe"] !== undefined ? parseFloat((v[hdr["rpe"]] || "").replace(/"/g,"")) : NaN;
+
+    // Validate date — handles ISO and Hevy "3 Jul 2026, 13:51" formats
+    var parsedDate = parseHevyDate(dt);
+    if (!parsedDate) { diag.skippedBadDate++; continue; }
+    var dateKey = parsedDate.dateKey;
+    var rowDate = new Date(parsedDate.timestamp);
+
+    // Date range filter
+    if (cutoff && rowDate < cutoff) { diag.skippedDateRange++; continue; }
+
+    // Set type filter — normalize, accept working sets only
+    // Skip only clearly labelled warmup or drop sets
+    var skipTypes = ["warmup","warm up","warm-up","dropset","drop set","drop-set","failure_end"];
+    if (skipTypes.indexOf(stype) !== -1) { diag.skippedSetType++; continue; }
+    // Accept: normal, failure, working, "", blank — anything not explicitly a warmup/drop
+
+    // Weight
+    if (isNaN(wt) || wt === undefined) { diag.skippedMissingWeight++; continue; }
+    if (wt <= 0) { diag.skippedZeroWeight++; continue; }
+
+    // Reps
+    if (isNaN(rp) || rp <= 0) { diag.skippedMissingReps++; continue; }
+
+    // Row is valid — count it
+    diag.importedRows++;
+    if (!minDate || dateKey < minDate) minDate = dateKey;
+    if (!maxDate || dateKey > maxDate) maxDate = dateKey;
+    if (!isNaN(rpe2) && rpe2 > 0) rawRPEs.push(rpe2);
+    if (allDates.indexOf(dateKey) === -1) allDates.push(dateKey);
+
+    var mapped = normalizeExerciseName(exName);
+    // Per-date log (Map week detail)
+    if (!byDate[dateKey]) byDate[dateKey] = {sets:0, rpes:[], ex:{}};
+    byDate[dateKey].sets++;
+    if (!isNaN(rpe2) && rpe2 > 0) byDate[dateKey].rpes.push(rpe2);
+    if (!byEx[mapped]) byEx[mapped] = {};
+    var ts = rowDate.getTime();
+    var setE1 = wt * (1 + rp / 30);
+    var existing = byEx[mapped][dateKey];
+    var hardCount = existing ? (existing.hardSets || 0) + 1 : 1;
+    if (!existing || setE1 > (existing.bestSet ? existing.bestSet.e1 : 0)) {
+      byEx[mapped][dateKey] = {
+        bestSet: {w:wt, r:rp, rpe:isNaN(rpe2)?null:rpe2, e1:Math.round(setE1), ts:ts},
+        hardSets: hardCount
+      };
+    } else {
+      byEx[mapped][dateKey].hardSets = hardCount;
+    }
+    var dEx = byDate[dateKey].ex[mapped];
+    if (!dEx || setE1 > dEx.e1)
+      byDate[dateKey].ex[mapped] = {w:wt, r:rp, e1:Math.round(setE1), rpe:isNaN(rpe2)?null:rpe2};
+  }
+
+  // Guard: empty import — do not overwrite previous STATE
+  if (Object.keys(byEx).length === 0) {
+    var diagMsg = "No workout rows matched.\n\n" +
+      "Diagnostics:\n" +
+      "  Total rows:       " + diag.totalRows + "\n" +
+      "  Skipped (date format): " + diag.skippedBadDate + "\n" +
+      "  Skipped (date range):  " + diag.skippedDateRange + "\n" +
+      "  Skipped (set type):    " + diag.skippedSetType + "\n" +
+      "  Skipped (no weight):   " + diag.skippedMissingWeight + "\n" +
+      "  Skipped (zero weight): " + diag.skippedZeroWeight + "\n" +
+      "  Skipped (no reps):     " + diag.skippedMissingReps + "\n\n" +
+      "Try: All time range, or check your CSV export settings.";
+    var banner = document.getElementById("importBanner");
+    banner.innerHTML = "&#9888; Import failed — " + diag.totalRows + " rows read, 0 matched. Check Import tab for details.";
+    banner.style.background = "#ff453a14";
+    banner.style.borderBottomColor = "#ff453a30";
+    banner.style.color = "var(--re)";
+    banner.style.display = "flex";
+    // Store diagnostics for Import tab to display
+    window._lastDiag = diag;
+    renderImportTab();
+    alert(diagMsg);
+    return;
+  }
+
+  window._lastDiag = null; // clear diagnostics on success
+  var mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function fd(s) { var p=s.split("-"); return mo[parseInt(p[1])-1]+" "+parseInt(p[2]); }
+  populateState(byEx, rawRPEs, allDates.length,
+    {start: minDate ? fd(minDate) : "\u2014", end: maxDate ? fd(maxDate) : "\u2014"}, byDate);
+}
+
+function populateState(byEx,rawRPEs,sessionCount,dateRange,byDate) {
+  if (!byEx || Object.keys(byEx).length === 0) return; // safety — caller should catch this
+  // Snapshot current lifts before overwriting
+  STATE.prevLifts = JSON.parse(JSON.stringify(STATE.lifts));
+  STATE.lifts = {};
+  STATE.muscleVolume = {};
+  STATE.dailyLog = byDate || {};
+  STATE.sessions = sessionCount;
+  STATE.dateRange = dateRange;
+  STATE.exercisesAnalyzed = Object.keys(byEx).length;
+  STATE.avgRPE = rawRPEs.length ? rawRPEs.reduce(function(a,b){return a+b;},0)/rawRPEs.length : null;
+  STATE.imported = true;
+  var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  Object.keys(byEx).forEach(function(ex) {
+    var dates=Object.keys(byEx[ex]).sort();
+    var latest=dates[dates.length-1];
+    var entry=byEx[ex][latest];
+    var best=entry.bestSet||entry;
+    var e1=best.e1||Math.round(best.w*(1+best.r/30));
+    var stuck=0;
+    for(var di=dates.length-1;di>=0;di--){
+      var entry2=byEx[ex][dates[di]];
+      var dW=(entry2.bestSet?entry2.bestSet.w:entry2.w)||0;
+      if(Math.abs(dW-best.w)<2.5) stuck++;
+      else break;
+    }
+    var tgt=PROFILE.liftTargets[ex]||{targetR:8};
+    var dp=latest.split("-");
+    var dStr=mo[parseInt(dp[1])-1]+" "+parseInt(dp[2]);
+    STATE.lifts[ex]={lastW:best.w,lastR:best.r,lastRPE:best.rpe,lastE:e1,
+      sessionsAtWeight:stuck,targetR:tgt.targetR,d:dStr,ts:best.ts||0,e1:e1};
+    var muscle=PROFILE.muscleMap[ex];
+    if(muscle){
+      var totalSets=0;
+      dates.forEach(function(dt){
+        var en=byEx[ex][dt]; totalSets+=(en.hardSets||1);
+      });
+      STATE.muscleVolume[muscle]=(STATE.muscleVolume[muscle]||0)+totalSets;
+    }
+  });
+  runEngine();
+  renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab();
+  renderNextSessionCoach();
+  saveState();
+  saveImportHistory();
+  var imported=Object.keys(byEx).length;
+  var banner=document.getElementById("importBanner");
+  banner.innerHTML="\u2713 "+imported+" exercises \u2022 "+sessionCount+" sessions \u2022 "+STATE.improved.length+" improving \u2022 "+STATE.warnings.length+" warnings";
+  banner.style.display="flex";
+}
+
+// ═══════════════════════════════════════
+// GYM MODE
+// ═══════════════════════════════════════
+var _sessKey=null, _selected={}, _timers={};
+var _activeTimer={secs:0,interval:null};
+var _swapIdx=-1;
+var _importWeeks=12;
+var _importCustomStart=null;
+
+function pick(k,btn) {
+  document.querySelectorAll(".sb").forEach(function(x){x.classList.remove("on");});
+  btn.classList.add("on");
+  _sessKey=k;
+  _selected={}; _timers={};
+  POOL[k].exercises.forEach(function(ex){
+    _selected[ex.n]=ex.def;
+    _timers[ex.n]=ex.timer||120;
+  });
+  showPool(k);
+}
+
+function showPool(k) {
+  var pool=POOL[k];
+  document.getElementById("exPool").style.display="block";
+  document.getElementById("activeSess").style.display="none";
+  var warmups=pool.exercises.filter(function(e){return e.wu;});
+  var working=pool.exercises.filter(function(e){return !e.wu;});
+  var html="<div style='font-size:11px;color:var(--t2);margin-bottom:12px;line-height:1.5'>"+pool.nt+"</div>";
+  if(warmups.length){
+    html+="<div class='pool-lbl'>Warmup (always)</div>";
+    html+=warmups.map(function(ex){
+      return "<div class='pool-item pool-wu'><div class='pchk on'>\u2713</div><div class='pinfo'><div class='pname'>"+ex.n+"</div></div></div>";
+    }).join("");
+  }
+  html+="<div class='pool-lbl'>Working sets \u2014 pick today</div>";
+  html+=working.map(function(ex){
+    var on=_selected[ex.n];
+    var d=STATE.lifts[ex.lk||ex.n];
+    var lastStr=d?"<span class='plast'>"+d.d+" \u2022 "+d.lastW+" lbs \u00d7"+d.lastR+"</span>":"";
+    var ts=_timers[ex.n]||120;
+    var m=Math.floor(ts/60),s=ts%60;
+    var tstr=ts?(m+":"+(s<10?"0":"")+s):"off";
+    var safeN=ex.n.replace(/'/g,"&apos;");
+    return "<div class='pool-item"+(on?" pool-on":"")+"' data-ex='"+safeN+"'>"+
+      "<div class='pchk"+(on?" on":"")+"'>"+(on?"\u2713":"")+"</div>"+
+      "<div class='pinfo'><div class='pname'>"+ex.n+"</div>"+lastStr+(ex.fl?"<div class='pflag'>\u2691 "+ex.fl+"</div>":"")+
+      "</div><div class='ptimer' data-ex='"+safeN+"'>\u23f1 "+tstr+"</div></div>";
+  }).join("");
+  var count=working.filter(function(e){return _selected[e.n];}).length;
+  html+="<button class='start-btn' onclick='startSession()'>\u25b6 Start Session <span style='font-size:11px;opacity:.7'>"+count+" exercises</span></button>";
+  document.getElementById("poolList").innerHTML=html;
+  document.querySelectorAll("#poolList .pool-item:not(.pool-wu)").forEach(function(item){
+    item.addEventListener("click",function(e){
+      if(e.target.closest(".ptimer")) return;
+      var n=this.dataset.ex;
+      _selected[n]=!_selected[n];
+      var chk=this.querySelector(".pchk");
+      chk.classList.toggle("on",_selected[n]);
+      chk.textContent=_selected[n]?"\u2713":"";
+      this.classList.toggle("pool-on",_selected[n]);
+      var cnt=POOL[_sessKey].exercises.filter(function(e){return !e.wu&&_selected[e.n];}).length;
+      var btn=document.querySelector(".start-btn");
+      if(btn) btn.innerHTML="\u25b6 Start Session <span style='font-size:11px;opacity:.7'>"+cnt+" exercises</span>";
+    });
+  });
+  document.querySelectorAll("#poolList .ptimer").forEach(function(tim){
+    tim.addEventListener("click",function(e){
+      e.stopPropagation();
+      var n=this.dataset.ex;
+      var opts=[60,90,120,180,240,0];
+      var cur=_timers[n]||120;
+      var nv=opts[(opts.indexOf(cur)+1)%opts.length];
+      _timers[n]=nv;
+      var m=Math.floor(nv/60),s=nv%60;
+      this.textContent="\u23f1 "+(nv?(m+":"+(s<10?"0":"")+s):"off");
+    });
+  });
+}
+
+function startSession() {
+  document.getElementById("exPool").style.display="none";
+  document.getElementById("activeSess").style.display="block";
+  var chosen=POOL[_sessKey].exercises.filter(function(e){return e.wu||_selected[e.n];});
+  // Generate coaching signals from STATE
+  var signals=[];
+  chosen.forEach(function(ex){
+    if(!ex.lk||!STATE.lifts[ex.lk]||ex.wu) return;
+    var rec=STATE.recommendations[ex.lk];
+    if(rec&&rec.action&&rec.action!=="building") signals.push(rec);
+  });
+  var h="";
+  if(signals.length){
+    var aC={increase:"var(--gr)",hold:"var(--bl)",reduce:"var(--re)",stall:"var(--am)",injury:"var(--re)"};
+    h="<div class='coach-brief'><div class='coach-brief-hd'>\u26a1 Pre-session signals</div>"+
+      signals.map(function(s){
+        var col=aC[s.action]||"var(--t2)";
+        return "<div class='cbrow'><span class='cbbadge' style='color:"+col+"'>"+s.badge+"</span>"+
+          "<div><div class='cbname'>"+shortName(s.lift)+"</div>"+
+          "<div class='cbreason'>"+s.reason+"</div>"+
+          (s.caution?"<div class='cbcaution'>"+s.caution+"</div>":"")+"</div></div>";
+      }).join("")+"</div>";
+  }
+  h+="<div style='display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0'>" +
+    "<button onclick='backToPool()' style='font-size:12px;font-weight:600;background:none;border:none;color:var(--t2);cursor:pointer'>&larr; Change</button>" +
+    "<span id='sessProgress' style='font-size:12px;font-weight:700;color:var(--t2)'>0/0 sets</span>" +
+    "<button id='addExBtn' style='font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--or);background:#e8673a14;color:var(--or);cursor:pointer'>+ Add</button>" +
+  "</div>";
+  chosen.forEach(function(ex,ei){h+=buildCard(ex,ei,_timers[ex.n]||0);});
+  document.getElementById("el").innerHTML=h;
+  updateProgress();
+}
+
+function backToPool() {
+  if(_activeTimer.interval) clearInterval(_activeTimer.interval);
+  document.getElementById("timerBar").style.display="none";
+  document.getElementById("exPool").style.display="block";
+  document.getElementById("activeSess").style.display="none";
+}
+
+function buildCard(ex,ei,timerSec) {
+  var d=ex.lk?STATE.lifts[ex.lk]:null;
+  var e1str=d?"<span class='ec-s'>Last: "+d.d+" \u2022 e1RM "+d.lastE+" lbs</span>":"";
+  // Suggested target from recommendations
+  var rec=ex.lk?STATE.recommendations[ex.lk]:null;
+  var recStr=rec?"<span class='ec-rec' style='color:"+(rec.action==="increase"?"var(--gr)":rec.action==="hold"?"var(--bl)":"var(--am)")+"'>Target: "+rec.target+" lbs</span>":"";
+  var mins=Math.floor(timerSec/60),secs=timerSec%60;
+  var tBadge=timerSec?"<span class='ec-timer' data-sec='"+timerSec+"' data-ei='"+ei+"'>\u23f1 "+mins+":"+(secs<10?"0":"")+secs+"</span>":"";
+  var body="";
+  if(ex.fl) body+="<div class='fgr'>\u2691 "+ex.fl+"</div>";
+  if(ex.sets&&ex.sets.length){
+    body+="<div class='sth'><span>SET</span><span>PREV</span><span>TARGET</span><span>RPE</span><span></span></div>";
+    ex.sets.forEach(function(s,si){
+      var prev=d&&d.lastW&&s.t!=="wu"?(d.lastW+" \u00d7"+(d.lastR||"?")):"&mdash;";
+      var tgt=s.tw>0?(s.tw+" lbs"+(s.tr?" \u00d7"+s.tr:"")):(s.nt||"&mdash;");
+      if(s.tr===0&&s.nt) tgt=s.nt;
+      // Dynamic target: use recommendation target for TOP sets
+      if(s.t==="top"&&rec&&rec.target&&rec.target>0){
+        var recTag="<span style='font-size:9px;color:var(--or)'>▶ rec</span>";
+        tgt=rec.target+" lbs ×"+(s.tr||8)+" "+recTag;
+      }
+      var rpe=s.rpe?"RPE "+s.rpe:"&mdash;";
+      var cid="c_"+ei+"_"+si;
+      body+="<div class='sr "+s.t+"'><span class='sn "+s.t+"'>"+s.lb+"</span><span class='pv'>"+prev+"</span><span class='tv'>"+tgt+"</span><span class='rv'>"+rpe+"</span>"+
+        "<div class='ck' id='"+cid+"' data-ei='"+ei+"' data-ts='"+timerSec+"'></div></div>";
+    });
+  } else {
+    body+="<div style='padding:10px 14px;font-size:11px;color:var(--t2)'>Log in Hevy.</div>";
+  }
+  body+="<div style='display:flex;gap:6px;padding:8px 14px 12px'>" +
+    "<button class='act-btn swap-btn' data-idx='"+ei+"'>\u21c6 Swap</button>" +
+    "<button class='act-btn rem-btn'>\u2715 Remove</button>" +
+  "</div>";
+  return "<div class='ec open' id='ex_"+ei+"'>" +
+    "<div class='ec-h' data-id='ex_"+ei+"'><div><div class='ec-n'>"+ex.n+"</div>"+e1str+recStr+"</div>" +
+    "<div style='display:flex;align-items:center;gap:8px'>"+tBadge+"<span class='ec-a'>&#8250;</span></div></div>" +
+    "<div class='ec-b'>"+body+"</div></div>";
+}
+
+function findEx(name) {
+  var keys=Object.keys(POOL);
+  for(var ki=0;ki<keys.length;ki++){
+    var exs=POOL[keys[ki]].exercises;
+    for(var ei=0;ei<exs.length;ei++){if(exs[ei].n===name) return exs[ei];}
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════
+// EXERCISE MODAL
+// ═══════════════════════════════════════
+function openExModal(mode,idx) {
+  _swapIdx=(mode==="swap")?idx:-1;
+  document.getElementById("exModalTitle").textContent=mode==="swap"?"Swap exercise":"Add exercise";
+  document.getElementById("exSearch").value="";
+  renderExList("");
+  document.getElementById("exModal").style.display="flex";
+}
+function closeExModal(){document.getElementById("exModal").style.display="none";}
+function renderExList(q) {
+  q=q.toLowerCase();
+  var html="";
+  ALL_EX.forEach(function(grp){
+    var matches=grp.exs.filter(function(e){return !q||e.toLowerCase().indexOf(q)!==-1;});
+    if(!matches.length) return;
+    html+="<div class='ex-grp'>"+grp.g+"</div>";
+    matches.forEach(function(e){
+      var d=STATE.lifts[e];
+      var lastStr=d?" \u2022 "+d.lastW+" lbs":"";
+      html+="<div class='ex-item' data-name='"+e.replace(/'/g,"&apos;")+"'><div style='font-size:13px;font-weight:600;color:var(--tx)'>"+e+"</div><div style='font-size:10px;color:var(--t3)'>"+lastStr+"</div></div>";
+    });
+  });
+  var list=document.getElementById("exModalList");
+  list.innerHTML=html||"<div style='padding:20px;text-align:center;color:var(--t3)'>No matches</div>";
+  list.querySelectorAll(".ex-item").forEach(function(item){
+    item.addEventListener("click",function(){selectEx(this.dataset.name);});
+  });
+}
+function selectEx(exName) {
+  closeExModal();
+  var ex=findEx(exName)||{n:exName,lk:exName,sets:[],wu:false,fl:null};
+  var addTimer = _timers[ex.n] || ex.timer || 120;
+  _timers[ex.n] = addTimer;
+  if(_swapIdx>=0){
+    var cards=document.querySelectorAll("#el .ec");
+    if(cards[_swapIdx]) cards[_swapIdx].outerHTML=buildCard(ex,_swapIdx,addTimer);
+  } else {
+    var idx=document.querySelectorAll("#el .ec").length;
+    document.getElementById("el").insertAdjacentHTML("beforeend",buildCard(ex,idx,addTimer));
+  }
+  updateProgress();
+}
+
+// ═══════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════
+function startTimer(secs) {
+  if(_activeTimer.interval) clearInterval(_activeTimer.interval);
+  _activeTimer.secs=secs;
+  var total=secs;
+  document.getElementById("timerBar").style.display="flex";
+  document.getElementById("timerFill").style.width="100%";
+  updateTimerDisplay();
+  _activeTimer.interval=setInterval(function(){
+    _activeTimer.secs--;
+    if(_activeTimer.secs<=0){
+      clearInterval(_activeTimer.interval);
+      _activeTimer.interval=null;
+      document.getElementById("timerBar").style.display="none";
+      try{var a=new AudioContext();var o=a.createOscillator();o.connect(a.destination);o.frequency.value=880;o.start();o.stop(a.currentTime+0.15);}catch(e){}
+    } else {
+      document.getElementById("timerFill").style.width=Math.round((_activeTimer.secs/total)*100)+"%";
+      updateTimerDisplay();
+    }
+  },1000);
+}
+function updateTimerDisplay(){
+  var m=Math.floor(_activeTimer.secs/60),s=_activeTimer.secs%60;
+  document.getElementById("timerCount").textContent=m+":"+(s<10?"0":"")+s;
+}
+function dismissTimer(){
+  if(_activeTimer.interval) clearInterval(_activeTimer.interval);
+  document.getElementById("timerBar").style.display="none";
+}
+function updateProgress(){
+  var all=document.querySelectorAll("#el .ck").length;
+  var done=document.querySelectorAll("#el .ck.done").length;
+  var p=document.getElementById("sessProgress");
+  if(p) p.textContent=done+"/"+all+" sets";
+}
+function tog(id){var e=document.getElementById(id);if(e)e.classList.toggle("open");}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function setMode(m,b) {
+  document.getElementById("gym").style.display=m==="gym"?"block":"none";
+  document.getElementById("ana").style.display=m==="ana"?"block":"none";
+  document.querySelectorAll(".tb").forEach(function(x){x.classList.remove("on");});
+  b.classList.add("on");
+  if(m==="ana") renderDashboard();
+}
+function iTab(id,b) {
+  document.querySelectorAll(".ip").forEach(function(p){p.classList.remove("on");});
+  document.querySelectorAll(".it").forEach(function(x){x.classList.remove("on");});
+  var pane=document.getElementById("t-"+id);
+  if(pane) pane.classList.add("on");
+  b.classList.add("on");
+  var fns={dash:renderDashboard,changed:renderWhatChanged,next:renderNextWeek,map:renderMap,insights:renderInsights,audit:renderAudit,import:renderImportTab};
+  if(fns[id]) fns[id]();
+}
+
+// ═══════════════════════════════════════
+// FILE IO
+// ═══════════════════════════════════════
+function onFileSelect(evt) {
+  var file=evt.target.files[0];
+  if(!file) return;
+  var cs=document.getElementById("customStart");
+  if(cs&&cs.value&&_importWeeks===0) _importCustomStart=new Date(cs.value);
+  var reader=new FileReader();
+  reader.onload=function(e){parseHevy(e.target.result);};
+  reader.readAsText(file);
+  evt.target.value="";
+}
+function triggerFileImport(){
+  if(_importWeeks===0){
+    // Custom mode — must go through doCustomImport to set the date
+    var el=document.getElementById("customStart");
+    if(!el||!el.value){alert("Enter a start date first.");return;}
+    doCustomImport();
+  } else {
+    document.getElementById("csvIn").click();
+  }
+}
+
+function doCustomImport(){
+  var el=document.getElementById("customStart");
+  if(!el) return;
+  var val=el.value;
+  if(!val){alert("Pick a start date.");return;}
+  _importCustomStart=new Date(val);
+  _importWeeks=0;
+  document.getElementById("csvIn").click();
+}
+
+// ═══════════════════════════════════════
+// SINGLE CLICK EVENT DELEGATION
+// ═══════════════════════════════════════
+document.addEventListener("click",function(e){
+  // Toggle card
+  var head=e.target.closest(".ec-h");
+  if(head){var id=head.dataset.id;if(id) tog(id); return;}
+  // Checkbox
+  var ck=e.target.closest(".ck");
+  if(ck){
+    ck.classList.toggle("done");
+    ck.textContent=ck.classList.contains("done")?"\u2713":"";
+    if(ck.classList.contains("done")){
+      var ts=parseInt(ck.dataset.ts||"0");
+      if(ts>0) startTimer(ts);
+    }
+    updateProgress(); return;
+  }
+  // Swap
+  var sw=e.target.closest(".swap-btn");
+  if(sw){openExModal("swap",parseInt(sw.dataset.idx));return;}
+  // Remove
+  var rm=e.target.closest(".rem-btn");
+  if(rm){rm.closest(".ec").remove();updateProgress();return;}
+  // Timer badge cycle
+  var tb=e.target.closest(".ec-timer");
+  if(tb){
+    var opts=[60,90,120,180,240,0];
+    var cur=parseInt(tb.dataset.sec||"120");
+    var nv=opts[(opts.indexOf(cur)+1)%opts.length];
+    tb.dataset.sec=nv;
+    var m2=Math.floor(nv/60),s2=nv%60;
+    tb.textContent="\u23f1 "+(nv?(m2+":"+(s2<10?"0":"")+s2):"off");
+    var card=tb.closest(".ec");
+    if(card) card.querySelectorAll(".ck").forEach(function(c){c.dataset.ts=nv;});
+    return;
+  }
+  // Status toggles
+  var tgl=e.target.closest("[data-togglekey]");
+  if(tgl){toggleStatus(tgl.dataset.togglekey);return;}
+  // Map interactive: phase cards
+  var mp=e.target.closest("[data-mapphase]");
+  if(mp){showPhaseDetail(mp.dataset.mapphase);return;}
+  // Map interactive: week dots
+  var mw=e.target.closest("[data-mapweek]");
+  if(mw){showWeekDetail(parseInt(mw.dataset.mapweek));return;}
+  // Add exercise
+  if(e.target.id==="addExBtn"||e.target.closest("#addExBtn")){openExModal("add",-1);return;}
+  // Import range buttons
+  var irb=e.target.closest(".irb");
+  if(irb){
+    document.querySelectorAll(".irb").forEach(function(btn){btn.classList.remove("on");});
+    irb.classList.add("on");
+    var weeks=parseInt(irb.dataset.w||"4");
+    _importWeeks=weeks;
+    var wrap=document.getElementById("customWrap");
+    if(wrap) wrap.style.display=weeks===0?"flex":"none";
+    if(weeks!==0) document.getElementById("csvIn").click();
+    return;
+  }
+});
+
+
+// ═══════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ═══════════════════════════════════════
+
+function toggleStatus(key) {
+  if (!(key in CURRENT_STATUS)) return;
+  CURRENT_STATUS[key] = !CURRENT_STATUS[key];
+  saveCurrentStatus();
+  renderCoachCard();
+  renderStatusToggles();
+  runEngine();
+  renderDashboard();
+  renderNextWeek();
+  renderAudit();
+  renderNextSessionCoach();
+}
+
+function saveCurrentStatus() {
+  try { localStorage.setItem("ti_status", JSON.stringify(CURRENT_STATUS)); }
+  catch(e) { console.warn("Could not save status:", e); }
+}
+
+function restoreCurrentStatus() {
+  try {
+    var raw = localStorage.getItem("ti_status");
+    if (!raw) return;
+    var s = JSON.parse(raw);
+    if (s && typeof s === "object") {
+      ["kneePain","ankleIssue","backTightness","lowRecovery"].forEach(function(k){
+        if (typeof s[k] === "boolean") CURRENT_STATUS[k] = s[k];
+      });
+    }
+  } catch(e) { console.warn("Could not restore status:", e); }
+}
+
+function renderStatusToggles() {
+  var el = document.getElementById("statusToggles");
+  if (!el) return;
+  var items = [
+    {key:"kneePain",      label:"Knee pain"},
+    {key:"ankleIssue",    label:"Ankle issue"},
+    {key:"backTightness", label:"Back tight"},
+    {key:"lowRecovery",   label:"Low recovery"}
+  ];
+  var html = "";
+  items.forEach(function(item) {
+    var on = CURRENT_STATUS[item.key];
+    html += "<button class='stoggle" + (on ? " stoggle-on" : "") +
+      "' data-togglekey='" + item.key + "'>" +
+      (on ? "● " : "○ ") + item.label + "</button>";
+  });
+  el.innerHTML = html;
+}
+function saveState() {
+  try {
+    localStorage.setItem('ti_state', JSON.stringify({
+      lifts: STATE.lifts,
+      prevLifts: STATE.prevLifts,
+      muscleVolume: STATE.muscleVolume,
+      dailyLog: STATE.dailyLog,
+      sessions: STATE.sessions,
+      dateRange: STATE.dateRange,
+      exercisesAnalyzed: STATE.exercisesAnalyzed,
+      avgRPE: STATE.avgRPE,
+      imported: STATE.imported,
+      ts: Date.now()
+    }));
+  } catch(e) { console.warn('Could not save state:', e); }
+}
+
+function restoreState() {
+  try {
+    var raw = localStorage.getItem('ti_state');
+    if (!raw) return false;
+    var saved = JSON.parse(raw);
+    if (!saved || !saved.imported) return false;
+    STATE.lifts = saved.lifts || {};
+    STATE.prevLifts = saved.prevLifts || {};
+    STATE.muscleVolume = saved.muscleVolume || {};
+    STATE.dailyLog = saved.dailyLog || {};
+    STATE.sessions = saved.sessions || 0;
+    STATE.dateRange = saved.dateRange || {start:null,end:null};
+    STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
+    STATE.avgRPE = saved.avgRPE || null;
+    STATE.imported = saved.imported || false;
+    runEngine();
+    return true;
+  } catch(e) { console.warn('Could not restore state:', e); return false; }
+}
+
+// ═══════════════════════════════════════
+// SINGLE DOMContentLoaded INIT
+// ═══════════════════════════════════════
+document.addEventListener("DOMContentLoaded",function(){
+  restoreImportHistory();
+  restoreCurrentStatus();
+  renderCoachCard();
+  renderStatusToggles();
+  var restored = restoreState();
+  renderNextSessionCoach();
+  if (restored) {
+    renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab();
+    var banner = document.getElementById("importBanner");
+    banner.innerHTML = "&#9654; Restored from last import &bull; " + (STATE.dateRange.end||"");
+    banner.style.display = "flex";
+  } else {
+    renderDashboard();
+    renderImportTab();
+    renderMap();
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
