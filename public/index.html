@@ -181,6 +181,8 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 .apill{display:inline-block;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;margin:3px 3px 3px 0}
 .apill.g{background:#1db87a20;color:var(--gr)}.apill.a{background:#ffd60a18;color:var(--am)}
 
+/* AI COACH */
+.ai-actions{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.ai-btn{border:0;background:var(--or);color:white;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer}.ai-btn.secondary{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx)}.ai-btn:disabled{opacity:.4}.ai-input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);padding:12px;font-size:13px;resize:vertical}.ai-result{font-size:12px;color:var(--t2);line-height:1.65;white-space:pre-wrap}.ai-proposal{padding:12px;border-radius:12px;border:1px solid var(--bd2);background:var(--bg2);margin:9px 0}.ai-feedback{font-size:11px;margin-top:7px;color:var(--t2);line-height:1.5}
 /* SHARED */
 .cc{background:var(--bg2);border:1px solid var(--bd);border-radius:13px;padding:13px;margin-bottom:10px}
 .cl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
@@ -270,6 +272,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
       <button class="it" onclick="iTab('next',this)">Next</button>
       <button class="it" onclick="iTab('map',this)">Map</button>
       <button class="it" onclick="iTab('insights',this)">Insights</button>
+      <button class="it" onclick="iTab('ai',this)">AI Coach</button>
       <button class="it" onclick="iTab('import',this)">Import</button>
     </div>
     <div id="t-dash"     class="ip on"></div>
@@ -278,6 +281,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
     <div id="t-map"      class="ip"></div>
     <div id="t-insights" class="ip"></div>
     <div id="t-import"   class="ip"></div>
+    <div id="t-ai" class="ip"></div>
   </div>
 </div>
 
@@ -1939,8 +1943,8 @@ function populateState(byEx,rawRPEs,sessionCount,dateRange,byDate) {
       STATE.muscleVolume[muscle]=(STATE.muscleVolume[muscle]||0)+totalSets;
     }
   });
-  runEngine();
-  renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab();
+  runEngine();applyApprovedCoachChanges();
+  renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab(); renderAICoach();
   renderNextSessionCoach();
   saveState();
   saveImportHistory();
@@ -2221,10 +2225,92 @@ function iTab(id,b) {
   var pane=document.getElementById("t-"+id);
   if(pane) pane.classList.add("on");
   b.classList.add("on");
-  var fns={dash:renderDashboard,changed:renderWhatChanged,next:renderNextWeek,map:renderMap,insights:renderInsights,audit:renderAudit,import:renderImportTab};
+  var fns={dash:renderDashboard,changed:renderWhatChanged,next:renderNextWeek,map:renderMap,insights:renderInsights,audit:renderAudit,ai:renderAICoach,import:renderImportTab};
   if(fns[id]) fns[id]();
 }
 
+
+
+// ═══════════════════════════════════════
+// GEMINI ADAPTIVE COACH — every adjustment requires explicit approval
+// Approval affects LiftIQ guidance only; NEVER modifies Hevy history.
+// ═══════════════════════════════════════
+var _aiResult=null,_aiBusy=false,_aiQuestion='',_aiError='',_aiNotice='';
+var _aiApproved={};
+try{_aiApproved=JSON.parse(localStorage.getItem('liftiq_ai_approved')||'{}')||{};}catch(e){_aiApproved={};}
+function aiSafe(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function aiTrainingSnapshot(){
+  return {goal:PROFILE.goal,sessions:STATE.sessions,avgRPE:STATE.avgRPE,
+    period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),
+    muscles:STATE.muscleVolume,flags:CURRENT_STATUS,
+    lifts:Object.keys(STATE.lifts).slice(0,35).map(function(name){var x=STATE.lifts[name],r=STATE.recommendations[name]||{};
+      return {name:name,weightLb:x.lastW,reps:x.lastR,rpe:x.lastRPE,e1rmLb:x.lastE,
+       sessionsAtWeight:x.sessionsAtWeight,ruleAction:r.action||'',ruleTargetLb:r.target||x.lastW};})};
+}
+function applyApprovedCoachChanges(){
+ Object.keys(_aiApproved).forEach(function(name){
+   var a=_aiApproved[name],last=STATE.lifts[name],existing=STATE.recommendations[name];
+   if(!last||!existing||Math.abs(last.lastW-a.baseWeightLb)>0.01){return;}
+   if(CURRENT_STATUS.lowRecovery&&a.action==='increase')return;
+   if(CURRENT_STATUS.kneePain&&/squat|lunge/i.test(name)&&a.action==='increase')return;
+   if(CURRENT_STATUS.backTightness&&/deadlift|rdl|extension/i.test(name)&&a.action==='increase')return;
+   existing.action=a.action;existing.target=a.targetLb;existing.badge='AI APPROVED';
+   existing.reason='You approved '+a.targetLb+' lbs × '+a.reps+' reps. '+a.reason;
+   existing.caution='LiftIQ target only; Hevy history is unchanged. Review comfort and technique.';
+ });
+}
+function approveAI(i){
+ var p=_aiResult&&_aiResult.proposals&&_aiResult.proposals[i],base=p&&STATE.lifts[p.lift];
+ if(!p||!base)return;
+ var baseWeight=base.lastW;
+ // Before accepting, confirm proposal is still based on the latest imported weight.
+ if(Math.abs(baseWeight-p.baseWeightLb)>0.01){_aiError='Training data changed. Run a new review before approving.';renderAICoach();return;}
+ _aiApproved[p.lift]={action:p.action,targetLb:p.targetLb,reps:p.reps,reason:p.reason,baseWeightLb:baseWeight};
+ localStorage.setItem('liftiq_ai_approved',JSON.stringify(_aiApproved));
+ runEngine();applyApprovedCoachChanges();renderNextSessionCoach();renderNextWeek();
+ _aiNotice='Approved for LiftIQ guidance. Hevy remains unchanged.';renderAICoach();
+}
+function undoAI(name){delete _aiApproved[name];localStorage.setItem('liftiq_ai_approved',JSON.stringify(_aiApproved));runEngine();applyApprovedCoachChanges();renderNextSessionCoach();renderNextWeek();_aiNotice='Approval undone.';renderAICoach();}
+function renderAICoach(){
+ var pane=document.getElementById('t-ai');if(!pane)return;
+ var html="<div class='cc'><div class='cl'>AI Performance Coach</div>"+
+ "<div class='ai-result'>Uses your imported Hevy performance summary and existing LiftIQ calculations. AI suggestions are optional. No changes reach Hevy. Sign in with Google in the Import tab first.</div>"+
+ "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':'Analyze my training')+"</button></div>"+
+ "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='Ask about stalls, volume, or progression…'>"+aiSafe(_aiQuestion)+"</textarea>"+
+ "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(\"question\")' "+(_aiBusy?'disabled':'')+">Ask LiftIQ</button></div>"+
+ "<div class='ai-feedback'>AI analysis sends summarized workout metrics to Gemini. Free-tier Gemini use may allow Google to use submitted content to improve its products. No names or raw Hevy session details are included in this request. AI can be mistaken.</div></div>";
+ if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
+ if(_aiNotice)html+="<div class='cc' style='color:var(--gr)'>"+aiSafe(_aiNotice)+"</div>";
+ if(_aiResult){html+="<div class='cc'><div class='cl'>Coach interpretation</div><div class='ai-result'>"+aiSafe(_aiResult.answer||_aiResult.summary)+"</div>";
+ if(_aiResult.answer&&_aiResult.summary)html+="<div class='ai-feedback'>"+aiSafe(_aiResult.summary)+"</div>";
+ (_aiResult.insights||[]).forEach(function(x){html+="<div class='ir'>• "+aiSafe(x)+"</div>";});html+='</div>';
+ if((_aiResult.proposals||[]).length){html+="<div class='cl'>Proposed changes — approve individually</div>";
+ _aiResult.proposals.forEach(function(p,i){var isApproved=!!_aiApproved[p.lift];html+="<div class='ai-proposal'><div style='font-size:13px;font-weight:700'>"+aiSafe(p.lift)+"</div>"+
+ "<div style='font-size:13px;color:var(--or);margin-top:5px'>"+aiSafe(p.action.toUpperCase())+" · "+p.targetLb+" lbs × "+p.reps+" reps</div>"+
+ "<div class='ai-feedback'>"+aiSafe(p.reason)+"</div><div class='ai-feedback'><b>Evidence:</b> "+aiSafe(p.evidence)+"</div>"+
+ "<div class='ai-actions'>"+(isApproved?"<button class='ai-btn secondary' data-undo='"+aiSafe(p.lift)+"'>Undo approval</button>":"<button class='ai-btn' onclick='approveAI("+i+")'>Approve this target</button>")+"</div></div>";});}
+ }
+ var names=Object.keys(_aiApproved);if(names.length){html+="<div class='cc'><div class='cl'>Your approved LiftIQ targets</div>";
+ names.forEach(function(n){var a=_aiApproved[n];html+="<div class='ir' style='display:block'><b>"+aiSafe(n)+"</b>: "+a.targetLb+" lbs × "+a.reps+" reps <button class='ai-btn secondary' style='padding:4px 8px;margin-left:5px' data-undo='"+aiSafe(n)+"'>Undo</button></div>";});html+='</div>';}
+ pane.innerHTML=html;
+ pane.querySelectorAll('[data-undo]').forEach(function(btn){btn.addEventListener('click',function(){undoAI(btn.dataset.undo);});});
+}
+async function askAI(mode){
+ if(_aiBusy)return;
+ var textarea=document.getElementById('aiQuestion');if(textarea)_aiQuestion=textarea.value.slice(0,350);
+ _aiError='';_aiNotice='';
+ if(!_googleIdToken){_aiError='Please sign in with Google under Intelligence → Import first.';renderAICoach();return;}
+ if(!STATE.imported){_aiError='Sync or import your Hevy workouts first.';renderAICoach();return;}
+ if(mode==='question'&&!_aiQuestion.trim()){_aiError='Enter your question first.';renderAICoach();return;}
+ _aiBusy=true;renderAICoach();
+ try{var res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},
+  body:JSON.stringify({mode:mode,question:_aiQuestion,training:aiTrainingSnapshot()})});
+ var data=await res.json();if(!res.ok)throw new Error(data.error||'AI request failed.');
+ (data.proposals||[]).forEach(function(p){p.baseWeightLb=STATE.lifts[p.lift]?STATE.lifts[p.lift].lastW:null;});
+ _aiResult=data;
+ }catch(e){_aiError=e.message||'Unable to analyze right now.';}
+ finally{_aiBusy=false;renderAICoach();}
+}
 
 // ═══════════════════════════════════════
 // HEVY PRO API: read-only finished-workout sync
@@ -2488,7 +2574,7 @@ function toggleStatus(key) {
   saveCurrentStatus();
   renderCoachCard();
   renderStatusToggles();
-  runEngine();
+  runEngine();applyApprovedCoachChanges();
   renderDashboard();
   renderNextWeek();
   renderAudit();
@@ -2563,7 +2649,7 @@ function restoreState() {
     STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
     STATE.avgRPE = saved.avgRPE || null;
     STATE.imported = saved.imported || false;
-    runEngine();
+    runEngine();applyApprovedCoachChanges();
     return true;
   } catch(e) { console.warn('Could not restore state:', e); return false; }
 }
@@ -2579,7 +2665,7 @@ document.addEventListener("DOMContentLoaded",function(){
   var restored = restoreState();
   renderNextSessionCoach();
   if (restored) {
-    renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab();
+    renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab(); renderAICoach();
     var banner = document.getElementById("importBanner");
     banner.innerHTML = "&#9654; Restored from last import &bull; " + (STATE.dateRange.end||"");
     banner.style.display = "flex";
