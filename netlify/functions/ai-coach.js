@@ -7,6 +7,7 @@ function sanitize(input){
   const lifts=Array.isArray(input?.lifts)?input.lifts.slice(0,35):[];
   return {goal:cleanText(input?.goal,150),sessions:finite(input?.sessions,0,10000),avgRPE:finite(input?.avgRPE,0,10),
     period:cleanText(input?.period,70),
+    cycle:input?.cycle?{label:cleanText(input.cycle.label,20),name:cleanText(input.cycle.name,70),start:cleanText(input.cycle.start,10),end:cleanText(input.cycle.end,10),rpe:cleanText(input.cycle.rpe,25),reps:cleanText(input.cycle.reps,25),week:finite(input.cycle.week,0,52),paused:input.cycle.paused===true}:null,
     muscles:Object.fromEntries(Object.entries(input?.muscles||{}).slice(0,20).map(([k,v])=>[cleanText(k,60),finite(v,0,30000)])),
     flags:{kneePain:input?.flags?.kneePain===true,ankleIssue:input?.flags?.ankleIssue===true,backTightness:input?.flags?.backTightness===true,lowRecovery:input?.flags?.lowRecovery===true},
     trends:sanitizeTrends(input?.trends),
@@ -27,6 +28,30 @@ function sanitizeTrends(trends){
  return {anchorDate:cleanText(trends?.anchorDate,12),windows,priorityLiftHistory:history,limitation:'Daily best set per exercise, not full intra-session set history; muscle appearances are not set counts.'};
 }
 function extract(response){return (response?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');}
+// Retry only transient upstream failures. Never repeat authorization or other 4xx errors.
+const RETRYABLE_STATUS=new Set([429,500,502,503,504]);
+const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function fetchGemini(url,options){
+ let res;
+ for(let attempt=0;attempt<3;attempt++){
+  try{
+   res=await fetch(url,{...options,signal:AbortSignal.timeout(14000)});
+  }catch(err){
+   // Network hiccups and timeouts may be transient; don't retry a programming error.
+   if(attempt===2)throw err;
+   await delay(650*Math.pow(2,attempt));
+   continue;
+  }
+  if(!RETRYABLE_STATUS.has(res.status)||attempt===2)return res;
+  // A retry of the same inference may generate another billable request.
+  // Respect provider Retry-After for modest waits, bounded for function runtime.
+  const ra=Number(res.headers.get('retry-after'));
+  const wait=Number.isFinite(ra)&&ra>0?Math.min(ra*1000,3500):650*Math.pow(2,attempt);
+  try{await res.body?.cancel();}catch{}
+  await delay(wait);
+ }
+ return res;
+}
 exports.handler=async(event)=>{
  if(event.httpMethod!=='POST')return reply(405,{error:'POST only.'});
  const auth=await verifyUser(event);if(auth.error)return reply(auth.status,{error:auth.error});
@@ -38,20 +63,22 @@ exports.handler=async(event)=>{
  if(!data.lifts.length)return reply(400,{error:'Sync or import Hevy workout data before requesting analysis.'});
  const question=cleanText(body.question,350);
  if(body.mode==='question' && !question.trim())return reply(400,{error:'Enter a question.'});
- const instructions=`You are LiftIQ, a conservative evidence-based strength training analyst. You receive 7/28/84-day summaries and up to 12 dated best-set observations per priority lift, NOT complete sessions. Never invent session comparisons, dates or injury diagnoses. Treat goals and status flags as user-reported. Training numbers and ruleTargets are supplied by deterministic code. Reference exact available lift data and dated history in your rationale. Do not treat exercise appearances as hard-set counts. Distinguish observations from hypotheses. If insufficient data say so. Respect reported knee, back, ankle pain and recovery concerns; do not propose load increases if lowRecovery is true, or unsafe increases while relevant pain is present. Never prescribe pain-provoking exercise. No medical diagnosis. Proposals require user acceptance and must not imply Hevy is changed. Output strict JSON, not markdown. Schema: {"summary":"string", "insights":["string"], "proposals":[{"lift":"exact input lift name", "action":"hold|increase|reduce", "targetLb":number, "reps":integer, "reason":"string", "evidence":"string"}], "answer":"string"}. 0-4 proposals. Propose plausible exercise-level target load adjustments only, generally within 10% of recorded weight, and stay close to deterministic ruleTarget; prefer hold when uncertain. Consider weights in pounds.`;
+ const instructions=`You are LiftIQ, a conservative evidence-based strength training analyst. You receive 7/28/84-day summaries and up to 12 dated best-set observations per priority lift, NOT complete sessions. Never invent session comparisons, dates or injury diagnoses. If asked about training cycle timing, consider the supplied cycle schedule as context and provide cautious recommendations for staying longer, deloading or shortening, with specific supporting observations and acknowledged limitations; never pretend to have edited a cycle or automatically make a cycle change. Treat goals and status flags as user-reported. Training numbers and ruleTargets are supplied by deterministic code. Reference exact available lift data and dated history in your rationale. Do not treat exercise appearances as hard-set counts. Distinguish observations from hypotheses. If insufficient data say so. Respect reported knee, back, ankle pain and recovery concerns; do not propose load increases if lowRecovery is true, or unsafe increases while relevant pain is present. Never prescribe pain-provoking exercise. No medical diagnosis. Proposals require user acceptance and must not imply Hevy is changed. Output strict JSON, not markdown. Schema: {"summary":"string", "insights":["string"], "proposals":[{"lift":"exact input lift name", "action":"hold|increase|reduce", "targetLb":number, "reps":integer, "reason":"string", "evidence":"string"}], "answer":"string"}. 0-4 proposals. Propose plausible exercise-level target load adjustments only, generally within 10% of recorded weight, and stay close to deterministic ruleTarget; prefer hold when uncertain. Consider weights in pounds.`;
  const prompt=JSON.stringify({task:body.mode,question:body.mode==='question'?question:undefined,training:data});
  const model=process.env.GEMINI_MODEL||'gemini-3.5-flash-lite';
  if(!/^gemini-[a-zA-Z0-9.-]+$/.test(model))return reply(503,{error:'Invalid Gemini model configuration.'});
  try{
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
+  const res=await fetchGemini(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
    method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
    body:JSON.stringify({systemInstruction:{parts:[{text:instructions}]},contents:[{role:'user',parts:[{text:prompt}]}],
-     generationConfig:{responseMimeType:'application/json',temperature:0.2,maxOutputTokens:1600}}),signal:AbortSignal.timeout(24000)});
+     generationConfig:{responseMimeType:'application/json',temperature:0.2,maxOutputTokens:1600}})});
   if(!res.ok){
    // Google may return 404 for an unavailable model, even when the key itself is valid.
    let providerMessage='';
    try{const errorBody=await res.json();providerMessage=cleanText(errorBody?.error?.message,240);}catch{}
-   const safe=res.status===429?'Gemini rate limit reached. Try again later.':
+   const safe=res.status===429?'Gemini is at its request limit right now. Please wait a minute and try again.':
+     res.status===503?'Gemini is temporarily overloaded or unavailable. LiftIQ retried automatically; please try again in a few minutes. Your workout data and approved targets are safe.':
+     res.status===502||res.status===504?'Gemini is temporarily having service issues. LiftIQ retried automatically; please try again shortly.':
      res.status===404?`Gemini model ${model} was not found or is unavailable to this API key. Check GEMINI_MODEL in Netlify (or remove it to use the app default).`:
      res.status===400?'Gemini rejected the request or model configuration.':
      res.status===403?'Your Gemini API key cannot access this model.':
@@ -72,5 +99,5 @@ exports.handler=async(event)=>{
     return {lift:original.name,action:p.action,targetLb:Math.round(target*2)/2,reps:Math.round(reps),reason:cleanText(p.reason,450),evidence:cleanText(p.evidence,350)};
   }).filter(Boolean);
   return reply(200,{summary:cleanText(result.summary,1100),insights:(Array.isArray(result.insights)?result.insights:[]).slice(0,5).map(x=>cleanText(x,450)),proposals,answer:cleanText(result.answer,1700),model});
- }catch(e){return reply(502,{error:e.name==='TimeoutError'?'Gemini request timed out. Try again.':'Gemini connection failed.'});}
+ }catch(e){return reply(502,{error:e.name==='TimeoutError'?'Gemini request timed out. Try again.':'Gemini connection failed after retrying. Please try again in a few minutes.'});}
 };

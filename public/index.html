@@ -292,6 +292,37 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .v3-compact-list{max-height:350px;overflow:auto}
 @media (max-width:370px){.v3-kpis{gap:4px}.v3-kpi{padding:9px 6px}.v3-kpi strong{font-size:17px}}
 
+
+/* V4 — consistent Obsidian UI, accessible filter controls and stable mobile fields */
+:root{--or:#cbd2da;--bl:#a6b3c1;--gr:#a9c7b9;--re:#e0aaa7;--am:#d9cbb3}
+.v3-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:16px}
+.v3-field,.v3-field.full{grid-column:auto;min-width:0;width:100%}
+.v3-field input,.v3-field select{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;font-size:16px;min-height:47px;padding:11px 12px;appearance:auto;border-radius:10px}
+.v3-field input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-height:49px;padding-right:10px}
+.v3-form .v3-action{width:100%;min-height:47px}
+.v4-filter{display:flex;gap:7px;overflow-x:auto;padding:8px 0 13px;scrollbar-width:thin}
+.v4-filter button{border:1px solid #46505c;background:#1e242a;color:#bbc4ce;border-radius:999px;padding:9px 13px;font-size:12px;white-space:nowrap;cursor:pointer}
+.v4-filter button.active{background:#d7dde5;color:#13171c;border-color:#d7dde5;font-weight:800}
+.v4-icon{width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;color:inherit;flex-shrink:0}
+.v4-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.v4-hierarchy{display:grid;gap:9px;margin:14px 0}
+.v4-level{background:#1b2026;border:1px solid #39424d;border-radius:12px;padding:13px 14px}
+.v4-level.active{border-color:#b6c2cf;background:linear-gradient(125deg,#28313b,#1b2026)}
+.v4-levelhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.v4-levelhead strong{font-size:13px;color:#e9edf2}
+.v4-eyebrow{font-size:9px;letter-spacing:.14em;font-weight:800;color:#a7b2bf;text-transform:uppercase}
+.v4-sub{font-size:11px;color:#a9b3c0;line-height:1.55;margin-top:6px}
+.v4-pill{font-size:10px;border:1px solid #687789;color:#c9d3dd;padding:4px 7px;border-radius:7px;white-space:nowrap}
+.v4-meter{height:5px;background:#333b46;border-radius:8px;overflow:hidden;margin-top:10px}
+.v4-meter>div{height:100%;background:#c4ced8}
+.v4-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.v4-cycle-ai{border:1px solid #687789;background:linear-gradient(150deg,#232d38,#15191e);border-radius:14px;padding:16px;margin:14px 0}
+.v4-cycle-ai button{background:#d7dfe8;border:0;color:#11151b;border-radius:9px;padding:11px 14px;font-weight:800;margin-top:11px;cursor:pointer}
+.v4-cycle-ai button:disabled{opacity:.5;cursor:default}
+.v4-cycle-ai .v3-muted{margin-top:9px}
+.v4-icon-scrub .dash-icon,.v4-icon-scrub .ins-icn,.v4-icon-scrub .change-icon{font-family:'DM Sans',sans-serif;filter:grayscale(1)}
+@media(min-width:560px){.v3-form{grid-template-columns:repeat(2,minmax(0,1fr))}.v3-field.full{grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -498,6 +529,12 @@ function v3Date(s){return new Date(s+'T12:00:00');}
 function v3AddDays(s,n){var d=v3Date(s);d.setDate(d.getDate()+n);return v3Iso(d);}
 function v3Today(){var d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
 function v3Safe(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function v4Date(s){if(!s)return '—';var d=v3Date(s);return isNaN(d)?s:d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});}
+function v4Icon(name){var paths={calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',pause:'<rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/>',play:'<path d="m8 5 11 7-11 7z"/>',edit:'<path d="M4 20l5-1 11-11-4-4L5 15zM14 6l4 4"/>',spark:'<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/>',trend:'<path d="m3 18 7-7 5 4 6-8M16 7h5v5"/>',layers:'<path d="m12 2 9 5-9 5-9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/>'};return '<span class="v4-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(paths[name]||paths.layers)+'</svg></span>';}
+function v4Group(name){var m=PROFILE.muscleMap[name]||'';if(m)return m;if(/glute|kickback|thrust/i.test(name))return 'Glutes';if(/curl|rdl|deadlift|hamstring/i.test(name))return 'Hamstrings';if(/squat|quad|leg press|extension/i.test(name))return 'Quads';if(/pulldown|row|pullup|back/i.test(name))return 'Back';if(/shoulder|delt|lateral raise/i.test(name))return 'Shoulders';if(/bench|chest|pec/i.test(name))return 'Chest';if(/bicep|tricep|arm|curl/i.test(name))return 'Arms';return 'Other';}
+function v4FilterHeld(group){document.querySelectorAll('#v4-held-list .change-row').forEach(function(el){el.hidden=group!=='All'&&el.dataset.muscle!==group;});document.querySelectorAll('#v4-held-filter button').forEach(function(b){b.classList.toggle('active',b.dataset.group===group);b.setAttribute('aria-pressed',String(b.dataset.group===group));});var count=document.querySelectorAll('#v4-held-list .change-row:not([hidden])').length;var e=document.getElementById('v4-held-count');if(e)e.textContent=count+' exercise'+(count===1?'':'s')+' shown';}
+function v4CycleReview(){var m=v3ActiveCycle();if(!m){alert('Select an active cycle before requesting a cycle review.');return;}var question='Review my current mesocycle '+m.label+' ('+m.name+'), scheduled '+m.start+' to '+m.end+', RPE '+m.rpe+', reps '+m.reps+'. Based ONLY on available 7/28/84 day training trends, should I extend, shorten, deload or keep it? Identify data limitations and suggest a specific adjustment for my approval. Do not claim to edit the plan.';_aiQuestion=question.slice(0,350);var coach=document.querySelector('.it[onclick*="ai"]');if(coach){iTab('ai',coach);}else{document.querySelectorAll('.it').forEach(function(b){if(b.textContent.toLowerCase().includes('coach'))iTab('ai',b);});}renderAICoach();var textarea=document.getElementById('aiQuestion');if(textarea){textarea.value=_aiQuestion;textarea.focus();}}
+
 function v3ReadCycles(){try{var j=JSON.parse(localStorage.getItem('liftiq_cycles_v3')||'null');if(!j||!Array.isArray(j.plan))return;var labels=DEFAULT_MESO_PLAN.map(function(m){return m.label;});if(j.plan.length!==labels.length||j.plan.some(function(m,i){return m.label!==labels[i]||!/^\d{4}-\d{2}-\d{2}$/.test(m.start)||!/^\d{4}-\d{2}-\d{2}$/.test(m.end)||v3Date(m.end)<v3Date(m.start)}))return;MESO_PLAN=j.plan;CYCLE_PAUSE=j.pause||null;}catch(e){console.warn('Cycle restore skipped',e);}}
 function v3SaveCycles(){localStorage.setItem('liftiq_cycles_v3',JSON.stringify({plan:MESO_PLAN,pause:CYCLE_PAUSE}));}
 function v3ActiveCycle(){var t=v3Today();if(CYCLE_PAUSE){var held=MESO_PLAN.find(function(m){return m.label===CYCLE_PAUSE.label;});if(held)return held;}return MESO_PLAN.find(function(m){return m.start<=t&&m.end>=t;})||null;}
@@ -983,7 +1020,12 @@ function renderWhatChanged() {
   }
 
   if (improved.length) html += "<div class='dash-sec'>Improved</div>"+changeList(improved,"g","&#8593;");
-  if (held.length) html += "<div class='dash-sec'>Held / Steady</div>"+changeList(held,"b","&#8594;");
+  if (held.length) {
+    var groups=['All'].concat(Array.from(new Set(held.map(function(item){return v4Group(item.c&&item.c.name||item.name);}))));
+    var groupButtons=groups.map(function(g){return "<button type='button' data-group='"+v3Safe(g)+"' aria-pressed='"+(g==='All'?'true':'false')+"' class='"+(g==='All'?'active':'')+"' onclick='v4FilterHeld(this.dataset.group)'>"+v3Safe(g)+"</button>";}).join('');
+    var heldRows=held.map(function(item){var group=v4Group(item.c&&item.c.name||item.name);return "<div class='change-row' data-muscle='"+v3Safe(group)+"'><span class='change-icon b'>&rarr;</span><div><div class='change-name'>"+v3Safe(item.name)+"</div><div class='change-reason'>"+v3Safe(item.reason)+"</div></div></div>";}).join('');
+    html += "<div class='dash-sec'>Held / Steady · "+held.length+" exercises</div><div class='v3-muted'>Filter by muscle group instead of scrolling through every exercise.</div><div id='v4-held-filter' class='v4-filter'>"+groupButtons+"</div><div id='v4-held-count' class='v3-muted' aria-live='polite'>"+held.length+" exercises shown</div><div id='v4-held-list' class='change-list'>"+heldRows+"</div>";
+  }
   if (regressed.length) html += "<div class='dash-sec'>Regressed</div>"+changeList(regressed,"r","&#8595;");
   if (newLifts.length) {
     html += "<div class='dash-sec'>New this period</div><div class='change-list'>" +
@@ -1074,7 +1116,7 @@ function renderMap() {
   ];
 
   // Phase cards reflect user edits rather than only original calendar labels.
-  PHASES.forEach(function(p){var m=MESO_PLAN.find(function(x){return x.label===p.label;});if(m){p.name=m.name;p.period=m.start+' → '+m.end;p.active=b.label===m.label;}});
+  PHASES.forEach(function(p){var m=MESO_PLAN.find(function(x){return x.label===p.label;});if(m){p.name=m.name;p.period=v4Date(m.start)+' – '+v4Date(m.end);p.active=b.label===m.label;}});
   // Phase cards — clickable
   var phaseRow = "<div class='phase-row'>" + PHASES.map(function(p) {
     return "<div class='phase-card"+(p.active?" phase-active":"")+"' style='border-top:3px solid "+p.color+"' "+
@@ -1117,10 +1159,17 @@ function renderMap() {
   }).join("");
 
   var activeCycle=v3ActiveCycle();
-  var hero="<div class='v3-active'><div class='v3-state'>"+(activeCycle?(v3Paused(activeCycle)?'⏸ PAUSED CYCLE':'● CURRENT CYCLE'):'NO ACTIVE CYCLE')+"</div><div class='v3-h1' style='margin-top:7px'>"+(activeCycle?v3Safe(activeCycle.label+' · '+activeCycle.name):'No cycle scheduled')+"</div><div class='v3-sub'>"+(activeCycle?v3Safe(activeCycle.start+' → '+activeCycle.end+' · Week '+b.week+' of '+b.totalWeeks):'Choose or edit a cycle below to get started.')+"</div>"+(activeCycle?"<div class='v3-actions'>"+(v3Paused(activeCycle)?"<button class='v3-action' onclick='v3ResumeCycle()'>Resume cycle</button>":"<button class='v3-action warn' onclick='v3PauseCycle()'>Pause cycle</button>")+"<button class='v3-action alt' data-cycle='"+activeCycle.label+"' onclick='v3SelectCycle(this.dataset.cycle)'>Edit cycle</button></div>":"")+"</div>";
+  var hero="<div class='v3-active'><div class='v3-state'>"+(activeCycle?(v3Paused(activeCycle)?'PAUSED CYCLE':'CURRENT CYCLE'):'NO ACTIVE CYCLE')+"</div><div class='v3-h1' style='margin-top:7px'>"+(activeCycle?v3Safe(activeCycle.label+' · '+activeCycle.name):'No cycle scheduled')+"</div><div class='v3-sub'>"+(activeCycle?v3Safe(v4Date(activeCycle.start)+' – '+v4Date(activeCycle.end)+' · Week '+b.week+' of '+b.totalWeeks):'Choose or edit a cycle below to get started.')+"</div>"+(activeCycle?"<div class='v3-actions'>"+(v3Paused(activeCycle)?"<button class='v3-action' onclick='v3ResumeCycle()'>"+v4Icon('play')+" Resume cycle</button>":"<button class='v3-action warn' onclick='v3PauseCycle()'>"+v4Icon('pause')+" Pause cycle</button>")+"<button class='v3-action alt' data-cycle='"+activeCycle.label+"' onclick='v3SelectCycle(this.dataset.cycle)'>"+v4Icon('edit')+" Edit cycle</button></div>":"")+"</div>";
   var editor="<div class='cc'><div class='v3-titlebar' style='margin:0 0 8px'><h3 id='v3-edit-head'>Edit training cycle</h3><button class='v3-mini' onclick='v3ResetCycles()'>Reset schedule</button></div><div class='v3-muted'>Editing affects LiftIQ's local plan only. Pausing freezes the cycle week; resuming shifts the current and later cycles forward by the pause duration.</div><div class='v3-actions'>"+MESO_PLAN.map(function(m){return "<button class='v3-mini' data-cycle='"+m.label+"' onclick='v3SelectCycle(this.dataset.cycle)'>"+m.label+"</button>";}).join('')+"</div><form id='v3-cycle-form' class='v3-form' onsubmit='event.preventDefault();v3SaveEdit()'><div class='v3-field full'><label>Cycle name</label><input name='cycleName' maxlength='80' required></div><div class='v3-field'><label>Start date</label><input name='cycleStart' type='date' required></div><div class='v3-field'><label>End date</label><input name='cycleEnd' type='date' required></div><div class='v3-field'><label>Target RPE</label><input name='cycleRpe' maxlength='20'></div><div class='v3-field'><label>Reps</label><input name='cycleReps' maxlength='20'></div><div class='v3-field full'><button class='v3-action' type='submit'>Save cycle changes</button></div></form></div>";
+  var cycleIndex=activeCycle?MESO_PLAN.indexOf(activeCycle):-1;
+  var macroStart=MESO_PLAN.length?MESO_PLAN[0].start:null,macroEnd=MESO_PLAN.length?MESO_PLAN[MESO_PLAN.length-1].end:null;
+  var mprogress=activeCycle?Math.max(0,Math.min(100,Math.round(100*(Math.max(0,(v3Date(v3Today())-v3Date(activeCycle.start))/86400000)+1)/Math.max(1,(v3Date(activeCycle.end)-v3Date(activeCycle.start))/86400000+1)))):0;
+  var hierarchy="<div class='v4-hierarchy'><div class='v4-level'><div class='v4-levelhead'><strong>Macrocycle · 2026 training roadmap</strong><span class='v4-pill'>"+MESO_PLAN.length+" blocks</span></div><div class='v4-sub'>"+v4Date(macroStart)+" – "+v4Date(macroEnd)+" · A high-level overview of the scheduled blocks; editable mesocycles make up this roadmap.</div></div>"+
+   "<div class='v4-level active'><div class='v4-levelhead'><strong>Mesocycle · "+(activeCycle?v3Safe(activeCycle.label+' '+activeCycle.name):'No current block')+"</strong><span class='v4-pill'>"+(activeCycle?(v3Paused(activeCycle)?'Paused':'Active'):'Unscheduled')+"</span></div><div class='v4-sub'>"+(activeCycle?v4Date(activeCycle.start)+' – '+v4Date(activeCycle.end):'Edit dates below to schedule a cycle')+"</div><div class='v4-meter'><div style='width:"+mprogress+"%'></div></div></div>"+
+   "<div class='v4-level'><div class='v4-levelhead'><strong>Microcycle · Training week</strong><span class='v4-pill'>Week "+(activeCycle?b.week:'—')+"</span></div><div class='v4-sub'>"+(activeCycle?v3Safe(b.phase+' · '+b.focus):'No scheduled weekly phase')+"</div></div></div>";
+  var cycleReview="<div class='v4-cycle-ai'><div class='v4-eyebrow'>"+v4Icon('spark')+" Gemini · Cycle advisor</div><div style='font-weight:800;margin-top:8px'>Should this block change?</div><div class='v3-muted'>Review your actual performance trends and ask Gemini whether to extend, hold, deload, or adjust the cycle. Advice is not automatically applied.</div><button onclick='v4CycleReview()' "+(!activeCycle?'disabled':'')+">Review my current cycle</button><div class='v3-muted'>After reviewing advice, use Edit cycle to approve a date change. Hevy data is never overwritten.</div></div>";
   el.innerHTML =
-    hero + phaseRow + phaseDetail + editor +
+    hero + hierarchy + cycleReview + phaseRow + phaseDetail + editor +
     "<div class='cc'><div class='cl'>Week in block</div>" +
       weekDots +
       "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" \u00b7 "+b.phase+"</div>" +
@@ -2351,6 +2400,7 @@ function aiTrainingSnapshot(){
   return {goal:PROFILE.goal,sessions:STATE.sessions,avgRPE:STATE.avgRPE,
     period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),trends:trainingTrends(),
     muscles:STATE.muscleVolume,flags:CURRENT_STATUS,
+    cycle:(function(){var c=v3ActiveCycle();return c?{label:c.label,name:c.name,start:c.start,end:c.end,rpe:c.rpe,reps:c.reps,week:calcBanner().week,paused:v3Paused(c)}:null;})(),
     lifts:Object.keys(STATE.lifts).slice(0,35).map(function(name){var x=STATE.lifts[name],r=STATE.recommendations[name]||{};
       return {name:name,weightLb:x.lastW,reps:x.lastR,rpe:x.lastRPE,e1rmLb:x.lastE,
        sessionsAtWeight:x.sessionsAtWeight,ruleAction:r.action||'',ruleTargetLb:r.target||x.lastW};})};
