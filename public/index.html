@@ -3037,6 +3037,93 @@ function aiTrainingSnapshot(){
       return {name:name,weightLb:x.lastW,reps:x.lastR,rpe:x.lastRPE,e1rmLb:x.lastE,
        sessionsAtWeight:x.sessionsAtWeight,existingRuleSuggestion:{action:r.action||'',targetLb:r.target||x.lastW}};})};
 }
+/* V12.8 — The question is short, but full training snapshots can exceed Netlify's
+   32,000-character request limit. Build a bounded evidence-first payload and never
+   resend duplicate all-time lists as part of each user question. No source records
+   are deleted or modified. */
+function compactCoachTraining(source,strict){
+ var maxEvidence=strict?6:10, setsPerLift=strict?2:4;
+ var active=(source.activePriorityNames||[]).slice(0,strict?10:16);
+ var activeKeys=active.map(function(x){return String(x).toLowerCase();});
+ var priorityFirst=function(a,b){
+  var ia=activeKeys.indexOf(String(a.name||'').toLowerCase()),ib=activeKeys.indexOf(String(b.name||'').toLowerCase());
+  return (ia<0?999:ia)-(ib<0?999:ib);
+ };
+ var orderedLifts=(source.lifts||[]).slice().sort(priorityFirst);
+ var slimTrends={anchorDate:source.trends&&source.trends.anchorDate,windows:{}};
+ ['7d','28d','84d'].forEach(function(period){
+  var w=source.trends&&source.trends.windows&&source.trends.windows[period]||{};
+  slimTrends.windows[period]={daysWithWorkouts:w.daysWithWorkouts,totalSets:w.totalSets,avgRPE:w.avgRPE,
+   muscleExerciseAppearances:Object.fromEntries(Object.entries(w.muscleExerciseAppearances||{}).slice(0,strict?5:9))};
+ });
+ return {
+  goal:source.goal,experience:source.experience,displayUnits:source.displayUnits,
+  trainingPreferences:source.trainingPreferences,
+  // Current block goal only: historical goals don't help answer a present-day question.
+  cycleSuccessCriteria:(function(){
+   var c=source.cycle, goals=source.cycleSuccessCriteria||{};
+   return c&&c.label&&goals[c.label]?{[c.label]:goals[c.label]}:{};
+  })(),
+  recentWorkoutTitles:(source.recentWorkoutTitles||[]).slice(0,strict?4:6),
+  sessions:source.sessions,avgRPE:source.avgRPE,recordMetrics:source.recordMetrics,
+  period:source.period,trends:slimTrends,
+  activePriorityNames:active,priorityMode:source.priorityMode,
+  // Priority audit retains evidence quality and tracked-goal progress; it never sends
+  // full dated sets that are also present in evidenceByLift.
+  priorityAudit:(source.priorityAudit||[]).slice(0,strict?6:10).map(function(a){return {
+   name:a.name,status:a.status,observation:String(a.observation||'').slice(0,strict?85:145),
+   allTimeTrainingDates:a.allTimeTrainingDates,lastDate:a.lastDate,
+   priorityStatus:a.priorityStatus,goalProgress:a.goalProgress
+  };}),
+  discoveredPriorityMovements:(source.discoveredPriorityMovements||[]).slice(0,strict?8:14).map(function(a){return {
+   name:a.name,trainingDates:a.trainingDates,recent84Days:a.recent84Days,lastDate:a.lastDate,
+   status:a.status,goalMatch:a.goalMatch,target:a.target
+   // Individual observed sets live in evidenceByLift below, not duplicated here.
+  };}),
+  evidenceByLift:(source.evidenceByLift||[]).slice(0,maxEvidence).map(function(e){return {
+   name:e.name,classification:e.classification,
+   observation:String(e.observation||'').slice(0,strict?90:170),
+   datedSets:(e.datedSets||[]).slice(-setsPerLift).map(function(x){return {
+    date:x.date,weightLb:x.weightLb,reps:x.reps,e1rmLb:x.e1rmLb,rpe:x.rpe
+   };})
+  };}),
+  analysisCautions:['Exercise variants and machine loads are not directly comparable.','RPE is missing where not recorded.','Daily best sets are not full workouts; estimated 1RM is approximate.'],
+  muscles:source.muscles,flags:source.flags,cycle:source.cycle,
+  lifts:orderedLifts.slice(0,strict?14:24).map(function(l){return {
+   name:l.name,weightLb:l.weightLb,reps:l.reps,rpe:l.rpe,e1rmLb:l.e1rmLb,
+   sessionsAtWeight:l.sessionsAtWeight,existingRuleSuggestion:l.existingRuleSuggestion
+  };})
+ };
+}
+function coachRequestBody(mode,question,maxLength){
+ var source=aiTrainingSnapshot(),cap=maxLength||23000;
+ var training=compactCoachTraining(source,false);
+ var payload=JSON.stringify({mode:mode,question:mode==='question'?question:'',training:training});
+ if(payload.length<=cap)return payload;
+ // Large user histories retain broad coverage in the normal path; strict mode
+ // reduces older evidence only when necessary to fit the transport constraint.
+ training=compactCoachTraining(source,true);
+ payload=JSON.stringify({mode:mode,question:mode==='question'?question:'',training:training});
+ if(payload.length<=cap)return payload;
+ // A very long custom goal, unusual exercise names or enormous metadata should
+ // not break the whole Coach; prune low-priority context in a predictable order.
+ training.priorityAudit=training.priorityAudit.slice(0,4);
+ training.discoveredPriorityMovements=training.discoveredPriorityMovements.slice(0,6);
+ training.evidenceByLift=training.evidenceByLift.slice(0,4);
+ training.lifts=training.lifts.slice(0,12);
+ training.activePriorityNames=training.activePriorityNames.slice(0,12);
+ training.muscles=Object.fromEntries(Object.entries(training.muscles||{}).slice(0,12));
+ training.trainingPreferences=Object.assign({},training.trainingPreferences||{},
+   {limitations:String(training.trainingPreferences&&training.trainingPreferences.limitations||'').slice(0,180)});
+ payload=JSON.stringify({mode:mode,question:mode==='question'?question:'',training:training});
+ if(payload.length>cap){
+  training.priorityAudit=[];training.discoveredPriorityMovements=[];training.evidenceByLift=[];
+  training.lifts=training.lifts.slice(0,8);
+  payload=JSON.stringify({mode:mode,question:mode==='question'?question:'',training:training});
+ }
+ if(payload.length>cap)throw new Error('Coach summary is still too large. Try shortening custom training notes or exercise names in Settings.');
+ return payload;
+}
 function applyApprovedCoachChanges(){
  Object.keys(_aiApproved).forEach(function(name){
    var a=_aiApproved[name],last=STATE.lifts[name],existing=STATE.recommendations[name];
@@ -3071,11 +3158,11 @@ function renderAICoach(){
  "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':(cached?'Refresh AI review':'Analyze my training'))+"</button></div>"+
  "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='Ask about stalls, volume, or progression…'>"+aiSafe(_aiQuestion)+"</textarea>"+
  "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(\"question\")' "+(_aiBusy?'disabled':'')+">Ask LiftIQ</button></div>"+
- "<div class='ai-feedback'>Observed evidence comes from recent dated workout sets. Existing rule-based targets are marked as suggestions, not facts. Training plans are never changed automatically.</div>"+
+ "<div class='ai-feedback'>LiftIQ sends a compact, priority-aware summary with dated best sets—not the entire Hevy export. Older or lower-priority records may be omitted; ask about a specific lift for a focused answer. Existing rule-based targets are suggestions, not facts. Training plans are never changed automatically.</div>"+
  "<div class='ai-feedback'>Coach review is cached until your workout history or readiness flags change. Approvals expire when underlying data changes. Data reflects saved Hevy sessions, not unfinished workouts.</div>"+
- "<div class='ai-feedback'>AI analysis sends summarized workout metrics to Gemini. Free-tier Gemini use may allow Google to use submitted content to improve its products. No names or raw Hevy session details are included in this request. AI can be mistaken.</div></div>";
+ "<div class='ai-feedback'>AI analysis sends summarized metrics, exercise names, selected goals, training preferences and up to six recent workout titles to Gemini. Your Google email and full raw Hevy sessions are not included. Google may use free-tier Gemini submissions to improve its products. AI can be mistaken.</div></div>";
  if(STATE.imported){html+=uiFold('coach-key-movements','Priority context','Your selected exercises included in coaching analysis',"<div class='v3-muted'>Review priorities under Targets before approving any programming changes.</div>"+smartPinned().slice(0,8).map(function(x){return "<div class='v3-row'>"+v3Safe(shortName(x.name))+" · "+x.dates+" recorded training dates</div>";}).join(''),false,smartPinned().length+' selected');}
- if(STATE.imported){html+=uiFold('coach-evidence','Workout evidence sent to Gemini','Inspect dated best-set observations by exercise',"<div class='v3-muted'>Up to 6 recent best sets per priority exercise over 84 days.</div>"+smartActivePriorityNames().slice(0,12).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join(''),false,smartActivePriorityNames().length+' lifts');}
+ if(STATE.imported){html+=uiFold('coach-evidence','Workout evidence sent to Gemini','Inspect dated best-set observations by exercise',"<div class='v3-muted'>Up to 4 recent best sets per priority exercise over 84 days are sent in the standard compact AI request. This inspector shows the full local evidence.</div>"+smartActivePriorityNames().slice(0,12).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join(''),false,smartActivePriorityNames().length+' lifts');}
  if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
  if(_aiNotice)html+="<div class='cc' style='color:var(--gr)'>"+aiSafe(_aiNotice)+"</div>";
  if(_aiResult){html+="<div class='cc'><div class='cl'>Coach interpretation</div><div class='ai-result'>"+aiSafe(_aiResult.answer||_aiResult.summary)+"</div>";
@@ -3102,9 +3189,18 @@ async function askAI(mode){
  var fp=trainingFingerprint();
  if(mode==='review'&&_aiReviewCache[fp]&&Date.now()-_aiReviewCache[fp].at<7*86400000){_aiResult=_aiReviewCache[fp].result;_aiResultFingerprint=fp;_aiNotice='Loaded existing review for this training data. To request fresh advice, use Ask LiftIQ.';renderAICoach();return;}
  _aiBusy=true;renderAICoach();
- try{var res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},
-  body:JSON.stringify({mode:mode,question:_aiQuestion,training:aiTrainingSnapshot()})});
- var data=await res.json();if(!res.ok)throw new Error(data.error||'AI request failed.');
+ try{
+ var requestText=coachRequestBody(mode,_aiQuestion,23000);
+ var res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},body:requestText});
+ // Some hosting gateways may enforce a lower payload ceiling. Automatically
+ // retry a single time with an even shorter summary, preserving the question.
+ if(res.status===413){
+  requestText=coachRequestBody(mode,_aiQuestion,10500);
+  res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},body:requestText});
+  if(res.ok)_aiNotice='LiftIQ used a smaller evidence summary to fit the hosting request limit.';
+ }
+ var data;try{data=await res.json();}catch(e){throw new Error(res.status===413?'The Coach summary exceeded the server limit. Try again with a more specific question.':'AI server returned an unreadable response (HTTP '+res.status+').');}
+ if(!res.ok)throw new Error(data.error||('AI request failed (HTTP '+res.status+').'));
  (data.proposals||[]).forEach(function(p){p.baseWeightLb=STATE.lifts[p.lift]?STATE.lifts[p.lift].lastW:null;});
  _aiResult=data;_aiResultFingerprint=fp;
  if(mode==='review'){_aiReviewCache={[fp]:{at:Date.now(),result:data}};storeAIReviewCache();}
