@@ -725,7 +725,7 @@ loadUserSettings();
 var STATE = {
   imported: false,
   dateRange: {start:null, end:null},
-  sessions: 0,
+  sessions: 0, recordMetrics:null,
   exercisesAnalyzed: 0,
   avgRPE: null,
   lifts: {},       // liftName -> {lastW,lastR,lastRPE,lastE,sessionsAtWeight,d,ts}
@@ -965,31 +965,10 @@ function runEngine() {
     STATE.recommendations[lk] = rec;
   });
 
-  // Volume rules — only when real data exists
-  if (!STATE.imported || STATE.exercisesAnalyzed === 0) return;
-  // The dashboard's muscleVolume is cumulative over the chosen import period.
-  // Weekly coaching alerts MUST use just the most recent seven calendar days.
-  var last7={},daysWithTraining=0;
-  var now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()-6);
-  var startKey=start.getFullYear()+"-"+String(start.getMonth()+1).padStart(2,"0")+"-"+String(start.getDate()).padStart(2,"0");
-  Object.keys(STATE.dailyLog||{}).forEach(function(k){
-    if(k<startKey)return;
-    var d=STATE.dailyLog[k];
-    if(d.sets>0)daysWithTraining++;
-    Object.keys(d.muscleSets||{}).forEach(function(m){last7[m]=(last7[m]||0)+d.muscleSets[m];});
-  });
-  if(!daysWithTraining)return; // Don't label an inactive week as a muscle imbalance.
-  var g=last7["Glutes"]||0, h=last7["Hamstrings"]||0;
-  var b=last7["Back"]||0, gm=last7["Glute Med"]||0;
-  if (g>0 && h < g*0.55)
-    STATE.warnings.push({type:"volume",flag:"hamstring_gap",
-      msg:"Last 7 days: Hamstrings "+h+" sets vs Glutes "+g+" sets. Consider more hamstring work next session."});
-  if (b < 6)
-    STATE.warnings.push({type:"volume",flag:"pull_low",
-      msg:"Last 7 days: Back volume "+b+" sets. Review your upper-pull schedule."});
-  if (gm < 6)
-    STATE.warnings.push({type:"volume",flag:"glute_med",
-      msg:"Last 7 days: Glute medius "+gm+" sets. Consider abduction work as tolerated."});
+  // V9: no automatic hamstring/glute ratio or fixed back/abduction thresholds.
+  // No comparative fatigue conclusion can be drawn from set counts alone.
+  // Use the evidence-led, time-windowed Audit for observation and review.
+
 }
 
 // ═══════════════════════════════════════
@@ -997,8 +976,7 @@ function runEngine() {
 // ═══════════════════════════════════════
 
 function suggestedSession() {
-  var days = ["Rest","Posterior Chain","Glute & Quad","Unilateral","Upper Pull","Glute & Quad","Rest"];
-  return days[new Date().getDay()];
+  return 'Choose from your actual Hevy routine';
 }
 
 // ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
@@ -1084,8 +1062,8 @@ function renderDashboard() {
     // Stat row
     "<div class='dash-grid'>" +
       statBox("Meso Block",b.label+" &middot; "+b.name,"Week "+b.week+"/"+b.totalWeeks) +
-      statBox("Synced sessions",STATE.sessions+"","All imported history") +
-      statBox("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1):"—","Target 7.5–8.5") +
+      statBox("Synced sessions",STATE.sessions+"","Recorded workouts · imported") +
+      statBox("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1):"—",STATE.recordMetrics&&STATE.recordMetrics.rpeEligible?Math.round(100*STATE.recordMetrics.rpeRecorded/STATE.recordMetrics.rpeEligible)+"% set coverage":"Recorded sets only") +
       statBox("Current cycle",v5CycleTrainingDays()+"","training days logged") +
     "</div>" +
     // Biggest win
@@ -1112,6 +1090,12 @@ function v3ProgressTop(){
  var flagged=target.filter(function(r){return ['stall','injury','reduce'].includes(r.action);}).length;
  var h="<div class='v3-hero'><div class='v3-eyebrow'>Performance snapshot</div><div class='v3-h1'>Your progress at a glance</div><div class='v3-sub'>Actionable targets appear first. Comparisons follow below.</div></div>";
  h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+pushes+"</strong><span>Ready to progress</span></div><div class='v3-kpi'><strong>"+holds+"</strong><span>Building / hold</span></div><div class='v3-kpi'><strong>"+flagged+"</strong><span>Need review</span></div></div>";
+ h+="<div class='v3-titlebar'><h3>Recent priority-lift trends</h3><span class='v3-muted'>Last 84 days</span></div>";
+ var history=trainingTrends().windows['84d'].priorityLiftHistory||{};
+ h+="<div class='v3-rows'>"+PROFILE.priorityLifts.slice(0,8).map(function(n){var rows=history[n]||[]; if(rows.length<2)return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span>Limited data</span></div></div>";
+ var first=rows[0],last=rows[rows.length-1],delta=Math.round((last.e1rmLb-first.e1rmLb)*10)/10;
+ return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span>"+(delta>0?'+':'')+delta+" lb estimated</span></div><div class='v3-muted'>"+v3Safe(first.date)+": "+first.weightLb+" × "+first.reps+" → "+v3Safe(last.date)+": "+last.weightLb+" × "+last.reps+" · "+rows.length+" training dates</div></div>";
+ }).join('')+"</div>";
  h+="<div class='v3-titlebar'><h3>Next-session targets</h3><button class='v3-mini' onclick='v3OpenTargets()'>All targets</button></div>";
  h+="<div class='v3-rows'>"+target.slice(0,5).map(function(r){var val=r.target!=null?r.target+' lbs':'—';return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(r.lift))+"</strong><span>"+v3Safe(val)+"</span></div><div class='v3-muted'>"+v3Safe(r.badge||'Review')+" · "+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set'+'</div></div>';}).join('')+(target.length?'':"<div class='v3-row v3-muted'>Sync Hevy to populate your lift targets.</div>")+"</div>";
  return h;
@@ -1601,7 +1585,7 @@ function deriveBiggestWin(state, recs) {
   // 10. Consistency
   if (state.sessions >= 10)
     return {icon:v4Icon("check"), title:"Consistency win",
-      body:state.sessions+" sessions this period. Showing up is compounding. Most people don\u2019t."};
+      body:state.sessions+" saved workouts in the imported history. Frequency should be assessed over the relevant time window."};
 
   // 11. Hamstring volume healthy (absolute)
   if (h>0&&g>0&&h/g>=0.6)
@@ -1684,46 +1668,19 @@ function deriveInsights() {
 
   if (!hasData) return ins;
 
-  // 2. Stalled lifts
+  // V9: put time-windowed observations first; do not diagnose volume gaps or fatigue.
   if (S.stalled.length) {
-    var sn = S.stalled.map(function(lk){return shortName(lk);}).join(", ");
-    ins.push({type:"risk", severity:"yellow",
-      title:S.stalled.length===1?"Stall detected":S.stalled.length+" lifts stalled",
-      body:sn+". Same load, 3+ sessions, no rep improvement. Drop set at 70%, rep reset, or technique audit before adding weight."});
+    var sn = S.stalled.slice(0,5).map(shortName).join(', ');
+    ins.push({type:'pattern',severity:'blue',title:'Lifts to review',
+      body:sn+'. Current progression signals warrant a look at comparable sets and recovery, not an automatic drop-set prescription.'});
+  }
+  var trendWindow=trainingTrends().windows['28d'];
+  if(trendWindow.totalSets){
+    ins.push({type:'pattern',severity:'blue',title:'Recent workload — last 28 days',
+      body:trendWindow.totalSets+' qualifying weighted sets across '+trendWindow.daysWithWorkouts+' lifting dates. Use Progress to assess individual exercises.'});
   }
 
-  // 3. Hamstring gap
-  if (g>0 && h<g*0.55)
-    ins.push({type:"risk", severity:"yellow", title:"Hamstrings trailing glutes",
-      body:h+" hamstring sets vs "+g+" glute sets. Hamstrings are the single biggest limiter for glute development and back health. Add 2\u20134 hard sets."});
-
-  // 4. RPE aligned
-  if (S.avgRPE) {
-    var rr2 = b.rpe.split("\u2013").map(parseFloat);
-    if (rr2.length===2 && S.avgRPE>=rr2[0] && S.avgRPE<=rr2[1])
-      ins.push({type:"win", severity:"green", title:"Intensity on target",
-        body:"Avg RPE "+S.avgRPE.toFixed(1)+" matches M8 target ("+b.rpe+"). Periodization works when intensity is dialled \u2014 you\u2019re loading correctly."});
-  }
-
-  // 5. High training density within the current cycle
-  var cycleDays=v5CycleTrainingDays();
-  if (cycleDays > 5)
-    ins.push({type:"risk", severity:"orange", title:"High training density",
-      body:cycleDays+" training days are logged in the current cycle window. Watch for accumulated fatigue if RPE continues climbing week-over-week."});
-
-  // 6. Priority lift near or past M8 target
-  PROFILE.priorityLifts.forEach(function(lk) {
-    var d=S.lifts[lk], t=PROFILE.liftTargets[lk];
-    if (!d||!t||!t.M8e||!d.lastE) return;
-    var pct=d.lastE/t.M8e, n=shortName(lk);
-    if (pct>=1.0) ins.push({type:"win", severity:"green",
-      title:n+" hit M8 target",
-      body:d.lastE+" lbs e1RM \u2014 M8 target was "+t.M8e+". Set sights on M9: "+t.M9e+" lbs e1RM."});
-    else if (pct>=0.85) ins.push({type:"win", severity:"green",
-      title:n+" approaching M8 target",
-      body:d.lastE+" lbs e1RM \u2014 "+Math.round(pct*100)+"% of M8 target. "+(t.M8e-d.lastE)+" lbs to go."});
-  });
-
+  // M8 legacy goals are archived rather than treated as current-cycle milestones.
   // 7. Upper pull check
   var backSets = S.muscleVolume["Back"]||0;
   if (backSets===0) ins.push({type:"risk", severity:"orange",
@@ -1779,45 +1736,21 @@ function renderInsights(){
 }
 
 function renderAudit() {
-  var el = document.getElementById("t-audit");
-  if (!el) return;
-  if (!STATE.imported) {
-    el.innerHTML = emptyState("Import Hevy CSV to generate a training audit.",""); return;
-  }
-  var S = STATE;
-  var volRows = Object.keys(S.muscleVolume).sort(function(a,b){return S.muscleVolume[b]-S.muscleVolume[a];}).map(function(m) {
-    var sets=S.muscleVolume[m], isPri=PROFILE.priorityMuscles.indexOf(m)!==-1;
-    var col = isPri?"var(--or)":"var(--bl)";
-    return "<div class='vol-row'>" +
-      "<div style='display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px'>" +
-        "<span style='color:var(--tx);font-weight:600'>"+m+(isPri?" ":"")+"</span>" +
-        "<span style='color:var(--t2)'>"+sets+" sets</span></div>" +
-      "<div class='vol-bar-bg'><div class='vol-bar-fill' style='width:"+Math.min(sets/25*100,100)+"%;background:"+col+"'></div></div>" +
-    "</div>";
-  }).join("");
-
-  var pills = function(list, cls) {
-    return list.length ? list.map(function(l){
-      return "<span class='apill "+cls+"'>"+shortName(l)+"</span>";
-    }).join("") : "<span style='color:var(--t3);font-size:11px'>None</span>";
-  };
-
-  el.innerHTML =
-    "<div class='cc'><div class='cl'>Improved lifts</div>"+pills(S.improved,"g")+"</div>" +
-    "<div class='cc'><div class='cl'>Stalled lifts</div>"+pills(S.stalled,"a")+"</div>" +
-    "<div class='cc'><div class='cl'>Volume by muscle group</div>"+volRows+"</div>" +
-    "<div class='ib'>" +
-      ir("&#8212;","<strong>Sessions:</strong> "+S.sessions+". Sustainable ceiling is 18–20/month.") +
-      ir("&#8212;","<strong>Avg RPE:</strong> "+(S.avgRPE?S.avgRPE.toFixed(1):"—")+". Target 7.5–8.5 on working sets. Posterior chain sessions historically run too low.") +
-      ir("&#8212;","<strong>Glute medius:</strong> Flat upper glute is a medius issue, not maximus. Abduction work every session, progressive overload on abduction past 200 lbs.") +
-    "</div>" +
-    "<div class='cc'><div class='cl'>Never / Always</div>" +
-      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px;color:var(--t2);line-height:2'>" +
-        "<div><div style='font-size:10px;font-weight:700;color:var(--re);margin-bottom:4px'>NEVER</div>" +
-          "&#10007; Failure on RDL/BSS<br>&#10007; Sled push (ankle)<br>&#10007; Skip RDL warmup sets<br>&#10007; Add more lat volume</div>" +
-        "<div><div style='font-size:10px;font-weight:700;color:var(--gr);margin-bottom:4px'>ALWAYS</div>" +
-          "&#10003; Log Belt Squat config<br>&#10003; 2+ warmup sets on compounds<br>&#10003; Beat 1 metric vs last session<br>&#10003; Hamstring work every session</div>" +
-      "</div></div>";
+ var el=document.getElementById('t-audit'); if(!el)return;
+ if(!STATE.imported){el.innerHTML=emptyState('Import Hevy workouts to see a training audit.','');return;}
+ var t=trainingTrends(), w=t.windows||{}, a=w['7d']||{}, b=w['28d']||{}, c=w['84d']||{};
+ var m=STATE.recordMetrics||{}, coverage=m.rpeEligible?Math.round(100*m.rpeRecorded/m.rpeEligible):null;
+ var muscle28={};Object.keys(STATE.dailyLog||{}).forEach(function(day){var stamp=Date.parse(day+'T12:00:00');var edge=Date.parse((t.anchorDate||day)+'T12:00:00')-27*86400000;
+   if(stamp>=edge && stamp<=Date.parse((t.anchorDate||day)+'T12:00:00')) Object.entries(STATE.dailyLog[day].muscleSets||{}).forEach(function(kv){muscle28[kv[0]]=(muscle28[kv[0]]||0)+kv[1];});
+ });
+ var sorted=Object.entries(muscle28).sort(function(x,y){return y[1]-x[1];}),max=Math.max(1,...sorted.map(function(p){return p[1];}));
+ var rows=sorted.map(function(pair){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(pair[0])+"</strong><span>"+pair[1]+" sets</span></div><div class='v3-track'><div class='v3-fill' style='width:"+Math.round(pair[1]/max*100)+"%'></div></div></div>";}).join('');
+ var metrics="<div class='v3-kpis'><div class='v3-kpi'><strong>"+(m.sessions??STATE.sessions)+"</strong><span>Saved workouts · imported</span></div><div class='v3-kpi'><strong>"+(m.strengthSets??'—')+"</strong><span>Weighted working sets</span></div><div class='v3-kpi'><strong>"+(coverage===null?'—':coverage+'%')+"</strong><span>RPE coverage</span></div></div>";
+ var timeRows=[['7 days',a],['28 days',b],['84 days',c]].map(function(p){return "<div class='v3-row'><div class='v3-line'><strong>Last "+p[0]+"</strong><span>"+(p[1].daysWithWorkouts||0)+" training dates</span></div><div class='v3-muted'>"+(p[1].totalSets||0)+" qualifying weighted sets · Avg RPE "+(p[1].avgRPE??'not recorded')+"</div></div>";}).join('');
+ el.innerHTML="<div class='v3-hero'><div class='v3-eyebrow'>Training audit · Evidence first</div><div class='v3-h1'>What your records show.</div><div class='v3-sub'>Session counts are distinct from strength-set counts. All time windows are anchored to the latest qualifying set in your import.</div></div>"+metrics+
+ "<div class='v3-titlebar'><h3>Activity by window</h3></div><div class='v3-rows'>"+timeRows+"</div>"+
+ "<div class='v3-titlebar'><h3>Muscle workload · Last 28 days</h3></div><div class='v3-rows'>"+(rows||"<div class='v3-row v3-muted'>No classified sets in this window.</div>")+"</div>"+
+ "<div class='cc'><div class='cl'>Interpretation limits</div><div class='v3-muted'>Weekly set counts are classified by exercise and can underestimate secondary muscle involvement. RPE is optional and averages only recorded values. A flat lift, low set count, or missed week alone does not establish a plateau or poor recovery.</div></div>";
 }
 
 // ── Import Tab ──
@@ -2080,6 +2013,7 @@ function parseHevy(text, options) {
   };
 
   var byEx = {}, byDate = {}, rawRPEs = [], allDates = [], cutoff = null;
+  var distinctWorkouts = new Set(), sessionDates = {}, totalRowsInWindow=0, qualifiedSets=0, rpeEligible=0;
   if (_importWeeks > 0) {
     cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - _importWeeks * 7);
@@ -2121,6 +2055,15 @@ function parseHevy(text, options) {
     // Date range filter
     if (cutoff && rowDate < cutoff) { diag.skippedDateRange++; continue; }
 
+    // Preserve all recorded sessions, including cardio and mobility-only workouts.
+    // Composite identity distinguishes two workouts on the same day when title/time differ.
+    var workoutTitle = hdr["title"]!==undefined ? String(v[hdr["title"]]||'').trim() : '';
+    var workoutEnd = hdr["end_time"]!==undefined ? String(v[hdr["end_time"]]||'').trim() : '';
+    distinctWorkouts.add(dt+'|'+workoutEnd+'|'+workoutTitle);
+    sessionDates[dateKey]=(sessionDates[dateKey]||new Set());
+    sessionDates[dateKey].add(dt+'|'+workoutEnd+'|'+workoutTitle);
+    totalRowsInWindow++;
+
     // Set type filter — normalize, accept working sets only
     // Skip only clearly labelled warmup or drop sets
     var skipTypes = ["warmup","warm up","warm-up","dropset","drop set","drop-set","failure_end"];
@@ -2135,10 +2078,10 @@ function parseHevy(text, options) {
     if (isNaN(rp) || rp <= 0) { diag.skippedMissingReps++; continue; }
 
     // Row is valid — count it
-    diag.importedRows++;
+    diag.importedRows++; qualifiedSets++; rpeEligible++;
     if (!minDate || dateKey < minDate) minDate = dateKey;
     if (!maxDate || dateKey > maxDate) maxDate = dateKey;
-    if (!isNaN(rpe2) && rpe2 > 0) rawRPEs.push(rpe2);
+    if (!isNaN(rpe2) && rpe2 >= 1 && rpe2 <= 10) rawRPEs.push(rpe2);
     if (allDates.indexOf(dateKey) === -1) allDates.push(dateKey);
 
     var mapped = normalizeExerciseName(exName);
@@ -2195,8 +2138,14 @@ function parseHevy(text, options) {
   window._lastDiag = null; // clear diagnostics on success
   var mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   function fd(s) { var p=s.split("-"); return mo[parseInt(p[1])-1]+" "+parseInt(p[2]); }
-  populateState(byEx, rawRPEs, options.sessionCount || allDates.length,
+  populateState(byEx, rawRPEs, distinctWorkouts.size,
     {start: minDate ? fd(minDate) : "\u2014", end: maxDate ? fd(maxDate) : "\u2014"}, byDate);
+  // Session count reports all saved workouts; lifting calculations still exclude nonweighted sets.
+  STATE.recordMetrics={sessions:distinctWorkouts.size, strengthSets:qualifiedSets,
+    rpeRecorded:rawRPEs.length, rpeEligible:rpeEligible, daysWithWorkouts:Object.keys(sessionDates).length,
+    workoutsPerDay:Object.fromEntries(Object.entries(sessionDates).map(function(pair){return [pair[0],pair[1].size];})),
+    totalRows:totalRowsInWindow};
+  saveState(); renderDashboard(); renderAudit(); renderImportTab(); renderAICoach();
 }
 
 function populateState(byEx,rawRPEs,sessionCount,dateRange,byDate) {
@@ -2570,7 +2519,7 @@ function refreshAIReviews(){
 var _aiResultFingerprint='';
 function loadCachedAIReview(){var fp=trainingFingerprint(),c=_aiReviewCache[fp];if(!_aiResult&&c&&Date.now()-c.at<7*86400000){_aiResult=c.result;_aiResultFingerprint=fp;}}
 function aiTrainingSnapshot(){
-  return {goal:PROFILE.goal,sessions:STATE.sessions,avgRPE:STATE.avgRPE,
+  return {goal:USER_SETTINGS.goal||PROFILE.goal,sessions:STATE.sessions,avgRPE:STATE.avgRPE, recordMetrics:STATE.recordMetrics,
     period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),trends:trainingTrends(),
     muscles:STATE.muscleVolume,flags:CURRENT_STATUS,
     cycle:(function(){var c=v3ActiveCycle();return c?{label:c.label,name:c.name,start:c.start,end:c.end,rpe:c.rpe,reps:c.reps,week:calcBanner().week,paused:v3Paused(c)}:null;})(),
@@ -2962,7 +2911,7 @@ function saveState() {
       prevLifts: STATE.prevLifts,
       muscleVolume: STATE.muscleVolume,
       dailyLog: STATE.dailyLog,
-      sessions: STATE.sessions,
+      sessions: STATE.sessions, recordMetrics:STATE.recordMetrics,
       dateRange: STATE.dateRange,
       exercisesAnalyzed: STATE.exercisesAnalyzed,
       avgRPE: STATE.avgRPE,
@@ -2982,7 +2931,7 @@ function restoreState() {
     STATE.prevLifts = saved.prevLifts || {};
     STATE.muscleVolume = saved.muscleVolume || {};
     STATE.dailyLog = saved.dailyLog || {};
-    STATE.sessions = saved.sessions || 0;
+    STATE.sessions = saved.sessions || 0; STATE.recordMetrics=saved.recordMetrics||null;
     STATE.dateRange = saved.dateRange || {start:null,end:null};
     STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
     STATE.avgRPE = saved.avgRPE || null;
