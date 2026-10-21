@@ -3,16 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Training Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>LiftIQ · Obsidian</title>
+<meta name="theme-color" content="#0a0b0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0f0f11;--bg2:#18181b;--bg3:#222226;
   --bd:#2a2a2f;--bd2:#3a3a42;
   --tx:#f4f4f6;--t2:#8b8b96;--t3:#4a4a54;
-  --or:#e8673a;--bl:#2d6ef5;--gr:#1db87a;--re:#ff453a;--am:#ffd60a;
+  --or:#bdc5d0;--bl:#2d6ef5;--gr:#1db87a;--re:#ff453a;--am:#ffd60a;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:"Outfit",sans-serif;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"DM Sans",sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-height:100vh}
 
 /* TOP BAR */
@@ -58,7 +61,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 .sth{display:grid;grid-template-columns:40px 1fr 1fr 52px 40px;padding:7px 14px;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--bd)}
 .sr{display:grid;grid-template-columns:40px 1fr 1fr 52px 40px;padding:9px 14px;font-size:12px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04)}
 .sr:last-child{border-bottom:none}
-.sr.wu{color:var(--t2)}.sr.top{background:#1db87a08;font-weight:600}.sr.bo{background:#2d6ef508}.sr.dr{background:#e8673a08}
+.sr.wu{color:var(--t2)}.sr.top{background:#1db87a08;font-weight:600}.sr.bo{background:#2d6ef508}.sr.dr{background:#bdc5d008}
 .sn{font-size:11px;font-weight:700}
 .sn.wu{color:var(--t3)}.sn.top{color:var(--gr)}.sn.bo{color:var(--bl)}.sn.dr{color:var(--or)}
 .pv{color:var(--t3);font-size:11px}.tv{color:var(--tx);font-weight:600;font-size:12px}.rv{font-size:10px;color:var(--t2)}
@@ -72,7 +75,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 /* POOL */
 .pool-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 6px}
 .pool-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg3);margin-bottom:6px;cursor:pointer;user-select:none;transition:border-color .15s}
-.pool-item.pool-on{border-color:var(--or);background:#e8673a0a}
+.pool-item.pool-on{border-color:var(--or);background:#bdc5d00a}
 .pool-wu{border-color:#1db87a30;background:#1db87a0a;cursor:default}
 .pchk{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--bd2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0;transition:all .15s}
 .pchk.on{background:var(--or);border-color:var(--or)}
@@ -110,7 +113,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 .meso-level{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
 .meso-badge{font-size:8px;font-weight:800;padding:3px 7px;border-radius:4px;letter-spacing:.08em;flex-shrink:0;margin-top:2px;white-space:nowrap}
 .meso-micro{background:#2d6ef520;color:var(--bl)}
-.meso-meso{background:#e8673a20;color:var(--or)}
+.meso-meso{background:#bdc5d020;color:var(--or)}
 .meso-macro{background:#ffd60a18;color:var(--am)}
 .meso-level-name{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:2px}
 .meso-level-body{font-size:11px;color:var(--t2);line-height:1.5}
@@ -129,7 +132,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 .dash-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
 .dash-card.win{border-color:#1db87a30;background:#1db87a08}
 .dash-card.warn{border-color:#ffd60a30;background:#ffd60a08}
-.dash-card.coach{border-color:#e8673a30;background:#e8673a08}
+.dash-card.coach{border-color:#bdc5d030;background:#bdc5d008}
 .dash-card.suggest{border-color:#2d6ef530;background:#2d6ef508}
 .dash-icon{font-size:20px;flex-shrink:0;margin-top:1px}
 .dash-title{font-size:12px;font-weight:800;color:var(--tx);margin-bottom:3px}
@@ -209,15 +212,66 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 .hevy-sync-actions button.secondary{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx)}
 .hevy-sync-actions button:disabled{opacity:.5;cursor:wait}
 .hevy-signin{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px}.hevy-signin button{border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);border-radius:9px;padding:9px 12px;cursor:pointer;font-size:12px}.hevy-signin #googleButton{min-height:40px}.hevy-status{font-size:11px;line-height:1.6;color:var(--t2);margin-top:10px;white-space:pre-wrap}
+
+/* ============================================================================
+   LIFTIQ — OBSIDIAN DESIGN SYSTEM
+   Presentation layer only: Hevy, Google sign-in, Gemini and training logic intact.
+   ============================================================================ */
+:root{
+  color-scheme:dark;
+  --bg:#0a0b0d;--bg2:#131518;--bg3:#1a1d22;
+  --bd:#292d33;--bd2:#414750;
+  --tx:#f3f3f1;--t2:#adb3bc;--t3:#848b95;
+  --or:#cbd2da;--bl:#a8c0d6;--gr:#78bf9d;--re:#ee877e;--am:#e9bf79;
+}
+html{scroll-behavior:smooth}
+body{max-width:620px;min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse 85% 24% at 50% -4%,rgba(173,188,209,.09),transparent 72%),var(--bg);color:var(--tx);padding-bottom:108px;font-family:'DM Sans',sans-serif;font-size:14px}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.10;background-image:radial-gradient(#a2aab5 .42px,transparent .45px);background-size:8px 8px;z-index:-1}
+button,input,textarea{font-family:'DM Sans',sans-serif}
+button{touch-action:manipulation}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #d5dce5;outline-offset:3px}
+.obs-header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 21px;border-bottom:1px solid #272b31;background:rgba(12,13,15,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.obs-brand{display:flex;align-items:center;gap:11px}.obs-monogram{height:38px;width:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:800 20px 'Manrope',sans-serif;letter-spacing:-.12em;background:linear-gradient(155deg,#e2e5e8,#7b828a);color:#0d0f12;box-shadow:inset 0 1px #ffffff80}
+.obs-monogram span{margin-left:2px;color:#535a64}.obs-wordmark{font:800 18px 'Manrope',sans-serif;letter-spacing:-.07em;line-height:1.2}.obs-wordmark span{font-weight:500;color:#a6adb7}.obs-subbrand{font-size:8px;font-weight:700;letter-spacing:.21em;color:var(--t3);margin-top:4px}
+.obs-edition{font-size:9px;color:#e6e7e7;font-weight:800;letter-spacing:.18em;display:flex;align-items:center;gap:6px}.obs-edition-no{color:var(--t3)}.obs-status-dot{width:5px;height:5px;background:#bed7c8;border-radius:50%;box-shadow:0 0 10px #bed7c875}
+.obs-headline{padding:26px 21px 13px}.obs-eyebrow{color:#a6aeb9;font-size:9px;letter-spacing:.21em;font-weight:700}.obs-headline h1{font:800 clamp(25px,7vw,36px)/1.2 'Manrope',sans-serif;letter-spacing:-.055em;margin-top:9px}.obs-headline em{font-style:normal;color:#89929f;font-weight:500}
+.topbar{position:fixed;bottom:0;top:auto;left:50%;transform:translateX(-50%);width:100%;max-width:620px;z-index:110;border:1px solid #343940;border-bottom:0;border-radius:19px 19px 0 0;box-shadow:0 -14px 45px #0009;background:rgba(18,20,24,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:9px 12px calc(12px + env(safe-area-inset-bottom));gap:9px}
+.tb{color:#9ca3ac;border:1px solid transparent;border-radius:12px;padding:9px 14px 10px;font:700 12px 'DM Sans',sans-serif;letter-spacing:.01em;display:flex;gap:7px;align-items:center;justify-content:center}.tb.on{color:#f2f3f3;background:linear-gradient(150deg,#353a42,#252a30);border:1px solid #59606c;box-shadow:inset 0 1px #ffffff19}.obs-nav-ico{font-size:18px;font-weight:400;line-height:1}
+#timerBar{top:0;background:#1a1e23;box-shadow:0 4px 20px #0006}
+.imp-banner{margin:10px 18px;border:1px solid #4b6259;border-radius:10px;background:#24332d;color:#b2dbc3}
+.coach-card{margin:11px 17px 13px;border:1px solid #454a52;border-radius:17px;background:linear-gradient(147deg,#262a30 0%,#191c20 55%,#111317 100%);box-shadow:0 16px 40px #0004,inset 0 1px #ffffff12}
+.cc-header{padding:18px 19px 0}.cc-meso{color:#d3d9df;letter-spacing:.15em;font-size:9px}.cc-week{color:#bec2c8;font-size:10px}.cc-phase{font:800 27px 'Manrope',sans-serif;letter-spacing:-.07em;padding:12px 19px 4px}.cc-focus{padding:0 19px 18px;line-height:1.65;font-size:12px;color:#aeb3bb}.cc-chips{padding:12px 19px;gap:7px;border-color:#ffffff13}.chip{border-radius:6px;font-size:9px;letter-spacing:.02em}
+.sp{margin:13px 17px;padding:16px 0;border-top:1px solid #353a42;border-bottom:1px solid #353a42}.sp-l,.stoggle-label,.pool-lbl,.cl,.dash-sec{color:#aeb5be;font-size:9px;letter-spacing:.17em;font-weight:800}.sp-w{gap:8px}.sb{padding:10px 13px;border-radius:8px;background:#1b1f24;border-color:#353b44;color:#c6cbd2;font-size:11px}.sb.on{background:#e0e4e8;color:#111418;border-color:#e0e4e8;font-weight:800;box-shadow:0 4px 15px #d1d5db20}
+.stoggle-label{padding-left:19px;margin-top:17px}.stoggle-row{padding:9px 18px 12px}.stoggle{border-radius:7px;padding:8px 12px;background:#1a1e22;border-color:#3b4149;color:#a9b1ba}.stoggle-on{background:#453a2c;color:#f3ce92;border-color:#7f6441}
+.coach-brief,.cc,.ec,.nx-card,.change-list,.ib{border-radius:13px;border:1px solid #30353c;background:linear-gradient(150deg,#191c21,#121417);box-shadow:0 4px 20px #0002}
+.coach-brief{margin:12px 1px}.coach-brief-hd{color:#d5dbe2;background:#ffffff05;padding:13px 15px;letter-spacing:.15em}.cbrow{padding:14px}.cbname{font-size:13px}.cbreason{font-size:11px;line-height:1.6}
+.pool-item,.bx,.dash-card,.phase-card,.ai-proposal{border-radius:11px;background:#191c21;border-color:#343941}.pool-item.pool-on{background:#232831;border-color:#8c959f}.pchk.on,.ck.done{background:#d9dee4;border-color:#d9dee4;color:#101216}.pname,.ec-n{font-size:13px}
+.el{padding:10px 17px}.ec-h{padding:15px}.ec-timer,.ptimer{color:#d0dae5;border-color:#415467;background:#22303f}.sr{padding:12px 14px}.sth{color:#aeb5be}.sr.top{background:#23332a}.sr.bo{background:#222b36}.sr.dr{background:#292c33}
+.start-btn,.ai-btn,.hevy-sync-actions button{border-radius:10px!important;background:linear-gradient(180deg,#e5e8eb,#bcc4cd)!important;color:#101316!important;font-weight:800!important;box-shadow:0 4px 14px #0005}.ai-btn.secondary,.hevy-sync-actions button.secondary{background:#252930!important;color:#e2e5e9!important;border:1px solid #454c55!important}
+.iw{padding:16px 17px}.its{background:none;border:0;border-radius:0;padding:0 0 8px;gap:19px;border-bottom:1px solid #333840;margin-bottom:20px;scrollbar-width:none}.its::-webkit-scrollbar{display:none}.it{flex:0 0 auto;min-width:auto;border-radius:0;border-bottom:2px solid transparent;padding:9px 1px 12px;color:#89939e;font-size:11px;letter-spacing:.01em}.it.on{background:none;border-bottom:2px solid #e2e7eb;color:#f2f4f5}
+.dash-grid{gap:10px}.bx{padding:17px 14px}.bl2{color:#aeb6be;letter-spacing:.02em}.bv{font:800 25px 'Manrope',sans-serif;letter-spacing:-.06em;margin:5px 0}.bs{font-size:10px}.dash-sec{margin:21px 0 10px}.dash-card{padding:16px;gap:13px}.dash-card.win{background:#17251e;border-color:#345947}.dash-card.warn{background:#272217;border-color:#5d4b2c}.dash-card.coach{background:#1c2229;border-color:#3b4a58}.dash-card.suggest{background:#1b222b;border-color:#3b4c60}.dash-title{font-size:12px}.dash-body{color:#b6bec6;font-size:11px;line-height:1.7}
+.cl{margin-bottom:13px;color:#aeb7c1}.cc{padding:17px}.ir{padding:12px 0;line-height:1.7}.ai-actions{gap:9px}.ai-btn{padding:12px 17px}.ai-input,.hevy-sync-card input{background:#101215;border-color:#464b54;border-radius:9px;padding:14px;font-size:13px}.ai-result{color:#c1c7cf;line-height:1.8}.ai-proposal{padding:16px}.ai-feedback{color:#aeb5be}.hevy-sync-card{background:linear-gradient(150deg,#1b2226,#15181b);border:1px solid #3c5151;border-radius:13px;padding:17px}.hevy-signin button{background:#24282e;border-color:#545963;color:#e6e9ed}.hevy-status{color:#b7bdc5}
+.phase-card{padding:12px}.phase-active{border-color:#b5c0cc}.wdot-active{background:#dce2e8;color:#101316}.map-bar-fill{background:linear-gradient(90deg,#6e8496,#e0e5e8)}.vol-bar-fill{max-width:100%}
+.ex-grp{color:#b4bdc7}.ex-item{border-color:#ffffff10}.ex-item:active{background:#343a43}
+#exModal>div{background:#181c20!important;max-width:620px!important;border:1px solid #3d434c}
+#exSearch{color:#f0f2f4!important;background:#101215!important;border-color:#48505b!important}
+.empty-state{color:#9da5af}.apill.g{background:#223f30;color:#b4e2c3}.apill.a{background:#423621;color:#f1d49d}
+@media(min-width:621px){body{border-left:1px solid #252a31;border-right:1px solid #252a31}.obs-header{padding:0 30px}.obs-headline{padding-left:29px}.topbar{bottom:15px;max-width:440px;border:1px solid #3e464f;border-radius:17px;padding:8px;box-shadow:0 16px 55px #000c}.tb{padding:12px}.iw{padding-left:25px;padding-right:25px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <input type="file" id="csvIn" accept=".csv" style="display:none" onchange="onFileSelect(event)">
 
-<div class="topbar">
-  <button class="tb on" onclick="setMode('gym',this)">&#127947; GYM</button>
-  <button class="tb" onclick="setMode('ana',this)">&#129504; INTELLIGENCE</button>
-</div>
+<header class="obs-header">
+  <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
+  <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 02</span></div>
+</header>
+<div class="obs-headline"><span class="obs-eyebrow">YOUR PERFORMANCE, IN FOCUS</span><h1>Built for <em>progress.</em></h1></div>
+<nav class="topbar" aria-label="Main navigation">
+  <button class="tb on" onclick="setMode('gym',this)"><span class="obs-nav-ico" aria-hidden="true">◈</span><span>Train</span></button>
+  <button class="tb" onclick="setMode('ana',this)"><span class="obs-nav-ico" aria-hidden="true">▥</span><span>Intelligence</span></button>
+</nav>
 
 <div class="imp-banner" id="importBanner"></div>
 
@@ -267,13 +321,13 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 <div id="ana" style="display:none">
   <div class="iw">
     <div class="its">
-      <button class="it on" onclick="iTab('dash',this)">Home</button>
-      <button class="it" onclick="iTab('changed',this)">Changed</button>
-      <button class="it" onclick="iTab('next',this)">Next</button>
-      <button class="it" onclick="iTab('map',this)">Map</button>
-      <button class="it" onclick="iTab('insights',this)">Insights</button>
-      <button class="it" onclick="iTab('ai',this)">AI Coach</button>
-      <button class="it" onclick="iTab('import',this)">Import</button>
+      <button class="it on" onclick="iTab('dash',this)">Overview</button>
+      <button class="it" onclick="iTab('changed',this)">Progress</button>
+      <button class="it" onclick="iTab('next',this)">Targets</button>
+      <button class="it" onclick="iTab('map',this)">Plan</button>
+      <button class="it" onclick="iTab('insights',this)">Audit</button>
+      <button class="it" onclick="iTab('ai',this)">Coach</button>
+      <button class="it" onclick="iTab('import',this)">Sync</button>
     </div>
     <div id="t-dash"     class="ip on"></div>
     <div id="t-changed"  class="ip"></div>
@@ -539,8 +593,8 @@ function shortName(name) {
 // ═══════════════════════════════════════
 function calcBanner() {
   var today = new Date();
-  var result = {label:"M8",name:"Hypertrophy",week:1,totalWeeks:8,
-    phase:"Accumulate",focus:"Establish baseline loads.",rpe:"7.5–8.5",reps:"8–12"};
+  var result = {label:"—",name:"Unscheduled",week:0,totalWeeks:0,
+    phase:"Plan needed",focus:"Your training plan does not cover today. Review the Plan tab before progressing.",rpe:"—",reps:"—"};
   for (var mi = 0; mi < MESO_PLAN.length; mi++) {
     var m = MESO_PLAN[mi];
     var s = new Date(m.start), e = new Date(m.end);
@@ -612,7 +666,7 @@ function runEngine() {
     } else if (d.sessionsAtWeight >= 3) {
       rec.action="stall"; rec.badge="STALLED"; rec.target=d.lastW;
       rec.reason=d.sessionsAtWeight + " sessions at " + d.lastW + " lbs with no rep improvement.";
-      rec.caution="Add drop set at " + Math.round(d.lastW*0.7/5)*5 + " lbs AMRAP, or run a 5x5 block.";
+      rec.caution="Possible plateau signal. Review multiweek performance and recovery with the AI Coach before changing the program.";
       STATE.stalled.push(lk);
       STATE.warnings.push({type:"stall",lift:lk,msg:d.lastW+" lbs for "+d.sessionsAtWeight+" sessions"});
     } else if (d.lastR >= targetR+2 && (d.lastRPE===null||d.lastRPE<=8.5)) {
@@ -1418,7 +1472,7 @@ function renderInsights() {
   var b = calcBanner();
 
   var colMap = {green:"var(--gr)",blue:"var(--bl)",yellow:"var(--am)",orange:"var(--or)",red:"var(--re)"};
-  var bgMap  = {green:"#1db87a0d",blue:"#2d6ef50d",yellow:"#ffd60a0d",orange:"#e8673a0d",red:"#ff453a0d"};
+  var bgMap  = {green:"#1db87a0d",blue:"#2d6ef50d",yellow:"#ffd60a0d",orange:"#bdc5d00d",red:"#ff453a0d"};
   var icnMap = {pattern:"&#128202;",risk:"&#9888;",win:"&#127942;",priority:"&#9658;",historical:"&#128336;"};
 
   var html = "";
@@ -1943,7 +1997,7 @@ function populateState(byEx,rawRPEs,sessionCount,dateRange,byDate) {
       STATE.muscleVolume[muscle]=(STATE.muscleVolume[muscle]||0)+totalSets;
     }
   });
-  runEngine();applyApprovedCoachChanges();
+  refreshAIReviews();runEngine();applyApprovedCoachChanges();
   renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab(); renderAICoach();
   renderNextSessionCoach();
   saveState();
@@ -2063,7 +2117,7 @@ function startSession() {
   h+="<div style='display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0'>" +
     "<button onclick='backToPool()' style='font-size:12px;font-weight:600;background:none;border:none;color:var(--t2);cursor:pointer'>&larr; Change</button>" +
     "<span id='sessProgress' style='font-size:12px;font-weight:700;color:var(--t2)'>0/0 sets</span>" +
-    "<button id='addExBtn' style='font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--or);background:#e8673a14;color:var(--or);cursor:pointer'>+ Add</button>" +
+    "<button id='addExBtn' style='font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--or);background:#bdc5d014;color:var(--or);cursor:pointer'>+ Add</button>" +
   "</div>";
   chosen.forEach(function(ex,ei){h+=buildCard(ex,ei,_timers[ex.n]||0);});
   document.getElementById("el").innerHTML=h;
@@ -2239,9 +2293,41 @@ var _aiResult=null,_aiBusy=false,_aiQuestion='',_aiError='',_aiNotice='';
 var _aiApproved={};
 try{_aiApproved=JSON.parse(localStorage.getItem('liftiq_ai_approved')||'{}')||{};}catch(e){_aiApproved={};}
 function aiSafe(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+// Snapshot revisions invalidate both cached AI reviews and approvals after a change in training data.
+function trainingFingerprint(){
+ var dates=Object.keys(STATE.dailyLog||{}).sort();
+ return JSON.stringify({dates:dates.map(function(d){return [d,STATE.dailyLog[d]];}),lifts:STATE.lifts,flags:CURRENT_STATUS});
+}
+function trainingTrends(){
+ var keys=Object.keys(STATE.dailyLog||{}).sort(), end=keys.length?new Date(keys[keys.length-1]+'T12:00:00').getTime():Date.now();
+ var windows=[7,28,84], summaries={};
+ windows.forEach(function(days){
+  var start=end-(days-1)*86400000, ds=keys.filter(function(k){var t=new Date(k+'T12:00:00').getTime();return t>=start&&t<=end;});
+  var count=0,rpes=[],muscles={},perLift={};
+  ds.forEach(function(d){var x=STATE.dailyLog[d];count+=Number(x.sets)||0;rpes=rpes.concat(x.rpes||[]);
+   Object.keys(x.ex||{}).forEach(function(name){var e=x.ex[name],muscle=PROFILE.muscleMap[name];if(muscle)muscles[muscle]=(muscles[muscle]||0)+1;
+    (perLift[name]||(perLift[name]=[])).push({date:d,weightLb:e.w,reps:e.r,e1rmLb:e.e1,rpe:e.rpe});
+   });
+  });
+  summaries[days+'d']={daysWithWorkouts:ds.length,totalSets:count,avgRPE:rpes.length?Math.round(10*rpes.reduce(function(a,b){return a+b;},0)/rpes.length)/10:null,muscleExerciseAppearances:muscles};
+  if(days===84){summaries.priorityLiftHistory={};PROFILE.priorityLifts.forEach(function(n){if(perLift[n])summaries.priorityLiftHistory[n]=perLift[n].slice(-12);});}
+ });
+ return {anchorDate:keys.length?keys[keys.length-1]:null,windows:summaries,note:'muscleExerciseAppearances are daily exercise occurrences, not hard-set counts; top performance per day only'};
+}
+var _aiReviewCache={};try{_aiReviewCache=JSON.parse(localStorage.getItem('liftiq_ai_cache')||'{}')||{};}catch(e){}
+function storeAIReviewCache(){try{localStorage.setItem('liftiq_ai_cache',JSON.stringify(_aiReviewCache));}catch(e){}}
+function expiredAIApproval(a){return !a||!a.fingerprint||a.fingerprint!==trainingFingerprint();}
+function refreshAIReviews(){
+ var fingerprint=trainingFingerprint(),invalid=0;
+ Object.keys(_aiApproved).forEach(function(name){if(expiredAIApproval(_aiApproved[name])){delete _aiApproved[name];invalid++;}});
+ if(invalid){localStorage.setItem('liftiq_ai_approved',JSON.stringify(_aiApproved));_aiNotice=invalid+' old approved target(s) expired because your training data or recovery status changed.';}
+ if(_aiResult&&_aiResultFingerprint!==fingerprint){_aiResult=null;_aiResultFingerprint='';}
+}
+var _aiResultFingerprint='';
+function loadCachedAIReview(){var fp=trainingFingerprint(),c=_aiReviewCache[fp];if(!_aiResult&&c&&Date.now()-c.at<7*86400000){_aiResult=c.result;_aiResultFingerprint=fp;}}
 function aiTrainingSnapshot(){
   return {goal:PROFILE.goal,sessions:STATE.sessions,avgRPE:STATE.avgRPE,
-    period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),
+    period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),trends:trainingTrends(),
     muscles:STATE.muscleVolume,flags:CURRENT_STATUS,
     lifts:Object.keys(STATE.lifts).slice(0,35).map(function(name){var x=STATE.lifts[name],r=STATE.recommendations[name]||{};
       return {name:name,weightLb:x.lastW,reps:x.lastR,rpe:x.lastRPE,e1rmLb:x.lastE,
@@ -2250,7 +2336,7 @@ function aiTrainingSnapshot(){
 function applyApprovedCoachChanges(){
  Object.keys(_aiApproved).forEach(function(name){
    var a=_aiApproved[name],last=STATE.lifts[name],existing=STATE.recommendations[name];
-   if(!last||!existing||Math.abs(last.lastW-a.baseWeightLb)>0.01){return;}
+   if(!last||!existing||expiredAIApproval(a)||Math.abs(last.lastW-a.baseWeightLb)>0.01){return;}
    if(CURRENT_STATUS.lowRecovery&&a.action==='increase')return;
    if(CURRENT_STATUS.kneePain&&/squat|lunge/i.test(name)&&a.action==='increase')return;
    if(CURRENT_STATUS.backTightness&&/deadlift|rdl|extension/i.test(name)&&a.action==='increase')return;
@@ -2264,8 +2350,8 @@ function approveAI(i){
  if(!p||!base)return;
  var baseWeight=base.lastW;
  // Before accepting, confirm proposal is still based on the latest imported weight.
- if(Math.abs(baseWeight-p.baseWeightLb)>0.01){_aiError='Training data changed. Run a new review before approving.';renderAICoach();return;}
- _aiApproved[p.lift]={action:p.action,targetLb:p.targetLb,reps:p.reps,reason:p.reason,baseWeightLb:baseWeight};
+ if(_aiResultFingerprint!==trainingFingerprint()||Math.abs(baseWeight-p.baseWeightLb)>0.01){_aiError='Training data changed. Run a new review before approving.';renderAICoach();return;}
+ _aiApproved[p.lift]={action:p.action,targetLb:p.targetLb,reps:p.reps,reason:p.reason,baseWeightLb:baseWeight,fingerprint:trainingFingerprint()};
  localStorage.setItem('liftiq_ai_approved',JSON.stringify(_aiApproved));
  runEngine();applyApprovedCoachChanges();renderNextSessionCoach();renderNextWeek();
  _aiNotice='Approved for LiftIQ guidance. Hevy remains unchanged.';renderAICoach();
@@ -2273,11 +2359,15 @@ function approveAI(i){
 function undoAI(name){delete _aiApproved[name];localStorage.setItem('liftiq_ai_approved',JSON.stringify(_aiApproved));runEngine();applyApprovedCoachChanges();renderNextSessionCoach();renderNextWeek();_aiNotice='Approval undone.';renderAICoach();}
 function renderAICoach(){
  var pane=document.getElementById('t-ai');if(!pane)return;
- var html="<div class='cc'><div class='cl'>AI Performance Coach</div>"+
+ refreshAIReviews();
+ loadCachedAIReview();
+ var cached=Object.prototype.hasOwnProperty.call(_aiReviewCache,trainingFingerprint());
+ var html="<div class='cc'><div class='cl'>Adaptive Coach · Evidence-led</div>"+
  "<div class='ai-result'>Uses your imported Hevy performance summary and existing LiftIQ calculations. AI suggestions are optional. No changes reach Hevy. Sign in with Google in the Import tab first.</div>"+
- "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':'Analyze my training')+"</button></div>"+
+ "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':(cached?'Refresh AI review':'Analyze my training'))+"</button></div>"+
  "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='Ask about stalls, volume, or progression…'>"+aiSafe(_aiQuestion)+"</textarea>"+
  "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(\"question\")' "+(_aiBusy?'disabled':'')+">Ask LiftIQ</button></div>"+
+ "<div class='ai-feedback'>Coach review is cached until your workout history or readiness flags change. Approvals expire when underlying data changes. Data reflects saved Hevy sessions, not unfinished workouts.</div>"+
  "<div class='ai-feedback'>AI analysis sends summarized workout metrics to Gemini. Free-tier Gemini use may allow Google to use submitted content to improve its products. No names or raw Hevy session details are included in this request. AI can be mistaken.</div></div>";
  if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
  if(_aiNotice)html+="<div class='cc' style='color:var(--gr)'>"+aiSafe(_aiNotice)+"</div>";
@@ -2302,12 +2392,15 @@ async function askAI(mode){
  if(!_googleIdToken){_aiError='Please sign in with Google under Intelligence → Import first.';renderAICoach();return;}
  if(!STATE.imported){_aiError='Sync or import your Hevy workouts first.';renderAICoach();return;}
  if(mode==='question'&&!_aiQuestion.trim()){_aiError='Enter your question first.';renderAICoach();return;}
+ var fp=trainingFingerprint();
+ if(mode==='review'&&_aiReviewCache[fp]&&Date.now()-_aiReviewCache[fp].at<7*86400000){_aiResult=_aiReviewCache[fp].result;_aiResultFingerprint=fp;_aiNotice='Loaded existing review for this training data. To request fresh advice, use Ask LiftIQ.';renderAICoach();return;}
  _aiBusy=true;renderAICoach();
  try{var res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},
   body:JSON.stringify({mode:mode,question:_aiQuestion,training:aiTrainingSnapshot()})});
  var data=await res.json();if(!res.ok)throw new Error(data.error||'AI request failed.');
  (data.proposals||[]).forEach(function(p){p.baseWeightLb=STATE.lifts[p.lift]?STATE.lifts[p.lift].lastW:null;});
- _aiResult=data;
+ _aiResult=data;_aiResultFingerprint=fp;
+ if(mode==='review'){_aiReviewCache={[fp]:{at:Date.now(),result:data}};storeAIReviewCache();}
  }catch(e){_aiError=e.message||'Unable to analyze right now.';}
  finally{_aiBusy=false;renderAICoach();}
 }
@@ -2574,7 +2667,7 @@ function toggleStatus(key) {
   saveCurrentStatus();
   renderCoachCard();
   renderStatusToggles();
-  runEngine();applyApprovedCoachChanges();
+  refreshAIReviews();runEngine();applyApprovedCoachChanges();
   renderDashboard();
   renderNextWeek();
   renderAudit();
@@ -2649,7 +2742,7 @@ function restoreState() {
     STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
     STATE.avgRPE = saved.avgRPE || null;
     STATE.imported = saved.imported || false;
-    runEngine();applyApprovedCoachChanges();
+    refreshAIReviews();runEngine();applyApprovedCoachChanges();
     return true;
   } catch(e) { console.warn('Could not restore state:', e); return false; }
 }

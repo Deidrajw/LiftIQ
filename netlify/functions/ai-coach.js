@@ -9,8 +9,22 @@ function sanitize(input){
     period:cleanText(input?.period,70),
     muscles:Object.fromEntries(Object.entries(input?.muscles||{}).slice(0,20).map(([k,v])=>[cleanText(k,60),finite(v,0,30000)])),
     flags:{kneePain:input?.flags?.kneePain===true,ankleIssue:input?.flags?.ankleIssue===true,backTightness:input?.flags?.backTightness===true,lowRecovery:input?.flags?.lowRecovery===true},
+    trends:sanitizeTrends(input?.trends),
     lifts:lifts.map(x=>({name:cleanText(x.name,110),weightLb:finite(x.weightLb,0,2000),reps:finite(x.reps,0,200),rpe:finite(x.rpe,0,10),
       sessionsAtWeight:finite(x.sessionsAtWeight,0,1000),e1rmLb:finite(x.e1rmLb,0,3000),ruleAction:cleanText(x.ruleAction,35),ruleTargetLb:finite(x.ruleTargetLb,0,2000)}))};
+}
+function sanitizeTrends(trends){
+ const windows={};const source=trends?.windows||{};
+ for(const key of ['7d','28d','84d']){
+  const w=source[key]||{};
+  const appearances=Object.fromEntries(Object.entries(w.muscleExerciseAppearances||{}).slice(0,12).map(([k,v])=>[cleanText(k,50),finite(v,0,5000)]));
+  windows[key]={daysWithWorkouts:finite(w.daysWithWorkouts,0,100),totalSets:finite(w.totalSets,0,20000),avgRPE:finite(w.avgRPE,0,10),muscleExerciseAppearances:appearances};
+ }
+ const history={};
+ for(const [name,records] of Object.entries(source.priorityLiftHistory||{}).slice(0,16)){
+  history[cleanText(name,100)]=(Array.isArray(records)?records:[]).slice(-12).map(x=>({date:cleanText(x.date,10),weightLb:finite(x.weightLb,0,2000),reps:finite(x.reps,0,200),e1rmLb:finite(x.e1rmLb,0,3000),rpe:finite(x.rpe,0,10)}));
+ }
+ return {anchorDate:cleanText(trends?.anchorDate,12),windows,priorityLiftHistory:history,limitation:'Daily best set per exercise, not full intra-session set history; muscle appearances are not set counts.'};
 }
 function extract(response){return (response?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');}
 exports.handler=async(event)=>{
@@ -24,7 +38,7 @@ exports.handler=async(event)=>{
  if(!data.lifts.length)return reply(400,{error:'Sync or import Hevy workout data before requesting analysis.'});
  const question=cleanText(body.question,350);
  if(body.mode==='question' && !question.trim())return reply(400,{error:'Enter a question.'});
- const instructions=`You are LiftIQ, a conservative evidence-based strength training analyst. You receive ONLY aggregated workout statistics, NOT complete sessions. Never invent session comparisons, dates or injury diagnoses. Treat goals and status flags as user-reported. Training numbers and ruleTargets are supplied by deterministic code. Cite exact lift data in your rationale. Distinguish observations from hypotheses. If insufficient data say so. Respect reported knee, back, ankle pain and recovery concerns; do not propose load increases if lowRecovery is true, or unsafe increases while relevant pain is present. Never prescribe pain-provoking exercise. No medical diagnosis. Proposals require user acceptance and must not imply Hevy is changed. Output strict JSON, not markdown. Schema: {"summary":"string", "insights":["string"], "proposals":[{"lift":"exact input lift name", "action":"hold|increase|reduce", "targetLb":number, "reps":integer, "reason":"string", "evidence":"string"}], "answer":"string"}. 0-4 proposals. Propose plausible exercise-level target load adjustments only, generally within 10% of recorded weight, and stay close to deterministic ruleTarget; prefer hold when uncertain. Consider weights in pounds.`;
+ const instructions=`You are LiftIQ, a conservative evidence-based strength training analyst. You receive 7/28/84-day summaries and up to 12 dated best-set observations per priority lift, NOT complete sessions. Never invent session comparisons, dates or injury diagnoses. Treat goals and status flags as user-reported. Training numbers and ruleTargets are supplied by deterministic code. Reference exact available lift data and dated history in your rationale. Do not treat exercise appearances as hard-set counts. Distinguish observations from hypotheses. If insufficient data say so. Respect reported knee, back, ankle pain and recovery concerns; do not propose load increases if lowRecovery is true, or unsafe increases while relevant pain is present. Never prescribe pain-provoking exercise. No medical diagnosis. Proposals require user acceptance and must not imply Hevy is changed. Output strict JSON, not markdown. Schema: {"summary":"string", "insights":["string"], "proposals":[{"lift":"exact input lift name", "action":"hold|increase|reduce", "targetLb":number, "reps":integer, "reason":"string", "evidence":"string"}], "answer":"string"}. 0-4 proposals. Propose plausible exercise-level target load adjustments only, generally within 10% of recorded weight, and stay close to deterministic ruleTarget; prefer hold when uncertain. Consider weights in pounds.`;
  const prompt=JSON.stringify({task:body.mode,question:body.mode==='question'?question:undefined,training:data});
  const model=process.env.GEMINI_MODEL||'gemini-2.5-flash';
  if(!/^gemini-[a-zA-Z0-9.-]+$/.test(model))return reply(503,{error:'Invalid Gemini model configuration.'});
