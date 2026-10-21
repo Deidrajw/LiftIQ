@@ -444,7 +444,7 @@ body[data-theme=light] .it.on{background:linear-gradient(180deg,#2f3944,#1f262e)
 
 <header class="obs-header">
   <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
-  <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 03</span></div>
+  <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 04</span></div>
 </header>
 <div class="obs-headline"><span class="obs-eyebrow">YOUR PERFORMANCE, IN FOCUS</span><h1>Built for <em>progress.</em></h1></div>
 <nav class="topbar" aria-label="Main navigation">
@@ -731,6 +731,7 @@ var STATE = {
   lifts: {},       // liftName -> {lastW,lastR,lastRPE,lastE,sessionsAtWeight,d,ts}
   prevLifts: {},   // snapshot before last import (for What Changed)
   muscleVolume: {},// muscle -> hard set count
+  exerciseHistory: {}, // canonical exercise -> dated qualifying best sets
   dailyLog: {},    // dateKey -> {sets, rpes[], ex:{name:{w,r,e1,rpe}}} — powers Map week detail
   improved: [],
   stalled: [],
@@ -1083,6 +1084,39 @@ function renderDashboard() {
 
 // ── What Changed ──
 function v3OpenTargets(){var b=document.querySelector('.it[onclick*=\"next\"]');if(b)iTab('next',b);}
+function v10ComparableHistory(name,days){
+ var log=STATE.exerciseHistory||{},want=normalizeExerciseName(name),all=[];
+ Object.keys(log).forEach(function(key){
+   if(normalizeExerciseName(key)!==want)return;
+   (log[key]||[]).forEach(function(item){
+     if(!item||!/^\d{4}-\d{2}-\d{2}$/.test(item.date))return;
+     var w=Number(item.weightLb),r=Number(item.reps),e=Number(item.e1rmLb);
+     if(w>0&&r>0&&Number.isFinite(e)&&e>0)all.push({date:item.date,weightLb:w,reps:r,e1rmLb:e,rpe:item.rpe==null?null:Number(item.rpe)});
+   });
+ });
+ // Legacy daily logs are a fallback if an older import has no dedicated series.
+ if(!all.length)Object.keys(STATE.dailyLog||{}).forEach(function(date){
+   var exercises=STATE.dailyLog[date].ex||{};
+   Object.keys(exercises).forEach(function(key){if(normalizeExerciseName(key)!==want)return;var item=exercises[key];if(item&&item.w>0&&item.r>0&&item.e1>0)all.push({date:date,weightLb:Number(item.w),reps:Number(item.r),e1rmLb:Number(item.e1),rpe:item.rpe==null?null:Number(item.rpe)});});
+ });
+ var dates=Object.keys(STATE.dailyLog||{}).sort(),anchor=dates.length?dates[dates.length-1]:(STATE.dateRange&&STATE.dateRange.end)||v3Today();
+ var end=Date.parse(anchor+'T12:00:00'),start=end-(days-1)*86400000;
+ var map={};all.forEach(function(item){var time=Date.parse(item.date+'T12:00:00');if(!(time>=start&&time<=end))return;var previous=map[item.date];if(!previous||item.e1rmLb>previous.e1rmLb)map[item.date]=item;});
+ return Object.keys(map).sort().map(function(date){return map[date];});
+}
+function v10TrendAssessment(name,days){
+ var rows=v10ComparableHistory(name,days);
+ if(!rows.length)return {status:'No comparable records',rows:rows,evidence:'No qualifying dated weighted sets for this movement in this '+days+'-day window.'};
+ if(rows.length===1)return {status:'One training date',rows:rows,evidence:'Only one qualifying training date in the '+days+'-day window.'};
+ var first=rows[0],last=rows[rows.length-1],delta=last.e1rmLb-first.e1rmLb;
+ var sameLoad=Math.abs(first.weightLb-last.weightLb)<.25;
+ var improved=delta>Math.max(2,first.e1rmLb*.025),declined=delta<-Math.max(2,first.e1rmLb*.025);
+ var status=improved?'Progressing':declined?'Needs context':'Stable / mixed';
+ var evidence=first.date+': '+first.weightLb+' lb × '+first.reps+' → '+last.date+': '+last.weightLb+' lb × '+last.reps+' · '+rows.length+' dated performances.';
+ if(sameLoad&&last.reps>first.reps){status='Rep progression';}
+ // This is a comparison signal, not a diagnosis of a plateau or fatigue.
+ return {status:status,rows:rows,delta:Math.round(delta),evidence:evidence};
+}
 function v3ProgressTop(){
  var target=PROFILE.priorityLifts.map(function(l){return STATE.recommendations[l];}).filter(Boolean);
  var pushes=target.filter(function(r){return r.action==='increase';}).length;
@@ -1091,10 +1125,18 @@ function v3ProgressTop(){
  var h="<div class='v3-hero'><div class='v3-eyebrow'>Performance snapshot</div><div class='v3-h1'>Your progress at a glance</div><div class='v3-sub'>Actionable targets appear first. Comparisons follow below.</div></div>";
  h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+pushes+"</strong><span>Ready to progress</span></div><div class='v3-kpi'><strong>"+holds+"</strong><span>Building / hold</span></div><div class='v3-kpi'><strong>"+flagged+"</strong><span>Need review</span></div></div>";
  h+="<div class='v3-titlebar'><h3>Recent priority-lift trends</h3><span class='v3-muted'>Last 84 days</span></div>";
- var history=trainingTrends().windows['84d'].priorityLiftHistory||{};
- h+="<div class='v3-rows'>"+PROFILE.priorityLifts.slice(0,8).map(function(n){var rows=history[n]||[]; if(rows.length<2)return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span>Limited data</span></div></div>";
- var first=rows[0],last=rows[rows.length-1],delta=Math.round((last.e1rmLb-first.e1rmLb)*10)/10;
- return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span>"+(delta>0?'+':'')+delta+" lb estimated</span></div><div class='v3-muted'>"+v3Safe(first.date)+": "+first.weightLb+" × "+first.reps+" → "+v3Safe(last.date)+": "+last.weightLb+" × "+last.reps+" · "+rows.length+" training dates</div></div>";
+ var trendInfo=trainingTrends(),history=trendInfo.windows['84d'].priorityLiftHistory||{};
+ var stored=STATE.exerciseHistory||{},anchor=trendInfo.anchorDate||v3Today();
+ var edge=new Date(anchor+'T12:00:00').getTime()-83*86400000;
+ var matchingKeys=Object.keys(stored);
+ PROFILE.priorityLifts.forEach(function(n){
+   var direct=stored[n]||stored[normalizeExerciseName(n)];
+   if(!direct) { var k=matchingKeys.find(function(k){return normalizeExerciseName(k)===normalizeExerciseName(n);});direct=k?stored[k]:null; }
+   if(direct&&direct.length)history[n]=direct.filter(function(x){var d=Date.parse(x.date+'T12:00:00');return Number.isFinite(d)&&d>=edge&&d<=Date.parse(anchor+'T12:00:00');}).slice(-12);
+ });
+ h+="<div class='v3-rows'>"+PROFILE.priorityLifts.slice(0,8).map(function(n){
+   var t=v10TrendAssessment(n,84);
+   return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span style='font-size:11px;color:var(--t2)'>"+v3Safe(t.status)+"</span></div><div class='v3-muted'>"+v3Safe(t.evidence)+"</div></div>";
  }).join('')+"</div>";
  h+="<div class='v3-titlebar'><h3>Next-session targets</h3><button class='v3-mini' onclick='v3OpenTargets()'>All targets</button></div>";
  h+="<div class='v3-rows'>"+target.slice(0,5).map(function(r){var val=r.target!=null?r.target+' lbs':'—';return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(r.lift))+"</strong><span>"+v3Safe(val)+"</span></div><div class='v3-muted'>"+v3Safe(r.badge||'Review')+" · "+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set'+'</div></div>';}).join('')+(target.length?'':"<div class='v3-row v3-muted'>Sync Hevy to populate your lift targets.</div>")+"</div>";
@@ -1331,7 +1373,7 @@ function renderMap() {
       "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" \u00b7 "+b.phase+"</div>" +
       weekDetail +
     "</div>" +
-    "<div class='cc'><div class='cl'>Lift targets \u2192 e1RM (Now \u2192 M8 target \u2192 Dec 2026 goal)</div>"+liftRows+"</div>" +
+    "<div class='cc'><div class='cl'>Historical lift benchmarks (M8 baseline and Dec 2026 goal — not automatic current targets)</div>"+liftRows+"</div>" +
     "<div class='ib'>" +
       ir("\u2728","<strong>Dec 2026 goal:</strong> Recapture Dec 2023 peaks \u2014 RDL 205 lbs, BSS 140 lbs, Glute Drive 540+ lbs e1RM.") +
       ir("\u2659","<strong>Back health:</strong> Hamstring:Glute ratio 1.5:1 or better is the single biggest lever for glute development and back health.") +
@@ -1553,49 +1595,15 @@ function deriveBiggestWin(state, recs) {
   }
 
   // 7. Hamstring:glute ratio improved vs last import
-  var g=state.muscleVolume["Glutes"]||0, h=state.muscleVolume["Hamstrings"]||0;
-  if (prevSnap && prevSnap.muscleVolume) {
-    var pg=prevSnap.muscleVolume["Glutes"]||0, ph=prevSnap.muscleVolume["Hamstrings"]||0;
-    if (g>0 && pg>0 && ph/pg < h/g && h/g >= 0.5)
-      return {icon:v4Icon("layers"), title:"Hamstring:glute ratio improving",
-        body:"Ratio moved "+(ph/pg).toFixed(2)+" \u2192 "+(h/g).toFixed(2)+". This is the single biggest lever for glute development and back health."};
-  }
-
-  // 8. Avg RPE in target zone
-  if (state.avgRPE) {
-    var rr = b.rpe.split("\u2013").map(parseFloat);
-    if (rr.length===2 && state.avgRPE>=rr[0] && state.avgRPE<=rr[1])
-      return {icon:v4Icon("target"), title:"Intensity aligned",
-        body:"Avg RPE "+state.avgRPE.toFixed(1)+" sits inside the "+b.label+" target range ("+b.rpe+"). Training intensity is calibrated correctly."};
-  }
-
-  // 9. Progress toward block target e1RM
-  var bestPct = 0, bestProg = null;
-  PROFILE.priorityLifts.forEach(function(lk) {
-    var d = state.lifts[lk], t = PROFILE.liftTargets[lk];
-    if (!d||!t||!t.M8e) return;
-    var pct = d.lastE/t.M8e;
-    if (pct > bestPct) { bestPct=pct; bestProg={lk:lk,d:d,t:t,pct:Math.round(pct*100)}; }
-  });
-  if (bestProg && bestProg.pct >= 70) {
-    return {icon:v4Icon("spark"), title:"Map win: "+shortName(bestProg.lk),
-      body:bestProg.d.lastE+" lbs e1RM \u2014 "+bestProg.pct+"% toward M8 target of "+bestProg.t.M8e+" lbs."};
-  }
+  // Evidence-led win from comparable dated performance (do not interpret historical targets as current).
+  var strongest=null;
+  PROFILE.priorityLifts.forEach(function(name){var t=v10TrendAssessment(name,84);if(t.rows.length<2||t.delta<=0)return;if(!strongest||t.delta>strongest.delta)strongest={name:name,delta:t.delta,evidence:t.evidence};});
+  if(strongest)return {icon:v4Icon('trend'),title:'Recent improvement: '+shortName(strongest.name),body:strongest.evidence+' Estimated strength is approximate.'};
 
   // 10. Consistency
   if (state.sessions >= 10)
     return {icon:v4Icon("check"), title:"Consistency win",
       body:state.sessions+" saved workouts in the imported history. Frequency should be assessed over the relevant time window."};
-
-  // 11. Hamstring volume healthy (absolute)
-  if (h>0&&g>0&&h/g>=0.6)
-    return {icon:v4Icon("trend"), title:"Volume balance",
-      body:"Hamstrings at "+h+" sets vs glutes at "+g+". Ratio is healthy. Back health and glute development both depend on this."};
-
-  // 12. No active flags
-  if (!CURRENT_STATUS.kneePain&&!CURRENT_STATUS.ankleIssue&&!CURRENT_STATUS.backTightness)
-    return {icon:v4Icon("check"), title:"Clean training block",
-      body:"No active injury flags. Full movement capacity available. This is when real strength gains happen \u2014 don\u2019t waste it."};
 
   // 13. Fallback: on the plan
   return {icon:v4Icon("barbell"), title:"Week "+b.week+" of "+b.totalWeeks,
@@ -1605,43 +1613,10 @@ function deriveBiggestWin(state, recs) {
 // ═══════════════════════════════════════
 // HISTORICAL LENS — picked from current data, not random rotation
 // ═══════════════════════════════════════
-function pickHistoricalLens(state) {
-  state = state || STATE;
-  var hasData = state.imported && state.exercisesAnalyzed > 0;
-  var g = state.muscleVolume["Glutes"]||0, h = state.muscleVolume["Hamstrings"]||0;
-  var back = state.muscleVolume["Back"]||0;
-
-  if (hasData) {
-    // 1. Glute Drive / Hip Thrust stalled → recapture framing
-    var recapStall = state.stalled.filter(function(lk){
-      return lk.indexOf("Glute Drive")!==-1 || lk.indexOf("Hip Thrust")!==-1;
-    });
-    if (recapStall.length)
-      return {title:"Recapture, not plateau", body:shortName(recapStall[0])+" is stalled \u2014 but historically this is the lift where the most ground was lost since Dec 2023 and the most can be recovered. A stall here usually breaks with a rep reset, not more weight."};
-
-    // 2. Hamstring gap active → the known limiter
-    if (g>0 && h < g*0.55)
-      return {title:"The old pattern is back", body:"Hamstrings trailing glutes ("+h+" vs "+g+" sets) is the exact pattern that historically caused back tightness and capped glute output. This limiter has bitten before \u2014 fix it before it fixes you."};
-
-    // 3. Ratio healthy → the correction is holding
-    if (g>0 && h/g >= 0.6)
-      return {title:"Hamstring balance holding", body:"Historically, hamstrings trailing glutes limited glute development and back health. The current ratio ("+(h/g).toFixed(2)+") shows the correction is holding \u2014 this is quietly the biggest structural win of the rebuild."};
-
-    // 4. Back volume low → the gym-switch drop
-    if (back < 6)
-      return {title:"Gym-switch echo: back volume", body:"Back volume dropped after the gym switch and it\u2019s low again ("+back+" sets). One dedicated pull session per week reverses this \u2014 definition, not width."};
-
-    // 5. Glute Drive being trained → recapture opportunity
-    if (state.lifts["Glute Drive"])
-      return {title:"Glute Drive: biggest recapture opportunity", body:"Dec 2023 was the all-time peak. Glute Drive at "+state.lifts["Glute Drive"].lastE+" lbs e1RM is where the most ground was lost and the most can be recovered. Every session here is compound interest on the rebuild."};
-
-    // 6. Consistent sessions → rebuild framing
-    if (state.sessions >= 8)
-      return {title:"The rebuild is tracking", body:"Sep 2025 was peak performance but also peak risk. The gym switch reset volume and RPE normally. "+state.sessions+" consistent sessions at controlled RPE is exactly the recapture process \u2014 this is not starting over."};
-  }
-
-  // Fallback — only when there is truly no current signal
-  return {title:"Context", body:"Dec 2023 was the all-time strength peak. Sep 2025 was peak performance and peak risk. The gym switch caused a normal reset. This is a recapture phase, not a restart."};
+function pickHistoricalLens(state){
+ state=state||STATE;var trend=trainingTrends(),recent=trend.windows['28d'];
+ if(!state.imported)return {title:'Start with evidence',body:'Connect Hevy to establish a training baseline.'};
+ return {title:'Recent training snapshot',body:(recent.daysWithWorkouts||0)+' lifting dates and '+(recent.totalSets||0)+' qualifying weighted sets in the latest 28-day window. Compare like-for-like sets before changing programming.'};
 }
 
 // ═══════════════════════════════════════
@@ -1652,19 +1627,10 @@ function deriveInsights() {
   var g=S.muscleVolume["Glutes"]||0, h=S.muscleVolume["Hamstrings"]||0;
   var hasData = S.imported && S.exercisesAnalyzed > 0;
 
-  // 1. Training read — always show
-  var rpeNote = "";
-  if (hasData && S.avgRPE) {
-    var rr = b.rpe.split("\u2013").map(parseFloat);
-    if (rr.length===2) {
-      if (S.avgRPE < rr[0]) rpeNote=" Avg RPE "+S.avgRPE.toFixed(1)+" is below target \u2014 push harder on working sets.";
-      else if (S.avgRPE > rr[1]) rpeNote=" Avg RPE "+S.avgRPE.toFixed(1)+" is above target \u2014 watch recovery this week.";
-      else rpeNote=" Avg RPE "+S.avgRPE.toFixed(1)+" is right inside the M8 target range. Calibrated.";
-    }
-  }
-  ins.push({type:"pattern", severity:"blue",
-    title:"Week "+b.week+" of "+b.totalWeeks+" \u2014 "+b.phase,
-    body:b.focus+(hasData?rpeNote:" Import your Hevy CSV to see how training compares.")});
+  // 1. Current-cycle read — short-window evidence rather than lifetime RPE.
+  var window=trainingTrends().windows['7d'],rpeNote='';
+  if(hasData&&window.avgRPE!=null)rpeNote=' Last 7 days: average recorded RPE '+window.avgRPE+'; effort alone does not establish adequate recovery.';
+  ins.push({type:'pattern',severity:'blue',title:'Week '+b.week+' of '+b.totalWeeks+' — '+b.phase,body:b.focus+rpeNote});
 
   if (!hasData) return ins;
 
@@ -1747,7 +1713,7 @@ function renderAudit() {
  var rows=sorted.map(function(pair){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(pair[0])+"</strong><span>"+pair[1]+" sets</span></div><div class='v3-track'><div class='v3-fill' style='width:"+Math.round(pair[1]/max*100)+"%'></div></div></div>";}).join('');
  var metrics="<div class='v3-kpis'><div class='v3-kpi'><strong>"+(m.sessions??STATE.sessions)+"</strong><span>Saved workouts · imported</span></div><div class='v3-kpi'><strong>"+(m.strengthSets??'—')+"</strong><span>Weighted working sets</span></div><div class='v3-kpi'><strong>"+(coverage===null?'—':coverage+'%')+"</strong><span>RPE coverage</span></div></div>";
  var timeRows=[['7 days',a],['28 days',b],['84 days',c]].map(function(p){return "<div class='v3-row'><div class='v3-line'><strong>Last "+p[0]+"</strong><span>"+(p[1].daysWithWorkouts||0)+" training dates</span></div><div class='v3-muted'>"+(p[1].totalSets||0)+" qualifying weighted sets · Avg RPE "+(p[1].avgRPE??'not recorded')+"</div></div>";}).join('');
- el.innerHTML="<div class='v3-hero'><div class='v3-eyebrow'>Training audit · Evidence first</div><div class='v3-h1'>What your records show.</div><div class='v3-sub'>Session counts are distinct from strength-set counts. All time windows are anchored to the latest qualifying set in your import.</div></div>"+metrics+
+ el.innerHTML="<div class='v3-hero'><div class='v3-eyebrow'>Training audit · Evidence first</div><div class='v3-h1'>What your records show.</div><div class='v3-sub'>Session counts are distinct from strength-set counts. All time windows are anchored to the latest qualifying set in your import. Trends compare best qualifying sets per exercise and training date.</div></div>"+metrics+
  "<div class='v3-titlebar'><h3>Activity by window</h3></div><div class='v3-rows'>"+timeRows+"</div>"+
  "<div class='v3-titlebar'><h3>Muscle workload · Last 28 days</h3></div><div class='v3-rows'>"+(rows||"<div class='v3-row v3-muted'>No classified sets in this window.</div>")+"</div>"+
  "<div class='cc'><div class='cl'>Interpretation limits</div><div class='v3-muted'>Weekly set counts are classified by exercise and can underestimate secondary muscle involvement. RPE is optional and averages only recorded values. A flat lift, low set count, or missed week alone does not establish a plateau or poor recovery.</div></div>";
@@ -2155,6 +2121,14 @@ function populateState(byEx,rawRPEs,sessionCount,dateRange,byDate) {
   STATE.lifts = {};
   STATE.muscleVolume = {};
   STATE.dailyLog = byDate || {};
+  STATE.exerciseHistory = {};
+  Object.keys(byEx).forEach(function(name){
+    var key=normalizeExerciseName(name), sessions=byEx[name];
+    STATE.exerciseHistory[key]=Object.keys(sessions).sort().map(function(date){
+      var record=sessions[date], set=record.bestSet||record;
+      return {date:date,weightLb:Number(set.w),reps:Number(set.r),e1rmLb:Number(set.e1),rpe:set.rpe};
+    }).filter(function(x){return x.date&&Number.isFinite(x.e1rmLb)&&x.e1rmLb>0;});
+  });
   STATE.sessions = sessionCount;
   STATE.dateRange = dateRange;
   STATE.exercisesAnalyzed = Object.keys(byEx).length;
@@ -2489,7 +2463,7 @@ function aiSafe(value){return String(value==null?'':value).replace(/[&<>"']/g,fu
 // Snapshot revisions invalidate both cached AI reviews and approvals after a change in training data.
 function trainingFingerprint(){
  var dates=Object.keys(STATE.dailyLog||{}).sort();
- return JSON.stringify({dates:dates.map(function(d){return [d,STATE.dailyLog[d]];}),lifts:STATE.lifts,flags:CURRENT_STATUS});
+ return JSON.stringify({dates:dates.map(function(d){return [d,STATE.dailyLog[d]];}),exerciseHistory:STATE.exerciseHistory||{},lifts:STATE.lifts,flags:CURRENT_STATUS,settings:USER_SETTINGS,cycle:MESO_PLAN});
 }
 function trainingTrends(){
  var keys=Object.keys(STATE.dailyLog||{}).sort(), end=keys.length?new Date(keys[keys.length-1]+'T12:00:00').getTime():Date.now();
@@ -2519,13 +2493,15 @@ function refreshAIReviews(){
 var _aiResultFingerprint='';
 function loadCachedAIReview(){var fp=trainingFingerprint(),c=_aiReviewCache[fp];if(!_aiResult&&c&&Date.now()-c.at<7*86400000){_aiResult=c.result;_aiResultFingerprint=fp;}}
 function aiTrainingSnapshot(){
-  return {goal:USER_SETTINGS.goal||PROFILE.goal,sessions:STATE.sessions,avgRPE:STATE.avgRPE, recordMetrics:STATE.recordMetrics,
+  return {goal:USER_SETTINGS.goal||PROFILE.goal,experience:USER_SETTINGS.experience||'',displayUnits:USER_SETTINGS.units||'lb',sessions:STATE.sessions,avgRPE:STATE.avgRPE, recordMetrics:STATE.recordMetrics,
     period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),trends:trainingTrends(),
+    evidenceByLift:PROFILE.priorityLifts.map(function(name){var assessment=v10TrendAssessment(name,84);return {name:name,classification:assessment.status,datedSets:assessment.rows.slice(-10),observation:assessment.evidence};}),
+    analysisCautions:['A machine weight is not interchangeable with a different machine or barbell variant.','Estimates of 1RM are estimates only.','RPE is incomplete where not recorded.','Rule-based target suggestions are not observations.'],
     muscles:STATE.muscleVolume,flags:CURRENT_STATUS,
     cycle:(function(){var c=v3ActiveCycle();return c?{label:c.label,name:c.name,start:c.start,end:c.end,rpe:c.rpe,reps:c.reps,week:calcBanner().week,paused:v3Paused(c)}:null;})(),
     lifts:Object.keys(STATE.lifts).slice(0,35).map(function(name){var x=STATE.lifts[name],r=STATE.recommendations[name]||{};
       return {name:name,weightLb:x.lastW,reps:x.lastR,rpe:x.lastRPE,e1rmLb:x.lastE,
-       sessionsAtWeight:x.sessionsAtWeight,ruleAction:r.action||'',ruleTargetLb:r.target||x.lastW};})};
+       sessionsAtWeight:x.sessionsAtWeight,existingRuleSuggestion:{action:r.action||'',targetLb:r.target||x.lastW}};})};
 }
 function applyApprovedCoachChanges(){
  Object.keys(_aiApproved).forEach(function(name){
@@ -2561,8 +2537,10 @@ function renderAICoach(){
  "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':(cached?'Refresh AI review':'Analyze my training'))+"</button></div>"+
  "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='Ask about stalls, volume, or progression…'>"+aiSafe(_aiQuestion)+"</textarea>"+
  "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(\"question\")' "+(_aiBusy?'disabled':'')+">Ask LiftIQ</button></div>"+
+ "<div class='ai-feedback'>Observed evidence comes from recent dated workout sets. Existing rule-based targets are marked as suggestions, not facts. Training plans are never changed automatically.</div>"+
  "<div class='ai-feedback'>Coach review is cached until your workout history or readiness flags change. Approvals expire when underlying data changes. Data reflects saved Hevy sessions, not unfinished workouts.</div>"+
  "<div class='ai-feedback'>AI analysis sends summarized workout metrics to Gemini. Free-tier Gemini use may allow Google to use submitted content to improve its products. No names or raw Hevy session details are included in this request. AI can be mistaken.</div></div>";
+ if(STATE.imported){html+="<div class='cc'><div class='cl'>Workout evidence sent to Gemini</div><div class='v3-muted'>Up to 10 recent best sets per priority exercise over 84 days. Open an exercise to inspect the supporting observations.</div>"+PROFILE.priorityLifts.slice(0,8).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join('')+"</div>";}
  if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
  if(_aiNotice)html+="<div class='cc' style='color:var(--gr)'>"+aiSafe(_aiNotice)+"</div>";
  if(_aiResult){html+="<div class='cc'><div class='cl'>Coach interpretation</div><div class='ai-result'>"+aiSafe(_aiResult.answer||_aiResult.summary)+"</div>";
@@ -2736,7 +2714,7 @@ async function syncHevy(weeks,options){
     // parseHevy converts back to the app's existing intelligence pipeline.
     // It also keeps previous STATE intact on any empty/invalid analysis.
     try{localStorage.setItem("ti_hevy_synced_at",String(Date.now()));}catch(e){}
-    renderImportTab();
+    renderImportTab(); renderWhatChanged();
     hevyStatus("✓ Synced "+fetched.length+" saved workouts from Hevy ("+pages+" pages). " +
       (stoppedForDate?"Older history not requested. ":"")+"Guidance and history are now updated.");
     if(!_hevySyncTimer){
@@ -2911,6 +2889,7 @@ function saveState() {
       prevLifts: STATE.prevLifts,
       muscleVolume: STATE.muscleVolume,
       dailyLog: STATE.dailyLog,
+      exerciseHistory: STATE.exerciseHistory,
       sessions: STATE.sessions, recordMetrics:STATE.recordMetrics,
       dateRange: STATE.dateRange,
       exercisesAnalyzed: STATE.exercisesAnalyzed,
@@ -2931,6 +2910,7 @@ function restoreState() {
     STATE.prevLifts = saved.prevLifts || {};
     STATE.muscleVolume = saved.muscleVolume || {};
     STATE.dailyLog = saved.dailyLog || {};
+    STATE.exerciseHistory = saved.exerciseHistory || {};
     STATE.sessions = saved.sessions || 0; STATE.recordMetrics=saved.recordMetrics||null;
     STATE.dateRange = saved.dateRange || {start:null,end:null};
     STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
