@@ -258,6 +258,40 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .empty-state{color:#9da5af}.apill.g{background:#223f30;color:#b4e2c3}.apill.a{background:#423621;color:#f1d49d}
 @media(min-width:621px){body{border-left:1px solid #252a31;border-right:1px solid #252a31}.obs-header{padding:0 30px}.obs-headline{padding-left:29px}.topbar{bottom:15px;max-width:440px;border:1px solid #3e464f;border-radius:17px;padding:8px;box-shadow:0 16px 55px #000c}.tb{padding:12px}.iw{padding-left:25px;padding-right:25px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* V3: compact visual progress, diagnostic audit, editable cycles */
+.v3-hero{background:linear-gradient(140deg,#242a32,#13161a 78%);border:1px solid #49515b;border-radius:18px;padding:17px;margin-bottom:12px}
+.v3-eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#aeb7c2;font-weight:800;margin-bottom:7px}
+.v3-h1{font-size:23px;font-weight:800;letter-spacing:-.03em;line-height:1.25;color:#f4f5f6}
+.v3-sub{font-size:12px;color:#aeb6c1;line-height:1.6;margin-top:6px}
+.v3-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+.v3-kpi{border:1px solid var(--bd);background:var(--bg2);padding:11px 9px;border-radius:12px;min-width:0}
+.v3-kpi strong{display:block;font-size:20px;letter-spacing:-.04em;color:var(--tx);overflow:hidden;text-overflow:ellipsis}
+.v3-kpi span{font-size:10px;color:var(--t2)}
+.v3-titlebar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:16px 0 8px}
+.v3-titlebar h3{font-size:13px;font-weight:800;color:var(--tx)}
+.v3-mini{border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);padding:7px 9px;border-radius:8px;font-size:11px;cursor:pointer}
+.v3-rows{border:1px solid var(--bd);border-radius:13px;overflow:hidden;background:var(--bg2)}
+.v3-row{padding:11px 12px;border-bottom:1px solid var(--bd)}.v3-row:last-child{border:0}
+.v3-line{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}
+.v3-track{height:7px;border-radius:6px;background:#333941;overflow:hidden;margin:8px 0 4px}
+.v3-fill{height:100%;background:linear-gradient(90deg,#717f91,#d0d7e0);border-radius:6px}
+.v3-muted{font-size:11px;color:var(--t2);line-height:1.6}
+.v3-active{border:1px solid #a7b5c7;background:linear-gradient(145deg,#303844,#171b20);box-shadow:0 0 0 1px #b3c1d022;border-radius:16px;padding:16px;margin:0 0 12px}
+.v3-state{font-size:10px;font-weight:800;letter-spacing:.1em;color:#e1e8f0}
+.v3-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.v3-field{display:flex;flex-direction:column;gap:5px;min-width:0}.v3-field.full{grid-column:1/-1}
+.v3-field label{font-size:10px;color:var(--t2)}
+.v3-field input,.v3-field select{min-width:0;width:100%;padding:10px 8px;background:var(--bg3);border:1px solid var(--bd2);border-radius:9px;color:var(--tx);font-size:12px;color-scheme:dark}
+.v3-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.v3-action{padding:10px 12px;font-size:12px;font-weight:700;border-radius:9px;border:1px solid #627082;background:#303944;color:#f4f6f8;cursor:pointer}
+.v3-action.alt{border-color:var(--bd2);background:var(--bg3);color:var(--t2)}
+.v3-action.warn{border-color:#88735b;color:#edd9b8;background:#382e24}
+.v3-banner{padding:10px 12px;border:1px solid #5c6a7b;border-radius:10px;color:#d6e0eb;background:#8292a311;font-size:11px;line-height:1.6;margin-bottom:10px}
+.v3-meter-label{font-size:10px;color:var(--t2)}
+.v3-compact-list{max-height:350px;overflow:auto}
+@media (max-width:370px){.v3-kpis{gap:4px}.v3-kpi{padding:9px 6px}.v3-kpi strong{font-size:17px}}
+
 </style>
 </head>
 <body>
@@ -456,6 +490,26 @@ var MESO_PLAN = [
    ]}
 ];
 
+// V3: user editable cycle dates; saved to this browser only.
+var DEFAULT_MESO_PLAN=JSON.parse(JSON.stringify(MESO_PLAN));
+var CYCLE_PAUSE=null;
+function v3Iso(d){return new Date(d).toISOString().slice(0,10);}
+function v3Date(s){return new Date(s+'T12:00:00');}
+function v3AddDays(s,n){var d=v3Date(s);d.setDate(d.getDate()+n);return v3Iso(d);}
+function v3Today(){var d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
+function v3Safe(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function v3ReadCycles(){try{var j=JSON.parse(localStorage.getItem('liftiq_cycles_v3')||'null');if(!j||!Array.isArray(j.plan))return;var labels=DEFAULT_MESO_PLAN.map(function(m){return m.label;});if(j.plan.length!==labels.length||j.plan.some(function(m,i){return m.label!==labels[i]||!/^\d{4}-\d{2}-\d{2}$/.test(m.start)||!/^\d{4}-\d{2}-\d{2}$/.test(m.end)||v3Date(m.end)<v3Date(m.start)}))return;MESO_PLAN=j.plan;CYCLE_PAUSE=j.pause||null;}catch(e){console.warn('Cycle restore skipped',e);}}
+function v3SaveCycles(){localStorage.setItem('liftiq_cycles_v3',JSON.stringify({plan:MESO_PLAN,pause:CYCLE_PAUSE}));}
+function v3ActiveCycle(){var t=v3Today();if(CYCLE_PAUSE){var held=MESO_PLAN.find(function(m){return m.label===CYCLE_PAUSE.label;});if(held)return held;}return MESO_PLAN.find(function(m){return m.start<=t&&m.end>=t;})||null;}
+function v3Paused(m){return !!(m&&CYCLE_PAUSE&&CYCLE_PAUSE.label===m.label&&CYCLE_PAUSE.pausedAt);}
+function v3RefreshCycles(){renderCoachCard();renderNextSessionCoach();renderDashboard();renderMap();renderInsights();renderAICoach();}
+function v3SelectCycle(label){var m=MESO_PLAN.find(function(x){return x.label===label;});if(!m)return;var form=document.getElementById('v3-cycle-form');if(!form)return;form.dataset.label=label;form.querySelector('[name=cycleName]').value=m.name;form.querySelector('[name=cycleStart]').value=m.start;form.querySelector('[name=cycleEnd]').value=m.end;form.querySelector('[name=cycleRpe]').value=m.rpe;form.querySelector('[name=cycleReps]').value=m.reps;var h=document.getElementById('v3-edit-head');if(h)h.textContent='Edit '+label;}
+function v3SaveEdit(){var f=document.getElementById('v3-cycle-form');if(!f)return;var label=f.dataset.label,m=MESO_PLAN.find(function(x){return x.label===label;});if(!m)return;var name=f.querySelector('[name=cycleName]').value.trim(),start=f.querySelector('[name=cycleStart]').value,end=f.querySelector('[name=cycleEnd]').value,rpe=f.querySelector('[name=cycleRpe]').value.trim(),reps=f.querySelector('[name=cycleReps]').value.trim();if(!name||!start||!end||end<start){alert('Enter a cycle name and a valid date range.');return;}if(MESO_PLAN.some(function(x){return x!==m&&!(end<x.start||start>x.end);})){alert('Those dates overlap another training cycle. Adjust the neighbouring cycle first.');return;}if(v3Paused(m)){alert('Resume the paused cycle before changing its dates.');return;}Object.assign(m,{name:name,start:start,end:end,rpe:rpe,reps:reps});v3SaveCycles();v3RefreshCycles();}
+function v3PauseCycle(){var m=v3ActiveCycle();if(!m){alert('Only a currently scheduled cycle can be paused.');return;}if(v3Paused(m))return;CYCLE_PAUSE={label:m.label,pausedAt:v3Today()};v3SaveCycles();v3RefreshCycles();}
+function v3ResumeCycle(){var p=CYCLE_PAUSE;if(!p)return;var m=MESO_PLAN.find(function(x){return x.label===p.label;});if(!m){CYCLE_PAUSE=null;v3SaveCycles();v3RefreshCycles();return;}var n=Math.max(0,Math.round((v3Date(v3Today())-v3Date(p.pausedAt))/86400000));if(n){var idx=MESO_PLAN.indexOf(m);MESO_PLAN.slice(idx).forEach(function(x){x.end=v3AddDays(x.end,n);if(x!==m)x.start=v3AddDays(x.start,n);});}CYCLE_PAUSE=null;v3SaveCycles();v3RefreshCycles();}
+function v3ResetCycles(){if(!confirm('Reset all mesocycle dates and names to the original schedule?'))return;MESO_PLAN=JSON.parse(JSON.stringify(DEFAULT_MESO_PLAN));CYCLE_PAUSE=null;v3SaveCycles();v3RefreshCycles();}
+v3ReadCycles();
+
 // ═══════════════════════════════════════
 // LAYER 2: IMPORTED TRAINING STATE (starts empty)
 // ═══════════════════════════════════════
@@ -597,12 +651,13 @@ function calcBanner() {
     phase:"Plan needed",focus:"Your training plan does not cover today. Review the Plan tab before progressing.",rpe:"—",reps:"—"};
   for (var mi = 0; mi < MESO_PLAN.length; mi++) {
     var m = MESO_PLAN[mi];
-    var s = new Date(m.start), e = new Date(m.end);
-    if (today >= s && today <= e) {
-      var wk = Math.min(Math.floor((today-s)/604800000)+1, m.weeks.length);
+    var s = v3Date(m.start), e = v3Date(m.end);
+    if ((v3Today() >= m.start && v3Today() <= m.end) || v3Paused(m)) {
+      var effective=v3Paused(m)?v3Date(CYCLE_PAUSE.pausedAt):today;
+      var wk = Math.max(1,Math.min(Math.floor((effective-s)/604800000)+1, m.weeks.length));
       var wd = m.weeks[wk-1] || m.weeks[0];
       result = {label:m.label,name:m.name,week:wk,totalWeeks:m.weeks.length,
-        phase:wd.phase,focus:wd.focus,rpe:m.rpe,reps:m.reps};
+        phase:v3Paused(m)?"Paused":wd.phase,focus:v3Paused(m)?"Training cycle paused. Resume when ready; scheduled dates will shift forward.":wd.focus,rpe:m.rpe,reps:m.reps,paused:v3Paused(m)};
       break;
     }
   }
@@ -840,6 +895,19 @@ function renderDashboard() {
 }
 
 // ── What Changed ──
+function v3OpenTargets(){var b=document.querySelector('.it[onclick*=\"next\"]');if(b)iTab('next',b);}
+function v3ProgressTop(){
+ var target=PROFILE.priorityLifts.map(function(l){return STATE.recommendations[l];}).filter(Boolean);
+ var pushes=target.filter(function(r){return r.action==='increase';}).length;
+ var holds=target.filter(function(r){return ['hold','building'].includes(r.action);}).length;
+ var flagged=target.filter(function(r){return ['stall','injury','reduce'].includes(r.action);}).length;
+ var h="<div class='v3-hero'><div class='v3-eyebrow'>Performance snapshot</div><div class='v3-h1'>Your progress at a glance</div><div class='v3-sub'>Actionable targets appear first. Comparisons follow below.</div></div>";
+ h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+pushes+"</strong><span>Ready to progress</span></div><div class='v3-kpi'><strong>"+holds+"</strong><span>Building / hold</span></div><div class='v3-kpi'><strong>"+flagged+"</strong><span>Need review</span></div></div>";
+ h+="<div class='v3-titlebar'><h3>Next-session targets</h3><button class='v3-mini' onclick='v3OpenTargets()'>All targets ↗</button></div>";
+ h+="<div class='v3-rows'>"+target.slice(0,5).map(function(r){var val=r.target!=null?r.target+' lbs':'—';return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(r.lift))+"</strong><span>"+v3Safe(val)+"</span></div><div class='v3-muted'>"+v3Safe(r.badge||'Review')+" · "+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set'+'</div></div>';}).join('')+(target.length?'':"<div class='v3-row v3-muted'>Sync Hevy to populate your lift targets.</div>")+"</div>";
+ return h;
+}
+
 function renderWhatChanged() {
   var el = document.getElementById("t-changed");
   if (!el) return;
@@ -856,7 +924,7 @@ function renderWhatChanged() {
     el.innerHTML = emptyState("No lift data in this import.","Try a wider date range."); return;
   }
   if (!hasPrev) {
-    el.innerHTML = "<div class='cc'>" +
+    el.innerHTML = v3ProgressTop() + "<div class='cc'>" +
       "<div class='cl'>First import recorded</div>" +
       "<div style='font-size:12px;color:var(--t2);line-height:1.6'>" +
       "Baseline saved with "+allKeys.length+" exercises across "+STATE.sessions+" sessions.<br>" +
@@ -935,7 +1003,7 @@ function renderWhatChanged() {
       "<div class='change-reason'>"+hv+" sets vs "+gv+" glute sets. Add 2\u20134 hard sets next week.</div></div></div></div>";
 
   if (!html) html = "<div style='padding:16px;color:var(--t2);font-size:12px'>Not enough data to compare. Import again after your next training week.</div>";
-  el.innerHTML = html;
+  el.innerHTML = v3ProgressTop() + html;
 }
 
 
@@ -971,9 +1039,7 @@ function renderNextWeek() {
     "</div>";
   });
 
-  STATE.warnings.filter(function(w){return w.type==="volume";}).forEach(function(w) {
-    html += "<div class='nx-vol-warn'>&#128202; "+w.msg+"</div>";
-  });
+  // Volume diagnostics live in the Audit screen, not after the lift targets.
 
   el.innerHTML = html;
 }
@@ -1007,6 +1073,8 @@ function renderMap() {
      success:"Recapture Dec 2023 peaks: RDL 205 lbs, BSS 140 lbs, Glute Drive 540+ e1RM."}
   ];
 
+  // Phase cards reflect user edits rather than only original calendar labels.
+  PHASES.forEach(function(p){var m=MESO_PLAN.find(function(x){return x.label===p.label;});if(m){p.name=m.name;p.period=m.start+' → '+m.end;p.active=b.label===m.label;}});
   // Phase cards — clickable
   var phaseRow = "<div class='phase-row'>" + PHASES.map(function(p) {
     return "<div class='phase-card"+(p.active?" phase-active":"")+"' style='border-top:3px solid "+p.color+"' "+
@@ -1048,8 +1116,11 @@ function renderMap() {
     "</div>";
   }).join("");
 
+  var activeCycle=v3ActiveCycle();
+  var hero="<div class='v3-active'><div class='v3-state'>"+(activeCycle?(v3Paused(activeCycle)?'⏸ PAUSED CYCLE':'● CURRENT CYCLE'):'NO ACTIVE CYCLE')+"</div><div class='v3-h1' style='margin-top:7px'>"+(activeCycle?v3Safe(activeCycle.label+' · '+activeCycle.name):'No cycle scheduled')+"</div><div class='v3-sub'>"+(activeCycle?v3Safe(activeCycle.start+' → '+activeCycle.end+' · Week '+b.week+' of '+b.totalWeeks):'Choose or edit a cycle below to get started.')+"</div>"+(activeCycle?"<div class='v3-actions'>"+(v3Paused(activeCycle)?"<button class='v3-action' onclick='v3ResumeCycle()'>Resume cycle</button>":"<button class='v3-action warn' onclick='v3PauseCycle()'>Pause cycle</button>")+"<button class='v3-action alt' data-cycle='"+activeCycle.label+"' onclick='v3SelectCycle(this.dataset.cycle)'>Edit cycle</button></div>":"")+"</div>";
+  var editor="<div class='cc'><div class='v3-titlebar' style='margin:0 0 8px'><h3 id='v3-edit-head'>Edit training cycle</h3><button class='v3-mini' onclick='v3ResetCycles()'>Reset schedule</button></div><div class='v3-muted'>Editing affects LiftIQ's local plan only. Pausing freezes the cycle week; resuming shifts the current and later cycles forward by the pause duration.</div><div class='v3-actions'>"+MESO_PLAN.map(function(m){return "<button class='v3-mini' data-cycle='"+m.label+"' onclick='v3SelectCycle(this.dataset.cycle)'>"+m.label+"</button>";}).join('')+"</div><form id='v3-cycle-form' class='v3-form' onsubmit='event.preventDefault();v3SaveEdit()'><div class='v3-field full'><label>Cycle name</label><input name='cycleName' maxlength='80' required></div><div class='v3-field'><label>Start date</label><input name='cycleStart' type='date' required></div><div class='v3-field'><label>End date</label><input name='cycleEnd' type='date' required></div><div class='v3-field'><label>Target RPE</label><input name='cycleRpe' maxlength='20'></div><div class='v3-field'><label>Reps</label><input name='cycleReps' maxlength='20'></div><div class='v3-field full'><button class='v3-action' type='submit'>Save cycle changes</button></div></form></div>";
   el.innerHTML =
-    phaseRow + phaseDetail +
+    hero + phaseRow + phaseDetail + editor +
     "<div class='cc'><div class='cl'>Week in block</div>" +
       weekDots +
       "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" \u00b7 "+b.phase+"</div>" +
@@ -1063,6 +1134,7 @@ function renderMap() {
 
   // Store PHASES for click handler access
   el._phases = PHASES;
+  v3SelectCycle((activeCycle||MESO_PLAN[0]).label);
 }
 
 // ── Map click helpers ──
@@ -1466,72 +1538,22 @@ function deriveInsights() {
 // ═══════════════════════════════════════
 // RENDER INSIGHTS TAB
 // ═══════════════════════════════════════
-function renderInsights() {
-  var el = document.getElementById("t-insights");
-  if (!el) return;
-  var b = calcBanner();
-
-  var colMap = {green:"var(--gr)",blue:"var(--bl)",yellow:"var(--am)",orange:"var(--or)",red:"var(--re)"};
-  var bgMap  = {green:"#1db87a0d",blue:"#2d6ef50d",yellow:"#ffd60a0d",orange:"#bdc5d00d",red:"#ff453a0d"};
-  var icnMap = {pattern:"&#128202;",risk:"&#9888;",win:"&#127942;",priority:"&#9658;",historical:"&#128336;"};
-
-  var html = "";
-
-  // Biggest win card
-  var win = deriveBiggestWin(STATE, STATE.recommendations);
-  if (win && STATE.imported) {
-    html += "<div class='ins-win-card'>" +
-      "<div class='ins-win-icon'>"+win.icon+"</div>" +
-      "<div><div class='ins-win-title'>"+win.title+"</div><div class='ins-win-body'>"+win.body+"</div></div>" +
-    "</div>";
-  }
-
-  // Micro / Meso / Macro section
-  html += "<div class='cc' style='margin-bottom:10px'>" +
-    "<div class='cl'>Training context</div>" +
-    // Micro
-    "<div class='meso-level'><span class='meso-badge meso-micro'>MICRO</span>" +
-    "<div><div class='meso-level-name'>Week "+b.week+" \u2014 "+b.phase+"</div>" +
-    "<div class='meso-level-body'>"+b.focus+"</div></div></div>" +
-    // Meso
-    "<div class='meso-level'><span class='meso-badge meso-meso'>MESO</span>" +
-    "<div><div class='meso-level-name'>"+b.label+" "+b.name+"</div>" +
-    "<div class='meso-level-body'>RPE "+b.rpe+" \u00b7 "+b.reps+" reps \u00b7 "+b.totalWeeks+" week block</div></div></div>" +
-    // Macro
-    "<div class='meso-level' style='border-bottom:none'><span class='meso-badge meso-macro'>MACRO</span>" +
-    "<div><div class='meso-level-name'>Jun \u2192 Dec 2026</div>" +
-    "<div class='meso-level-body'>" +
-    "<span style='color:var(--bl)'>M8</span> Hypertrophy \u2192 " +
-    "<span style='color:#bf5af2'>M9</span> Strength \u2192 " +
-    "<span style='color:var(--t3)'>M10</span> Deload \u2192 " +
-    "<span style='color:var(--or)'>M11</span> Accumulation 2.0 \u2192 Dec 2026 goal" +
-    "</div></div></div>" +
-  "</div>";
-
-  // Historical lens — picked from current data, random fallback only with no signal
-  var lens2 = pickHistoricalLens(STATE);
-  html += "<div class='cc' style='margin-bottom:10px'>" +
-    "<div class='cl'>Historical lens</div>" +
-    "<div style='font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px'>"+lens2.title+"</div>" +
-    "<div style='font-size:11px;color:var(--t2);line-height:1.75'>"+lens2.body+"</div>" +
-    "</div>";
-
-  // Dynamic insights
-  var insights = deriveInsights();
-  insights.forEach(function(ins) {
-    var col=colMap[ins.severity]||"var(--t2)";
-    var bg=bgMap[ins.severity]||"transparent";
-    var icn=icnMap[ins.type]||"\u25cf";
-    html += "<div class='ins-card' style='border-left-color:"+col+";background:"+bg+"'>" +
-      "<div class='ins-head'><span class='ins-icn'>"+icn+"</span><span class='ins-title'>"+ins.title+"</span></div>" +
-      "<div class='ins-body'>"+ins.body+"</div>" +
-    "</div>";
-  });
-
-  if (!STATE.imported)
-    html += "<div class='empty-state' style='margin-top:8px'>Import Hevy CSV to generate personalised insights.</div>";
-
-  el.innerHTML = html;
+function renderInsights(){
+ var el=document.getElementById('t-insights');if(!el)return;
+ if(!STATE.imported){el.innerHTML=emptyState('Sync Hevy to view your training audit.','');return;}
+ var vol=STATE.muscleVolume||{},keys=Object.keys(vol).sort(function(a,b){return vol[b]-vol[a];});
+ var max=Math.max(1,...keys.map(function(k){return vol[k];}));
+ var insights=deriveInsights();
+ var today=v3Date(v3Today()),cutoff=new Date(today.getTime()-6*86400000);
+ var recentDays=Object.keys(STATE.dailyLog||{}).filter(function(k){var d=v3Date(k);return d>=cutoff&&d<=today;});
+ var recentSets=recentDays.reduce(function(total,k){return total+Number(STATE.dailyLog[k].sets||0);},0);
+ var h="<div class='v3-hero'><div class='v3-eyebrow'>Training diagnostics</div><div class='v3-h1'>Audit your workload.</div><div class='v3-sub'>Exercise exposure, effort and review signals. Numbers below cover the most recently synced data window unless noted otherwise.</div></div>";
+ h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+STATE.sessions+"</strong><span>Sessions in import</span></div><div class='v3-kpi'><strong>"+(STATE.avgRPE==null?'—':STATE.avgRPE.toFixed(1))+"</strong><span>Average RPE</span></div><div class='v3-kpi'><strong>"+STATE.warnings.length+"</strong><span>Review signals</span></div></div>";
+ h+="<div class='v3-titlebar'><h3>Last 7 days</h3></div><div class='v3-rows'><div class='v3-row'><div class='v3-line'><strong>Training days</strong><span>"+recentDays.length+"</span></div><div class='v3-muted'>"+recentSets+" logged sets in available history</div></div></div>";
+ h+="<div class='v3-titlebar'><h3>Muscle group volume</h3></div><div class='v3-rows'>"+keys.map(function(k){var n=vol[k];return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(k)+"</strong><span>"+n+" sets</span></div><div class='v3-track'><div class='v3-fill' style='width:"+Math.round(100*n/max)+"%'></div></div><div class='v3-meter-label'>Relative to the highest recorded group</div></div>";}).join('')+(keys.length?'':"<div class='v3-row v3-muted'>No volume data yet.</div>")+"</div>";
+ h+="<div class='v3-titlebar'><h3>Signals to review</h3><span class='v3-muted'>"+STATE.warnings.length+" flags</span></div><div class='v3-rows'>"+(STATE.warnings.length?STATE.warnings.slice(0,8).map(function(w){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(w.lift||w.flag||w.type||'Review')+"</strong><span>↗</span></div><div class='v3-muted'>"+v3Safe(w.msg||'Check this with your coach.')+"</div></div>";}).join(''):"<div class='v3-row v3-muted'>No current warning signals.</div>")+"</div>";
+ h+="<div class='v3-titlebar'><h3>Interpretation</h3></div><div class='v3-rows v3-compact-list'>"+insights.slice(0,5).map(function(x){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(x.title)+"</strong></div><div class='v3-muted'>"+v3Safe(x.body)+"</div></div>";}).join('')+"</div>";
+ el.innerHTML=h;
 }
 
 function renderAudit() {

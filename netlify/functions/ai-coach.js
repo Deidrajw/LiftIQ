@@ -40,14 +40,25 @@ exports.handler=async(event)=>{
  if(body.mode==='question' && !question.trim())return reply(400,{error:'Enter a question.'});
  const instructions=`You are LiftIQ, a conservative evidence-based strength training analyst. You receive 7/28/84-day summaries and up to 12 dated best-set observations per priority lift, NOT complete sessions. Never invent session comparisons, dates or injury diagnoses. Treat goals and status flags as user-reported. Training numbers and ruleTargets are supplied by deterministic code. Reference exact available lift data and dated history in your rationale. Do not treat exercise appearances as hard-set counts. Distinguish observations from hypotheses. If insufficient data say so. Respect reported knee, back, ankle pain and recovery concerns; do not propose load increases if lowRecovery is true, or unsafe increases while relevant pain is present. Never prescribe pain-provoking exercise. No medical diagnosis. Proposals require user acceptance and must not imply Hevy is changed. Output strict JSON, not markdown. Schema: {"summary":"string", "insights":["string"], "proposals":[{"lift":"exact input lift name", "action":"hold|increase|reduce", "targetLb":number, "reps":integer, "reason":"string", "evidence":"string"}], "answer":"string"}. 0-4 proposals. Propose plausible exercise-level target load adjustments only, generally within 10% of recorded weight, and stay close to deterministic ruleTarget; prefer hold when uncertain. Consider weights in pounds.`;
  const prompt=JSON.stringify({task:body.mode,question:body.mode==='question'?question:undefined,training:data});
- const model=process.env.GEMINI_MODEL||'gemini-2.5-flash';
+ const model=process.env.GEMINI_MODEL||'gemini-3.5-flash-lite';
  if(!/^gemini-[a-zA-Z0-9.-]+$/.test(model))return reply(503,{error:'Invalid Gemini model configuration.'});
  try{
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
    method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
    body:JSON.stringify({systemInstruction:{parts:[{text:instructions}]},contents:[{role:'user',parts:[{text:prompt}]}],
      generationConfig:{responseMimeType:'application/json',temperature:0.2,maxOutputTokens:1600}}),signal:AbortSignal.timeout(24000)});
-  if(!res.ok){const safe=res.status===429?'Gemini rate limit reached. Try later.':res.status===400?'Gemini rejected this request or model configuration.':res.status===403?'Gemini key does not have access to this model.':'Gemini returned HTTP '+res.status;return reply(502,{error:safe});}
+  if(!res.ok){
+   // Google may return 404 for an unavailable model, even when the key itself is valid.
+   let providerMessage='';
+   try{const errorBody=await res.json();providerMessage=cleanText(errorBody?.error?.message,240);}catch{}
+   const safe=res.status===429?'Gemini rate limit reached. Try again later.':
+     res.status===404?`Gemini model ${model} was not found or is unavailable to this API key. Check GEMINI_MODEL in Netlify (or remove it to use the app default).`:
+     res.status===400?'Gemini rejected the request or model configuration.':
+     res.status===403?'Your Gemini API key cannot access this model.':
+     `Gemini returned HTTP ${res.status}.`;
+   // Do not return raw provider errors for authentication failures.
+   return reply(502,{error:safe+(res.status===404&&providerMessage?' Google: '+providerMessage:'')});
+  }
   const raw=await res.json();let result;try{result=JSON.parse(extract(raw));}catch{return reply(502,{error:'Gemini did not return valid JSON. Please retry.'});}
   const reference=new Map(data.lifts.map(x=>[x.name,x]));
   const proposals=(Array.isArray(result.proposals)?result.proposals:[]).slice(0,4).map(p=>{
