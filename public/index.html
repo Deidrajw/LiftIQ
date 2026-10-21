@@ -437,6 +437,36 @@ body[data-theme=light] .it{color:#647281}
 body[data-theme=light] .it.on{background:linear-gradient(180deg,#2f3944,#1f262e);border-color:#404b57;color:#fff;box-shadow:inset 0 1px rgba(255,255,255,.08),0 8px 20px rgba(31,48,69,.12)}
 @media(min-width:621px){.obs-header{padding:0 28px}.obs-headline{padding:24px 28px 10px}.iw{padding-left:24px;padding-right:24px}.topbar{max-width:456px;padding:8px 9px;gap:9px}.tb{padding:12px 14px}}
 
+
+/* V10.1 — all-time exercise drilldown */
+.history-launch{width:100%;display:block;text-align:left;background:transparent;border:0;color:inherit;cursor:pointer;font:inherit;padding:0}
+.history-launch:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radius:5px}
+.history-launch .v3-line{align-items:flex-start}
+.history-launch .history-status{font-size:11px;color:var(--t2);flex-shrink:0;text-align:right}
+.history-launch .history-affordance{display:inline-flex;gap:5px;align-items:center;white-space:nowrap;font-size:10px;color:var(--t2);margin-top:7px}
+.history-modal{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.76);display:none;align-items:flex-end;justify-content:center}
+.history-modal.open{display:flex}
+.history-sheet{width:100%;max-width:620px;max-height:92dvh;overflow:auto;background:var(--bg2);border:1px solid var(--bd2);border-radius:22px 22px 0 0;padding:20px 17px calc(25px + env(safe-area-inset-bottom));box-shadow:0 -20px 90px rgba(0,0,0,.5);color:var(--tx)}
+.history-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.history-title{font:800 21px/1.2 Manrope,sans-serif;letter-spacing:-.04em}
+.history-close{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx);border-radius:10px;padding:9px 12px;cursor:pointer;flex-shrink:0}
+.history-controls{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+.history-controls label{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:7px}
+.history-controls select{font-size:12px;background:var(--bg3);color:var(--tx);border:1px solid var(--bd2);padding:9px 11px;border-radius:9px;max-width:170px}
+.history-chart{width:100%;height:auto;display:block;background:var(--bg3);border:1px solid var(--bd);border-radius:13px}
+.history-point{cursor:pointer;stroke:var(--bg2);stroke-width:2}
+.history-detail{font-size:12px;line-height:1.6;background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:11px 0;color:var(--tx)}
+.history-rows{border:1px solid var(--bd);border-radius:13px;max-height:235px;overflow:auto}
+.history-rows>div{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;gap:10px;font-size:11px}
+.history-rows>div:last-child{border-bottom:0}
+.history-library{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0 18px}
+.history-library button{padding:11px 12px;text-align:left;border:1px solid var(--bd2);border-radius:10px;background:var(--bg3);color:var(--tx);font-size:12px;cursor:pointer;overflow-wrap:anywhere}
+.history-library button small{display:block;font-size:10px;color:var(--t2);margin-top:3px}
+@media(max-width:400px){.history-library{grid-template-columns:minmax(0,1fr)}}
+
+
+/* V11: planning and settings continuity */
+.v11-card{padding:16px;border:1px solid #596575;border-radius:15px;background:linear-gradient(145deg,#222a34,#14191f);margin:12px 0}.v11-heading{font-weight:800;font-size:16px;margin:9px 0 10px}.v11-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:11px}.v11-stats span{padding:11px 8px;border-radius:10px;border:1px solid #3c4652;font-size:10px;color:#b8c4cf;line-height:1.4}.v11-stats strong{display:block;font-size:20px;color:#f2f5f8;margin-bottom:4px}.v11-label{display:block;color:var(--t2);font-size:11px;margin:11px 0 5px}.v11-input{width:100%;min-height:72px;resize:vertical;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:11px;font-size:14px;color:var(--tx)}.v11-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.v11-proposal{margin-top:12px;border:1px solid #5e6e7d;border-radius:12px;padding:12px}.v11-proposal p{font-size:11px;color:var(--t2);line-height:1.6;margin:8px 0}.settings-row input[type=number]{font-variant-numeric:tabular-nums}body[data-theme=light] .v11-card{background:#fff;border-color:#c8d1dc}body[data-theme=light] .v11-stats span{border-color:#d6dce3;color:#65707d}body[data-theme=light] .v11-stats strong{color:#19212b}
 </style>
 </head>
 <body>
@@ -454,6 +484,14 @@ body[data-theme=light] .it.on{background:linear-gradient(180deg,#2f3944,#1f262e)
 
 <div class="imp-banner" id="importBanner"></div>
 
+<div id="exerciseHistoryModal" class="history-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Exercise progression">
+  <div class="history-sheet">
+    <div class="history-head"><div><div class="v3-eyebrow">Exercise history · all time</div><div class="history-title" id="historyName"></div><div class="v3-muted" id="historyCount"></div></div><button class="history-close" type="button" onclick="closeExerciseHistory()" aria-label="Close exercise history">Close</button></div>
+    <div class="history-controls"><label>Metric <select id="historyMetric" onchange="renderExerciseHistoryDetail()"><option value="e1rmLb">Estimated 1RM</option><option value="weightLb">Working weight</option><option value="reps">Repetitions</option></select></label><label>Range <select id="historyRange" onchange="renderExerciseHistoryDetail()"><option value="all">All time</option><option value="365">365 days</option><option value="84">84 days</option></select></label></div>
+    <svg id="historySvg" class="history-chart" viewBox="0 0 360 230" role="img" aria-label="Exercise progression chart"></svg><div id="historySelected" class="history-detail" aria-live="polite"></div>
+    <div class="v3-titlebar"><h3>Dated best sets</h3><span class="v3-muted">Tap chart points for details</span></div><div id="historyRows" class="history-rows"></div>
+  </div>
+</div>
 <!-- ═══ GYM MODE ═══ -->
 <div id="gym">
   <!-- Coach Status Card -->
@@ -697,11 +735,11 @@ function v5CycleTrainingDays(){
 }
 function v4CycleReview(){var m=v3ActiveCycle();if(!m){alert('Select an active cycle before requesting a cycle review.');return;}var question='Review my current mesocycle '+m.label+' ('+m.name+'), scheduled '+m.start+' to '+m.end+', RPE '+m.rpe+', reps '+m.reps+'. Based ONLY on available 7/28/84 day training trends, should I extend, shorten, deload or keep it? Identify data limitations and suggest a specific adjustment for my approval. Do not claim to edit the plan.';_aiQuestion=question.slice(0,350);var coach=document.querySelector('.it[onclick*="ai"]');if(coach){iTab('ai',coach);}else{document.querySelectorAll('.it').forEach(function(b){if(b.textContent.toLowerCase().includes('coach'))iTab('ai',b);});}renderAICoach();var textarea=document.getElementById('aiQuestion');if(textarea){textarea.value=_aiQuestion;textarea.focus();}}
 var _cycleEditorOpen=false;
-var USER_SETTINGS={name:'Deidra',goal:'Glute growth and posterior chain strength',units:'lb',theme:'dark',notes:'',experience:'Intermediate'};
+var USER_SETTINGS={name:'Deidra',goal:'Glute growth and posterior chain strength',units:'lb',theme:'dark',notes:'',experience:'Intermediate',sessionsPerWeek:4,sessionMinutes:75,equipment:'Gym machines, free weights and Smith machine',limitations:'',routinePreference:''};
 function loadUserSettings(){try{var j=JSON.parse(localStorage.getItem('liftiq_user_settings_v1')||'null');if(j&&typeof j==='object')Object.assign(USER_SETTINGS,j);}catch(e){}applyTheme(USER_SETTINGS.theme||'dark');}
-function saveUserSettings(ev){if(ev)ev.preventDefault();var f=document.getElementById('settingsForm');if(!f)return;USER_SETTINGS.name=f.name.value.trim()||'Deidra';USER_SETTINGS.goal=f.goal.value.trim();USER_SETTINGS.units=f.units.value||'lb';USER_SETTINGS.theme=f.theme.value||'dark';USER_SETTINGS.notes=f.notes.value.trim();USER_SETTINGS.experience=f.experience.value||'Intermediate';localStorage.setItem('liftiq_user_settings_v1',JSON.stringify(USER_SETTINGS));applyTheme(USER_SETTINGS.theme);renderSettings();alert('Settings saved locally on this device.');}
+function saveUserSettings(ev){if(ev)ev.preventDefault();var f=document.getElementById('settingsForm');if(!f)return;USER_SETTINGS.name=f.name.value.trim()||'Deidra';USER_SETTINGS.goal=f.goal.value.trim();USER_SETTINGS.units=f.units.value||'lb';USER_SETTINGS.theme=f.theme.value||'dark';USER_SETTINGS.notes=f.notes.value.trim();USER_SETTINGS.experience=f.experience.value||'Intermediate';USER_SETTINGS.sessionsPerWeek=Math.max(1,Math.min(7,Number(f.sessionsPerWeek.value)||4));USER_SETTINGS.sessionMinutes=Math.max(20,Math.min(240,Number(f.sessionMinutes.value)||75));USER_SETTINGS.equipment=f.equipment.value.trim();USER_SETTINGS.limitations=f.limitations.value.trim();USER_SETTINGS.routinePreference=f.routinePreference.value.trim();localStorage.setItem('liftiq_user_settings_v1',JSON.stringify(USER_SETTINGS));applyTheme(USER_SETTINGS.theme);renderSettings();alert('Settings saved locally on this device.');}
 function applyTheme(theme){document.body.setAttribute('data-theme',theme==='light'?'light':'dark');var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='light'?'#f4f5f7':'#0a0b0d');}
-function renderSettings(){var el=document.getElementById('t-settings');if(!el)return;el.innerHTML="<div class='settings-grid'><div class='settings-card'><div class='settings-head'>Preferences</div><div class='settings-title'>Your LiftIQ profile</div><div class='settings-sub'>Store personal training preferences locally and switch between light and dark mode. These settings do not change Hevy history.</div><form id='settingsForm' class='settings-form' onsubmit='saveUserSettings(event)'><div class='settings-row'><label>Name<input name='name' maxlength='60' value='"+v3Safe(USER_SETTINGS.name||'')+"'></label><label>Experience<select name='experience'><option"+(USER_SETTINGS.experience==='Beginner'?' selected':'')+">Beginner</option><option"+(USER_SETTINGS.experience==='Intermediate'?' selected':'')+">Intermediate</option><option"+(USER_SETTINGS.experience==='Advanced'?' selected':'')+">Advanced</option></select></label></div><label>Primary goal<textarea name='goal' rows='3'>"+v3Safe(USER_SETTINGS.goal||'')+"</textarea></label><div class='settings-row'><label>Units<select name='units'><option value='lb'"+(USER_SETTINGS.units==='lb'?' selected':'')+">Pounds (lb)</option><option value='kg'"+(USER_SETTINGS.units==='kg'?' selected':'')+">Kilograms (kg)</option></select></label><label>Theme<select name='theme' onchange='applyTheme(this.value)'><option value='dark'"+(USER_SETTINGS.theme!=='light'?' selected':'')+">Dark</option><option value='light'"+(USER_SETTINGS.theme==='light'?' selected':'')+">Light</option></select></label></div><label>Notes<textarea name='notes' rows='4' placeholder='Anything you want LiftIQ to remember locally...'>"+v3Safe(USER_SETTINGS.notes||'')+"</textarea></label><div class='settings-actions'><button class='v3-action' type='submit'>Save settings</button><button class='v3-action alt' type='button' onclick='loadUserSettings();renderSettings()'>Revert</button></div></form></div><div class='settings-card'><div class='settings-head'>Theme & account</div><div class='settings-sub'><span class='settings-chip'>Theme: "+v3Safe((USER_SETTINGS.theme||'dark').charAt(0).toUpperCase()+(USER_SETTINGS.theme||'dark').slice(1))+"</span> <span class='settings-chip'>Units: "+v3Safe((USER_SETTINGS.units||'lb').toUpperCase())+"</span></div><div class='settings-note' style='margin-top:12px'>Google sign-in, Hevy sync, and Gemini settings stay connected through your deployed Netlify app. This screen is for your local app preferences only.</div></div></div>";}
+function renderSettings(){var el=document.getElementById('t-settings');if(!el)return;el.innerHTML="<div class='settings-grid'><div class='settings-card'><div class='settings-head'>Preferences</div><div class='settings-title'>Your LiftIQ profile</div><div class='settings-sub'>Store personal training preferences locally and switch between light and dark mode. These settings do not change Hevy history.</div><form id='settingsForm' class='settings-form' onsubmit='saveUserSettings(event)'><div class='settings-row'><label>Name<input name='name' maxlength='60' value='"+v3Safe(USER_SETTINGS.name||'')+"'></label><label>Experience<select name='experience'><option"+(USER_SETTINGS.experience==='Beginner'?' selected':'')+">Beginner</option><option"+(USER_SETTINGS.experience==='Intermediate'?' selected':'')+">Intermediate</option><option"+(USER_SETTINGS.experience==='Advanced'?' selected':'')+">Advanced</option></select></label></div><label>Primary goal<textarea name='goal' rows='3'>"+v3Safe(USER_SETTINGS.goal||'')+"</textarea></label><div class='settings-row'><label>Units<select name='units'><option value='lb'"+(USER_SETTINGS.units==='lb'?' selected':'')+">Pounds (lb)</option><option value='kg'"+(USER_SETTINGS.units==='kg'?' selected':'')+">Kilograms (kg)</option></select></label><label>Theme<select name='theme' onchange='applyTheme(this.value)'><option value='dark'"+(USER_SETTINGS.theme!=='light'?' selected':'')+">Dark</option><option value='light'"+(USER_SETTINGS.theme==='light'?' selected':'')+">Light</option></select></label></div><label>Notes<textarea name='notes' rows='4' placeholder='Anything you want LiftIQ to remember locally...'>"+v3Safe(USER_SETTINGS.notes||'')+"</textarea></label><div class='settings-row'><label>Training days per week<input name='sessionsPerWeek' type='number' min='1' max='7' value='"+v3Safe(USER_SETTINGS.sessionsPerWeek||4)+"'></label><label>Session duration (min)<input name='sessionMinutes' type='number' min='20' max='240' value='"+v3Safe(USER_SETTINGS.sessionMinutes||75)+"'></label></div><label>Equipment<input name='equipment' maxlength='250' value='"+v3Safe(USER_SETTINGS.equipment||'')+"'></label><label>Training limitations<textarea name='limitations' rows='2'>"+v3Safe(USER_SETTINGS.limitations||'')+"</textarea></label><label>Preferred training split<textarea name='routinePreference' rows='2' placeholder='Optional: e.g. Glutes / upper / hamstrings'>"+v3Safe(USER_SETTINGS.routinePreference||'')+"</textarea></label><div class='settings-actions'><button class='v3-action' type='submit'>Save settings</button><button class='v3-action alt' type='button' onclick='loadUserSettings();renderSettings()'>Revert</button></div></form></div><div class='settings-card'><div class='settings-head'>Theme & account</div><div class='settings-sub'><span class='settings-chip'>Theme: "+v3Safe((USER_SETTINGS.theme||'dark').charAt(0).toUpperCase()+(USER_SETTINGS.theme||'dark').slice(1))+"</span> <span class='settings-chip'>Units: "+v3Safe((USER_SETTINGS.units||'lb').toUpperCase())+"</span></div><div class='settings-note' style='margin-top:12px'>Google sign-in, Hevy sync, and Gemini settings stay connected through your deployed Netlify app. This screen is for your local app preferences only.</div></div></div>";}
 function toggleCycleEditor(force){_cycleEditorOpen=(typeof force==='boolean')?force:!_cycleEditorOpen;var box=document.getElementById('cycleEditorBox');if(box)box.classList.toggle('open',_cycleEditorOpen);var body=document.getElementById('cycleEditorBody');if(body)body.style.display=_cycleEditorOpen?'block':'none';}
 function v3OpenEditor(label){if(label)v3SelectCycle(label);_cycleEditorOpen=true;setTimeout(function(){toggleCycleEditor(true);var box=document.getElementById('cycleEditorBox');if(box)box.scrollIntoView({behavior:'smooth',block:'start'});},0);}
 function humanizeSignalName(s){s=String(s||'Review');if(s.indexOf('_')>-1)s=s.replace(/_/g,' ');return s.replace(/\b\w/g,function(m){return m.toUpperCase();});}
@@ -716,6 +754,38 @@ function v3SaveEdit(){var f=document.getElementById('v3-cycle-form');if(!f)retur
 function v3PauseCycle(){var m=v3ActiveCycle();if(!m){alert('Only a currently scheduled cycle can be paused.');return;}if(v3Paused(m))return;CYCLE_PAUSE={label:m.label,pausedAt:v3Today()};v3SaveCycles();v3RefreshCycles();}
 function v3ResumeCycle(){var p=CYCLE_PAUSE;if(!p)return;var m=MESO_PLAN.find(function(x){return x.label===p.label;});if(!m){CYCLE_PAUSE=null;v3SaveCycles();v3RefreshCycles();return;}var n=Math.max(0,Math.round((v3Date(v3Today())-v3Date(p.pausedAt))/86400000));if(n){var idx=MESO_PLAN.indexOf(m);MESO_PLAN.slice(idx).forEach(function(x){x.end=v3AddDays(x.end,n);if(x!==m)x.start=v3AddDays(x.start,n);});}CYCLE_PAUSE=null;v3SaveCycles();v3RefreshCycles();}
 function v3ResetCycles(){if(!confirm('Reset all mesocycle dates and names to the original schedule?'))return;MESO_PLAN=JSON.parse(JSON.stringify(DEFAULT_MESO_PLAN));CYCLE_PAUSE=null;v3SaveCycles();v3RefreshCycles();}
+
+/* V11: locally approved cycle recommendations, grounded in dated training exposure. */
+var V11_CYCLE_GOALS={};var V11_PROPOSAL=null;
+try{V11_CYCLE_GOALS=JSON.parse(localStorage.getItem('liftiq_v11_cycle_goals')||'{}')||{};}catch(e){}
+function v11Persist(){localStorage.setItem('liftiq_v11_cycle_goals',JSON.stringify(V11_CYCLE_GOALS));}
+function v11CycleStats(c){
+ if(!c)return {days:0,sets:0,priority:0};var dates=Object.keys(STATE.dailyLog||{}).filter(function(x){return x>=c.start&&x<=c.end;});
+ var sets=dates.reduce(function(n,d){return n+Number((STATE.dailyLog[d]||{}).sets||0);},0);
+ var priority=PROFILE.priorityLifts.filter(function(n){return (STATE.exerciseHistory[n]||[]).some(function(x){return x.date>=c.start&&x.date<=c.end;});}).length;
+ return {days:dates.length,sets:sets,priority:priority};
+}
+function v11CyclePanel(c){
+ if(!c)return "<div class='cc'><div class='cl'>Cycle review</div><div class='v3-muted'>No active cycle. Review your schedule in the editor.</div></div>";
+ var st=v11CycleStats(c),goal=V11_CYCLE_GOALS[c.label]||'',target=Number(USER_SETTINGS.sessionsPerWeek)||4;
+ var durationWeeks=Math.max(1,Math.ceil((v3Date(c.end)-v3Date(c.start))/604800000));
+ var targetDays=durationWeeks*target;
+ return "<div class='v11-card'><div class='v4-eyebrow'>"+v4Icon('target')+" CYCLE REVIEW · "+v3Safe(c.label)+"</div>"+
+ "<div class='v11-heading'>Progress against your plan</div><div class='v11-stats'><span><strong>"+st.days+"</strong> training dates logged</span><span><strong>"+st.sets+"</strong> qualifying sets</span><span><strong>"+st.priority+"</strong> priority lifts seen</span></div>"+
+ "<p class='v3-muted'>Planning reference: "+target+" sessions/week (approximately "+targetDays+" across this block). This is not an adherence or readiness diagnosis; imported data may be incomplete.</p>"+
+ "<label class='v11-label' for='v11-goal'>Cycle success criterion</label><textarea id='v11-goal' class='v11-input' placeholder='E.g., repeat planned sessions with manageable effort'>"+v3Safe(goal)+"</textarea>"+
+ "<div class='v11-buttons'><button class='v3-action alt' onclick='v11SaveGoal()'>Save goal</button><button class='v3-action' onclick='v11ReviewExtend()'>Review 7-day extension</button></div><div id='v11-proposal'></div></div>";
+}
+function v11SaveGoal(){var c=v3ActiveCycle(),e=document.getElementById('v11-goal');if(!c||!e)return;V11_CYCLE_GOALS[c.label]=e.value.trim().slice(0,400);v11Persist();}
+function v11ReviewExtend(){var c=v3ActiveCycle();if(!c)return;v11SaveGoal();var i=MESO_PLAN.indexOf(c),last=MESO_PLAN[MESO_PLAN.length-1];
+ V11_PROPOSAL={label:c.label,originalEnd:c.end,newEnd:v3AddDays(c.end,7),index:i,goal:V11_CYCLE_GOALS[c.label]||'',nextEnd:last.end};
+ var el=document.getElementById('v11-proposal');if(!el)return;
+ el.innerHTML="<div class='v11-proposal'><strong>Proposed 7-day extension</strong><p>"+v3Safe(v4Date(c.end))+" → "+v3Safe(v4Date(V11_PROPOSAL.newEnd))+". Later cycles shift by 7 days to preserve their durations.</p><p>This is an option to review, not an AI conclusion that you need more time. Check your performance and recovery first.</p><button class='v3-action' onclick='v11ApproveExtend()'>Approve schedule change</button> <button class='v3-action alt' onclick='v11DismissExtend()'>Dismiss</button></div>";
+}
+function v11DismissExtend(){V11_PROPOSAL=null;var e=document.getElementById('v11-proposal');if(e)e.innerHTML='';}
+function v11ApproveExtend(){var p=V11_PROPOSAL,c=v3ActiveCycle();if(!p||!c||c.label!==p.label||c.end!==p.originalEnd||v3Paused(c)){alert('The cycle has changed or is paused. Review it again.');return;}if(!confirm('Extend '+c.label+' by 7 days and shift all later blocks by 7 days?'))return;
+ MESO_PLAN.slice(p.index).forEach(function(x){x.end=v3AddDays(x.end,7);if(x!==c)x.start=v3AddDays(x.start,7);});v3SaveCycles();V11_PROPOSAL=null;v3RefreshCycles();}
+
 v3ReadCycles();
 loadUserSettings();
 
@@ -731,6 +801,7 @@ var STATE = {
   lifts: {},       // liftName -> {lastW,lastR,lastRPE,lastE,sessionsAtWeight,d,ts}
   prevLifts: {},   // snapshot before last import (for What Changed)
   muscleVolume: {},// muscle -> hard set count
+  workoutTitles: [], // dated actual Hevy workout names (not an inferred calendar)
   exerciseHistory: {}, // canonical exercise -> dated qualifying best sets
   dailyLog: {},    // dateKey -> {sets, rpes[], ex:{name:{w,r,e1,rpe}}} — powers Map week detail
   improved: [],
@@ -977,7 +1048,11 @@ function runEngine() {
 // ═══════════════════════════════════════
 
 function suggestedSession() {
-  return 'Choose from your actual Hevy routine';
+  var h=(STATE.workoutTitles||[]).filter(function(x){return x&&x.name&&x.date;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  if(!h.length)return 'Select a session from your Hevy routine';
+  var groups={};h.slice(0,24).forEach(function(x){var name=x.name.trim();if(name)groups[name]=(groups[name]||0)+1;});
+  var frequent=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a];});
+  return frequent.length?'Recent Hevy routines: '+frequent.slice(0,3).join(' · '):'Select a session from your Hevy routine';
 }
 
 // ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
@@ -1117,6 +1192,26 @@ function v10TrendAssessment(name,days){
  // This is a comparison signal, not a diagnosis of a plateau or fatigue.
  return {status:status,rows:rows,delta:Math.round(delta),evidence:evidence};
 }
+
+var selectedHistoryExercise='';
+function historyEntries(name){
+ var want=normalizeExerciseName(name),result=[];
+ Object.keys(STATE.exerciseHistory||{}).forEach(function(k){if(normalizeExerciseName(k)!==want)return;(STATE.exerciseHistory[k]||[]).forEach(function(x){if(!x||!/\d{4}-\d{2}-\d{2}/.test(x.date))return;var w=Number(x.weightLb),r=Number(x.reps),e=Number(x.e1rmLb);if(w>0&&r>0&&e>0)result.push({date:x.date,weightLb:w,reps:r,e1rmLb:e,rpe:x.rpe==null?null:Number(x.rpe)});});});
+ if(!result.length)Object.keys(STATE.dailyLog||{}).forEach(function(d){var log=STATE.dailyLog[d].ex||{};Object.keys(log).forEach(function(k){if(normalizeExerciseName(k)!==want)return;var x=log[k];if(x&&x.w>0&&x.r>0&&x.e1>0)result.push({date:d,weightLb:Number(x.w),reps:Number(x.r),e1rmLb:Number(x.e1),rpe:x.rpe});});});
+ var byDate={};result.forEach(function(x){if(!byDate[x.date]||x.e1rmLb>byDate[x.date].e1rmLb)byDate[x.date]=x;});return Object.keys(byDate).sort().map(function(d){return byDate[d];});
+}
+function historyDate(s){return new Date(s+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});}
+function historyLibrary(){var all=Object.keys(STATE.exerciseHistory||{}).filter(function(k){return (STATE.exerciseHistory[k]||[]).length;}).sort();return all;}
+function renderHistoryLibrary(){var list=historyLibrary();return "<details style='margin:14px 0'><summary class='v3-titlebar' style='cursor:pointer'><h3>Browse all exercise histories</h3><span class='v3-muted'>"+list.length+" movements · Expand</span></summary><div class='v3-muted'>Open any movement to view its full recorded progression, even if it has no workouts in the last 84 days.</div><div class='history-library'>"+list.map(function(name){return "<button type='button' data-history='"+v3Safe(name)+"' onclick='openExerciseHistory(this.dataset.history)'>"+v3Safe(shortName(name))+"<small>"+historyEntries(name).length+" training dates · View chart →</small></button>";}).join('')+"</div></details>";}
+function openExerciseHistory(name){selectedHistoryExercise=normalizeExerciseName(name);var m=document.getElementById('exerciseHistoryModal');if(!m)return;document.getElementById('historyName').textContent=shortName(selectedHistoryExercise);document.getElementById('historyRange').value='all';document.getElementById('historyMetric').value='e1rmLb';m.classList.add('open');m.setAttribute('aria-hidden','false');renderExerciseHistoryDetail();}
+function closeExerciseHistory(){var m=document.getElementById('exerciseHistoryModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}}
+function selectHistoryPoint(index){var rows=window._visibleHistory||[],row=rows[index],el=document.getElementById('historySelected');if(!row||!el)return;el.textContent=historyDate(row.date)+' · '+row.weightLb+' lb × '+row.reps+' reps · Estimated 1RM '+Math.round(row.e1rmLb)+' lb'+(Number.isFinite(row.rpe)&&row.rpe>0?' · RPE '+row.rpe:'');}
+function renderExerciseHistoryDetail(){var rows=historyEntries(selectedHistoryExercise),n=rows.length,range=document.getElementById('historyRange').value,metric=document.getElementById('historyMetric').value;document.getElementById('historyCount').textContent=n+' recorded training dates';var shown=rows;if(range!=='all'&&rows.length){var last=new Date(rows[rows.length-1].date+'T12:00:00').getTime(),edge=last-(Number(range)-1)*86400000;shown=rows.filter(function(x){return new Date(x.date+'T12:00:00').getTime()>=edge;});}window._visibleHistory=shown;var svg=document.getElementById('historySvg');if(!shown.length){svg.innerHTML='<text x="20" y="112" fill="currentColor" font-size="12">No weighted history available for this range.</text>';document.getElementById('historySelected').textContent='No dated qualifying sets found.';document.getElementById('historyRows').innerHTML='';return;}
+ var vals=shown.map(function(x){return Number(x[metric]);}),min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),pad=Math.max((max-min)*.15,metric==='reps'?1:5),low=Math.max(0,min-pad),high=max+pad,w=320,h=165,x0=24,y0=14;var x=function(i){return x0+(shown.length===1?w/2:i*w/(shown.length-1));},y=function(v){return y0+h-(v-low)/(high-low)*h;};var path=shown.map(function(r,i){return (i?'L':'M')+x(i).toFixed(2)+' '+y(vals[i]).toFixed(2);}).join(' ');var tick=Math.round((low+high)/2);svg.innerHTML='<path d="M24 179H344" stroke="currentColor" opacity=".16" fill="none"/><path d="M24 96H344" stroke="currentColor" opacity=".10" fill="none"/><path d="'+path+'" stroke="currentColor" stroke-width="2" fill="none"/>'+shown.map(function(r,i){return '<circle class="history-point" data-index="'+i+'" onclick="selectHistoryPoint('+i+')" cx="'+x(i).toFixed(2)+'" cy="'+y(vals[i]).toFixed(2)+'" r="'+(shown.length>28?3.5:5)+'" fill="currentColor"><title>'+historyDate(r.date)+': '+r.weightLb+' lb x '+r.reps+'</title></circle>';}).join('')+'<text x="24" y="202" font-size="10" fill="currentColor" opacity=".65">'+historyDate(shown[0].date)+'</text><text x="344" y="202" text-anchor="end" font-size="10" fill="currentColor" opacity=".65">'+historyDate(shown[shown.length-1].date)+'</text><text x="24" y="12" font-size="10" fill="currentColor" opacity=".65">'+Math.round(high)+'</text>';
+ var lastRow=shown[shown.length-1];document.getElementById('historyRows').innerHTML=shown.slice().reverse().map(function(r){return '<div><span>'+historyDate(r.date)+'</span><span>'+r.weightLb+' lb × '+r.reps+' · e1RM '+Math.round(r.e1rmLb)+' lb</span></div>';}).join('');selectHistoryPoint(shown.length-1);
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExerciseHistory();});
+
 function v3ProgressTop(){
  var target=PROFILE.priorityLifts.map(function(l){return STATE.recommendations[l];}).filter(Boolean);
  var pushes=target.filter(function(r){return r.action==='increase';}).length;
@@ -1136,8 +1231,9 @@ function v3ProgressTop(){
  });
  h+="<div class='v3-rows'>"+PROFILE.priorityLifts.slice(0,8).map(function(n){
    var t=v10TrendAssessment(n,84);
-   return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span style='font-size:11px;color:var(--t2)'>"+v3Safe(t.status)+"</span></div><div class='v3-muted'>"+v3Safe(t.evidence)+"</div></div>";
+   var full=historyEntries(n),status=t.status;if(!t.rows.length&&full.length)status='Older history available';return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View all-time chart →</span></button></div>";
  }).join('')+"</div>";
+ h+=renderHistoryLibrary();
  h+="<div class='v3-titlebar'><h3>Next-session targets</h3><button class='v3-mini' onclick='v3OpenTargets()'>All targets</button></div>";
  h+="<div class='v3-rows'>"+target.slice(0,5).map(function(r){var val=r.target!=null?r.target+' lbs':'—';return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(r.lift))+"</strong><span>"+v3Safe(val)+"</span></div><div class='v3-muted'>"+v3Safe(r.badge||'Review')+" · "+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set'+'</div></div>';}).join('')+(target.length?'':"<div class='v3-row v3-muted'>Sync Hevy to populate your lift targets.</div>")+"</div>";
  return h;
@@ -1367,7 +1463,7 @@ function renderMap() {
    "<div class='v4-level'><div class='v4-levelhead'><strong>Microcycle · Training week</strong><span class='v4-pill'>Week "+(activeCycle?b.week:'—')+"</span></div><div class='v4-sub'>"+(activeCycle?v3Safe(b.phase+' · '+b.focus):'No scheduled weekly phase')+"</div></div></div>";
   var cycleReview="<div class='v4-cycle-ai'><div class='v4-eyebrow'>"+v4Icon('spark')+" Gemini · Cycle advisor</div><div style='font-weight:800;margin-top:8px'>Should this block change?</div><div class='v3-muted'>Review your actual performance trends and ask Gemini whether to extend, hold, deload, or adjust the cycle. Advice is not automatically applied.</div><button onclick='v4CycleReview()' "+(!activeCycle?'disabled':'')+">Review my current cycle</button><div class='v3-muted'>After reviewing advice, use Edit cycle to approve a date change. Hevy data is never overwritten.</div></div>";
   el.innerHTML =
-    hero + hierarchy + cycleReview + phaseRow + phaseDetail + editor +
+    hero + hierarchy + v11CyclePanel(activeCycle) + cycleReview + phaseRow + phaseDetail + editor +
     "<div class='cc'><div class='cl'>Week in block</div>" +
       weekDots +
       "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" \u00b7 "+b.phase+"</div>" +
@@ -1376,7 +1472,7 @@ function renderMap() {
     "<div class='cc'><div class='cl'>Historical lift benchmarks (M8 baseline and Dec 2026 goal — not automatic current targets)</div>"+liftRows+"</div>" +
     "<div class='ib'>" +
       ir("\u2728","<strong>Dec 2026 goal:</strong> Recapture Dec 2023 peaks \u2014 RDL 205 lbs, BSS 140 lbs, Glute Drive 540+ lbs e1RM.") +
-      ir("\u2659","<strong>Back health:</strong> Hamstring:Glute ratio 1.5:1 or better is the single biggest lever for glute development and back health.") +
+      ir("\u2014","<strong>Training balance:</strong> Review trends, recovery, and scheduled movement exposure before changing muscle-group volume.") +
     "</div>";
 
   // Store PHASES for click handler access
@@ -1979,7 +2075,7 @@ function parseHevy(text, options) {
   };
 
   var byEx = {}, byDate = {}, rawRPEs = [], allDates = [], cutoff = null;
-  var distinctWorkouts = new Set(), sessionDates = {}, totalRowsInWindow=0, qualifiedSets=0, rpeEligible=0;
+  var routineMap = {}, distinctWorkouts = new Set(), sessionDates = {}, totalRowsInWindow=0, qualifiedSets=0, rpeEligible=0;
   if (_importWeeks > 0) {
     cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - _importWeeks * 7);
@@ -2025,7 +2121,7 @@ function parseHevy(text, options) {
     // Composite identity distinguishes two workouts on the same day when title/time differ.
     var workoutTitle = hdr["title"]!==undefined ? String(v[hdr["title"]]||'').trim() : '';
     var workoutEnd = hdr["end_time"]!==undefined ? String(v[hdr["end_time"]]||'').trim() : '';
-    distinctWorkouts.add(dt+'|'+workoutEnd+'|'+workoutTitle);
+    distinctWorkouts.add(dt+'|'+workoutEnd+'|'+workoutTitle);if(workoutTitle)routineMap[dt+'|'+workoutEnd+'|'+workoutTitle]={name:workoutTitle,date:dateKey};
     sessionDates[dateKey]=(sessionDates[dateKey]||new Set());
     sessionDates[dateKey].add(dt+'|'+workoutEnd+'|'+workoutTitle);
     totalRowsInWindow++;
@@ -2107,7 +2203,7 @@ function parseHevy(text, options) {
   populateState(byEx, rawRPEs, distinctWorkouts.size,
     {start: minDate ? fd(minDate) : "\u2014", end: maxDate ? fd(maxDate) : "\u2014"}, byDate);
   // Session count reports all saved workouts; lifting calculations still exclude nonweighted sets.
-  STATE.recordMetrics={sessions:distinctWorkouts.size, strengthSets:qualifiedSets,
+  STATE.workoutTitles=Object.values(routineMap).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,120);STATE.recordMetrics={sessions:distinctWorkouts.size, strengthSets:qualifiedSets,
     rpeRecorded:rawRPEs.length, rpeEligible:rpeEligible, daysWithWorkouts:Object.keys(sessionDates).length,
     workoutsPerDay:Object.fromEntries(Object.entries(sessionDates).map(function(pair){return [pair[0],pair[1].size];})),
     totalRows:totalRowsInWindow};
@@ -2493,7 +2589,7 @@ function refreshAIReviews(){
 var _aiResultFingerprint='';
 function loadCachedAIReview(){var fp=trainingFingerprint(),c=_aiReviewCache[fp];if(!_aiResult&&c&&Date.now()-c.at<7*86400000){_aiResult=c.result;_aiResultFingerprint=fp;}}
 function aiTrainingSnapshot(){
-  return {goal:USER_SETTINGS.goal||PROFILE.goal,experience:USER_SETTINGS.experience||'',displayUnits:USER_SETTINGS.units||'lb',sessions:STATE.sessions,avgRPE:STATE.avgRPE, recordMetrics:STATE.recordMetrics,
+  return {goal:USER_SETTINGS.goal||PROFILE.goal,experience:USER_SETTINGS.experience||'',cycleSuccessCriteria:V11_CYCLE_GOALS,trainingPreferences:{sessionsPerWeek:USER_SETTINGS.sessionsPerWeek,sessionMinutes:USER_SETTINGS.sessionMinutes,equipment:USER_SETTINGS.equipment,limitations:USER_SETTINGS.limitations,routinePreference:USER_SETTINGS.routinePreference},recentWorkoutTitles:(STATE.workoutTitles||[]).slice(0,12),displayUnits:USER_SETTINGS.units||'lb',sessions:STATE.sessions,avgRPE:STATE.avgRPE, recordMetrics:STATE.recordMetrics,
     period:(STATE.dateRange.start||'')+' to '+(STATE.dateRange.end||''),trends:trainingTrends(),
     evidenceByLift:PROFILE.priorityLifts.map(function(name){var assessment=v10TrendAssessment(name,84);return {name:name,classification:assessment.status,datedSets:assessment.rows.slice(-10),observation:assessment.evidence};}),
     analysisCautions:['A machine weight is not interchangeable with a different machine or barbell variant.','Estimates of 1RM are estimates only.','RPE is incomplete where not recorded.','Rule-based target suggestions are not observations.'],
@@ -2890,6 +2986,7 @@ function saveState() {
       muscleVolume: STATE.muscleVolume,
       dailyLog: STATE.dailyLog,
       exerciseHistory: STATE.exerciseHistory,
+      workoutTitles: STATE.workoutTitles,
       sessions: STATE.sessions, recordMetrics:STATE.recordMetrics,
       dateRange: STATE.dateRange,
       exercisesAnalyzed: STATE.exercisesAnalyzed,
@@ -2911,6 +3008,7 @@ function restoreState() {
     STATE.muscleVolume = saved.muscleVolume || {};
     STATE.dailyLog = saved.dailyLog || {};
     STATE.exerciseHistory = saved.exerciseHistory || {};
+    STATE.workoutTitles = saved.workoutTitles || [];
     STATE.sessions = saved.sessions || 0; STATE.recordMetrics=saved.recordMetrics||null;
     STATE.dateRange = saved.dateRange || {start:null,end:null};
     STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
