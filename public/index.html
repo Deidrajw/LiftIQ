@@ -549,6 +549,68 @@ body[data-theme=light] .next-workout-card{background:#f6f8fa}
 .ui-highlights span{font-size:10px;color:var(--t2);background:var(--bg3);border:1px solid var(--bd);padding:5px 9px;border-radius:20px}
 @media(max-width:390px){.ui-fold>summary{padding:12px}.ui-fold-right{gap:5px}.ui-fold-body{padding:8px 10px 12px}.ui-fold-count{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.ui-fold-chevron{transition:none}}
+
+/* V12.7 | restrained semantic accents, consistent card anatomy, readable figures */
+:root{
+ --v127-warn:#eacb96; --v127-warn-bg:#30281d; --v127-warn-edge:#795e38;
+ --v127-grow:#b6d7f0; --v127-grow-bg:#202e3b; --v127-grow-edge:#52728d;
+ --v127-go:#afe0c9; --v127-go-bg:#1c3129; --v127-go-edge:#4c8368;
+ --v127-steady:#c6cce0; --v127-steady-bg:#272b38; --v127-steady-edge:#5f6983;
+ --v127-danger:#edb6b8; --v127-danger-bg:#392428; --v127-danger-edge:#905b65;
+ --v127-neutral:#c6cbd2; --v127-neutral-bg:#282d33; --v127-neutral-edge:#57616e;
+}
+body[data-theme="light"]{
+ --v127-warn:#775119; --v127-warn-bg:#fff2d8; --v127-warn-edge:#bd9358;
+ --v127-grow:#285979; --v127-grow-bg:#e9f4fc; --v127-grow-edge:#739bb8;
+ --v127-go:#236147; --v127-go-bg:#e3f6eb; --v127-go-edge:#77ad92;
+ --v127-steady:#4e5b84; --v127-steady-bg:#eff1fb; --v127-steady-edge:#96a2c4;
+ --v127-danger:#923c4a; --v127-danger-bg:#fcecf0; --v127-danger-edge:#c9939c;
+ --v127-neutral:#4b5968; --v127-neutral-bg:#edf0f5; --v127-neutral-edge:#aebbc8;
+}
+.state-tone--stall{--tone:var(--v127-warn);--tone-bg:var(--v127-warn-bg);--tone-edge:var(--v127-warn-edge)}
+.state-tone--building{--tone:var(--v127-grow);--tone-bg:var(--v127-grow-bg);--tone-edge:var(--v127-grow-edge)}
+.state-tone--increase{--tone:var(--v127-go);--tone-bg:var(--v127-go-bg);--tone-edge:var(--v127-go-edge)}
+.state-tone--hold{--tone:var(--v127-steady);--tone-bg:var(--v127-steady-bg);--tone-edge:var(--v127-steady-edge)}
+.state-tone--injury,.state-tone--reduce{--tone:var(--v127-danger);--tone-bg:var(--v127-danger-bg);--tone-edge:var(--v127-danger-edge)}
+.state-tone--pinned,.state-tone--tracked,.state-tone--baseline{--tone:var(--v127-neutral);--tone-bg:var(--v127-neutral-bg);--tone-edge:var(--v127-neutral-edge)}
+.state-chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;max-width:100%;min-height:25px;padding:4px 9px;border-radius:8px;border:1px solid var(--tone-edge,var(--bd2));background:var(--tone-bg,var(--bg3));color:var(--tone,var(--tx));font-size:10px;font-weight:800;line-height:1.35;letter-spacing:.025em;white-space:normal;text-align:center}
+.history-launch .history-status.state-chip{color:var(--tone,var(--tx));font-size:10px;text-align:center;flex-shrink:1}
+.state-chip:before{content:'';width:5px;height:5px;flex-shrink:0;border-radius:50%;background:currentColor}
+/* Progress: status first, clear target second, recorded observation third */
+.v125-next-targets .v3-rows{border-radius:13px}
+.v127-target-row{padding:12px 13px!important;border-left:3px solid var(--tone-edge,var(--bd2));min-width:0}
+.v127-target-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.v127-target-name{font-size:13px;line-height:1.4;color:var(--tx);font-weight:800;overflow-wrap:anywhere}
+.v127-target-values{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px 12px;align-items:end;margin-top:8px}
+.v127-metric-label{font-size:9px;letter-spacing:.09em;font-weight:750;text-transform:uppercase;color:var(--t2);display:block;margin-bottom:4px}
+.v127-target-weight{font:800 17px 'Manrope',system-ui,sans-serif;letter-spacing:-.035em;color:var(--tx);font-variant-numeric:tabular-nums}
+.v127-last-set{font-size:11px;color:var(--t2);font-variant-numeric:tabular-nums;line-height:1.55}
+/* Next-session guidance cards: same structure for prescribed and pinned/tracked */
+.nx-card.v127-guidance{border-color:var(--bd2);border-left:3px solid var(--tone-edge,var(--bd2));background:var(--bg2);box-shadow:none;overflow:hidden}
+.nx-card.v127-guidance .nx-head{padding:14px 15px 12px;gap:9px;align-items:flex-start}
+.nx-card.v127-guidance .nx-name{min-width:0;overflow-wrap:anywhere;line-height:1.45;font-size:14px}
+.nx-card.v127-guidance .nx-badge{font-size:10px;flex-shrink:0;max-width:50%;padding:0;border:0;background:none}
+.nx-card.v127-guidance .nx-stats{padding:13px 15px;gap:14px;align-items:start}
+.nx-card.v127-guidance .nx-stat-l{color:var(--t2);font-size:9px;letter-spacing:.09em}
+.nx-card.v127-guidance .nx-stat-v{color:var(--tx);font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.nx-card.v127-guidance .nx-stats>div:nth-child(2) .nx-stat-v{font-weight:800;font-size:17px;letter-spacing:-.025em}
+.nx-card.v127-guidance .nx-reason{padding:13px 15px;color:var(--tx);font-size:12px;line-height:1.6}
+.nx-card.v127-guidance .nx-caution{padding:0 15px 13px}
+.v127-guidance-body{padding:13px 15px 15px;display:flex;align-items:flex-start;flex-direction:column;gap:11px}
+.v127-guidance-body .v127-guidance-note{margin:0;font-size:12px;line-height:1.6;color:var(--t2);overflow-wrap:anywhere}
+.v127-guidance-body .smart-goal{margin:0;width:100%}
+.v127-guidance-body .smart-connected-link{display:inline-flex;align-items:center;min-height:38px;padding:10px 13px;margin:0;font-size:11px;font-weight:750;border-radius:9px;line-height:1.3}
+.v127-guidance-body .smart-connected-link:focus-visible{outline:2px solid var(--or);outline-offset:3px}
+/* Target goals: increase contrast on real numbers without additional panels */
+.v127-goal-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:9px 0 4px}
+.v127-goal-stats strong{display:block;font-weight:800;font-size:14px;letter-spacing:-.02em;color:var(--tx);overflow-wrap:anywhere}
+.smart-goalbar{height:7px;background:var(--bd);border:1px solid var(--bd2)}
+.smart-goalbar span{background:linear-gradient(90deg,var(--v127-grow-edge),var(--v127-go))}
+.smart-actions button{line-height:1.4;min-height:36px}
+.v127-goal-note{line-height:1.55;font-size:11px;color:var(--t2);margin-top:7px}
+@media(max-width:380px){.v127-target-head{align-items:flex-start}.state-chip{font-size:9px;padding:4px 7px}.v127-target-values{gap:9px}.nx-card.v127-guidance .nx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.state-chip,.v127-guidance-body .smart-connected-link{transition:none}}
+
 </style>
 </head>
 <body>
@@ -1501,10 +1563,14 @@ function smartGoalState(name){
 }
 function smartGoalProgress(name){
  var g=smartGoalState(name);if(!g)return '';
- var unit=g.metric==='reps'?' reps':' lb',label=g.metric==='reps'?'Reps at reference load':g.metric==='weightLb'?'Working weight on dated best set':'Estimated strength';
- var observation=g.current==null?'Not comparable':(Math.round(g.current*10)/10)+unit+' · '+v3Safe(historyDate(g.date));
- return '<div class="smart-goal"><div class="smart-muted">'+v3Safe(label)+' · observed '+observation+' · goal '+v3Safe(g.target+unit)+'</div>'+
-  '<div class="smart-goalbar"><span style="width:'+(g.pct==null?0:g.pct)+'%"></span></div><div class="smart-muted">'+v3Safe(g.reason||(g.achieved?'Goal reached on a comparable best set · Review before changing it.':g.pct+'% of planned improvement from your reference'))+'</div></div>';
+ var unit=g.metric==='reps'?' reps':' lb',label=g.metric==='reps'?'Reps at reference load':g.metric==='weightLb'?'Working weight':'Estimated strength';
+ var current=g.current==null?'Not comparable':(Math.round(g.current*10)/10)+unit;
+ return '<div class="smart-goal"><div class="v127-goal-stats">'+
+  '<div><span class="v127-metric-label">'+v3Safe(label)+'</span><strong>'+v3Safe(current)+'</strong></div>'+
+  '<div><span class="v127-metric-label">Approved goal</span><strong>'+v3Safe(g.target+unit)+'</strong></div></div>'+
+  '<div class="smart-goalbar" role="progressbar" aria-label="Progress toward goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+(g.pct==null?0:g.pct)+'"><span style="width:'+(g.pct==null?0:g.pct)+'%"></span></div>'+
+  '<div class="v127-goal-note">'+v3Safe(g.reason||(g.achieved?'Goal reached on a comparable best set · Review before changing it.':(g.pct==null?'Progress cannot yet be compared':g.pct+'% of planned improvement from your reference')))+
+  (g.date?' · '+v3Safe(historyDate(g.date)):'')+'</div></div>';
 }
 function smartEditGoal(name){var k=smartKey(name),rows=historyEntries(name),latest=rows.length?rows[rows.length-1]:null,old=smartGoal(name),panel=document.getElementById('smartGoalEditor');if(!panel)return;
  var metric=old?old.metric:'reps',base=old?old.baseline:(latest?latest.reps:0),target=old?old.target:(latest?latest.reps+2:0);
@@ -1528,18 +1594,39 @@ function smartTargetsPanel(){
  '<div class="smart-minihead">TRACKED TARGETS · '+tracked.length+'</div>'+
  (tracked.length?tracked.slice(0,2).map(smartTrackedItem).join(''):'<p class="smart-empty">No numerical goals yet. Track a movement from Discoveries.</p>')+
  (tracked.length>2?uiFold('targets-more-tracked','More tracked goals','Edit or review the rest of your numerical targets',tracked.slice(2).map(smartTrackedItem).join(''),false,(tracked.length-2)+' goals'):'')+
- '</div>'+
- (pins.length?uiFold('targets-pins','Pinned movements','Important lifts without numerical goals',pinnedBody,false,pins.length+' pinned'):'')+
- smartPriorityPanel(false);
+ '</div>';
+}
+function smartTargetsExtras(){
+ var pins=smartPinned().filter(function(x){return x.status==='pinned';});
+ var pinnedBody=pins.map(function(x){return '<div class="smart-compact"><button class="history-launch smart-name" data-history="'+v3Safe(x.name)+'" onclick="openExerciseHistory(this.dataset.history)">'+v3Safe(shortName(x.name))+'</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'tracked\')">Create goal</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'supporting\')">Remove</button></div>';}).join('');
+ return (pins.length?uiFold('targets-pins','Pinned movements','Important lifts without numerical goals',pinnedBody,false,pins.length+' pinned'):'')+smartPriorityPanel(false);
 }
 function smartPlanSummary(){var selected=smartPinned();return '<details class="smart-card smart-plan"><summary class="smart-discovery-head"><strong>Key movements</strong><span class="smart-tag">'+selected.length+' selected · Manage in Targets</span></summary><p class="smart-muted">'+(selected.length?selected.map(function(x){var t=v10TrendAssessment(x.name,84);return '<span class="smart-plan-item">'+v3Safe(shortName(x.name))+' · '+v3Safe(t.status)+(x.status==='tracked'&&smartGoalState(x.name)?' · '+v3Safe(smartGoalState(x.name).achieved?'Goal reached':'Goal active'):'')+'</span>';}).join(''): 'No selected movements. Add them under Targets.')+'</p><button class="v3-mini" type="button" onclick="smartOpenTargets()">Manage in Targets →</button></details>';}
 
 // V12.5: Keep next-session guidance near the top of Progress; preserve all targets.
+// V12.7: presentation-only status mapping; no prescription or analytics changes.
+function v127Tone(action){
+ var name=String(action||'baseline').toLowerCase();
+ return ['stall','building','increase','hold','injury','reduce','tracked','pinned','baseline'].indexOf(name)>=0?name:'baseline';
+}
+function v127Label(action,label){
+ if(label){var cleaned=String(label).replace('HOLD — ','Hold · ').replace('INJURY — ','Injury · ');return cleaned==='STALLED'?'Stalled':cleaned==='BUILDING'?'Building':cleaned==='INCREASE'?'Increase':cleaned;}
+ return ({stall:'Stalled',increase:'Increase',hold:'Hold',building:'Building',injury:'Review injury',reduce:'Reduce',tracked:'Tracked',pinned:'Pinned'})[action]||'Review';
+}
+function v127TrendTone(label){var value=String(label||'').toLowerCase();return value.includes('rep progression')?'building':value.includes('progressing')?'increase':value.includes('mixed')||value.includes('stable')?'hold':'baseline';}
+function v127StatusChip(action,label){
+ var tone=v127Tone(action);
+ return '<span class="state-chip state-tone--'+tone+'">'+v3Safe(v127Label(tone,label))+'</span>';
+}
+
 function v125NextSessionTargets(target){
  var limit=3;
  function targetRow(r){
-   var val=r.target!=null?r.target+' lbs':'—';
-   return '<div class="v3-row"><div class="v3-line"><strong>'+v3Safe(shortName(r.lift))+'</strong><span>'+v3Safe(val)+'</span></div><div class="v3-muted">'+v3Safe(r.badge||'Review')+' · '+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set</div></div>';
+   var tone=v127Tone(r.action), val=r.target!=null?r.target+' lb':'Not set';
+   return '<div class="v3-row v127-target-row state-tone--'+tone+'">'+
+    '<div class="v127-target-head"><strong class="v127-target-name">'+v3Safe(shortName(r.lift))+'</strong>'+v127StatusChip(tone,v127Label(tone,r.badge))+'</div>'+
+    '<div class="v127-target-values"><div><span class="v127-metric-label">Next target</span><strong class="v127-target-weight">'+v3Safe(val)+'</strong></div>'+
+    '<div><span class="v127-metric-label">Last recorded set</span><span class="v127-last-set">'+v3Safe(r.lastW+' lb × '+r.lastR)+'</span></div></div></div>';
  }
  return '<section class="v125-next-targets" aria-label="Next-session targets">'+
  '<div class="v3-titlebar"><h3>Next-session targets</h3><button class="v3-mini" type="button" onclick="v3OpenTargets()">All targets →</button></div>'+
@@ -1571,7 +1658,7 @@ function v3ProgressTop(){
  function trendRow(n){
   var t=v10TrendAssessment(n,84),full=historyEntries(n),status=t.status;
   if(!t.rows.length&&full.length)status='Older history available';
-  return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View all-time chart →</span></button></div>";
+  return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status state-chip state-tone--"+v127TrendTone(status)+"'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View all-time chart →</span></button></div>";
  }
  h+='<div class="v3-rows ui-small-rows">'+trendNames.slice(0,3).map(trendRow).join('')+'</div>';
  if(trendNames.length>3)h+=uiFold('progress-more-trends','More priority-lift trends','Additional lifts with clickable all-time charts','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' lifts');
@@ -1689,38 +1776,40 @@ function renderNextWeek() {
              stall:"var(--am)",injury:"var(--re)",building:"var(--t2)"};
   var aBg = {increase:"#30d15812",hold:"#0a84ff10",reduce:"#ff453a10",
               stall:"#ffd60a10",injury:"#ff453a10",building:"#ffffff06"};
-  var html = "<div style='font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Generated from your last import &bull; "+uiLongDate(STATE.dateRange.end)+". Keep logging in Hevy.</div>";
+  var html = "<div class='v127-goal-note'>Based on completed workouts through "+uiLongDate(STATE.dateRange.end)+". Not a confirmed workout schedule.</div>";
 
   smartActivePriorityNames().forEach(function(lk) {
     var rec = STATE.recommendations[lk];
     if(!rec){
       var review=smartPriorityEvidence(lk,84),g=smartGoalState(lk);
-      html+='<div class="nx-card"><div class="nx-head"><div class="nx-name">'+v3Safe(shortName(lk))+'</div><span class="nx-badge">'+v3Safe(smartPriorityStatus(lk)==='tracked'?'TRACKED':smartPriorityStatus(lk)==='pinned'?'PINNED':'BASELINE')+'</span></div>'+
+      var st=v127Tone(smartPriorityStatus(lk));
+      html+='<div class="nx-card v127-guidance state-tone--'+st+'"><div class="nx-head"><div class="nx-name">'+v3Safe(shortName(lk))+'</div><span class="nx-badge">'+v127StatusChip(st)+'</span></div>'+
        '<div class="nx-reason">'+v3Safe(review.observation)+'</div>'+
-       (g?smartGoalProgress(lk):'<div class="v3-muted">Pinned for monitoring · No numerical load prescription.</div>')+
-       '<button class="smart-connected-link" type="button" data-history="'+v3Safe(lk)+'" onclick="openExerciseHistory(this.dataset.history)">View progression →</button></div>';
+       '<div class="v127-guidance-body">'+(g?smartGoalProgress(lk):'<p class="v127-guidance-note">'+(st==='tracked'?'Tracking activity · No measurable goal saved yet. Set one in Active priorities.':'Pinned for monitoring · No numerical load prescription.')+'</p>')+
+       '<button class="smart-connected-link" type="button" data-history="'+v3Safe(lk)+'" onclick="openExerciseHistory(this.dataset.history)">View progression →</button></div></div>';
       return;
     }
     var col = aC[rec.action]||"var(--t2)";
     var bg  = aBg[rec.action]||"var(--bg3)";
+    var tone=v127Tone(rec.action);
     var name = shortName(lk);
-    html += "<div class='nx-card'>" +
+    html += "<div class='nx-card v127-guidance state-tone--"+tone+"'>" +
       "<div class='nx-head'>" +
         "<div class='nx-name'>"+name+"</div>" +
-        "<span class='nx-badge' style='background:"+bg+";color:"+col+"'>"+rec.badge+"</span>" +
+        "<span class='nx-badge'>"+v127StatusChip(tone,rec.badge)+"</span>" +
       "</div>" +
       "<div class='nx-stats'>" +
         nxStat("Last top set", rec.lastW ? rec.lastW+" lbs &times;"+rec.lastR+(rec.lastRPE?" @RPE"+rec.lastRPE:"") : "—") +
-        nxStat("Next target","<span style='color:"+col+";font-weight:700'>"+rec.target+" lbs</span>") +
+        nxStat("Next target","<span>"+rec.target+" lb</span>") +
       "</div>" +
-      "<div class='nx-reason'>"+rec.reason+"</div>" +
+      "<div class='nx-reason'>"+v3Safe(rec.reason)+"</div>" +
       (rec.caution?"<div class='nx-caution'>"+v4Icon("alert")+" "+rec.caution+"</div>":"") +
     "</div>";
   });
 
   // Volume diagnostics live in the Audit screen, not after the lift targets.
 
-  el.innerHTML = smartTargetsPanel()+uiFold("targets-prescriptions","Next-session guidance","Lift-specific prescriptions and evidence for your next session",html,false,smartActivePriorityNames().length+" lifts");
+  el.innerHTML = smartTargetsPanel()+uiFold("targets-prescriptions","Next-session guidance","Prescriptions, monitoring and dated workout evidence",html,false,smartActivePriorityNames().length+" lifts")+smartTargetsExtras();
 }
 
 // ── Training Map ──
