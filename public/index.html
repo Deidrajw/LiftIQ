@@ -611,9 +611,52 @@ body[data-theme="light"]{
 @media(max-width:380px){.v127-target-head{align-items:flex-start}.state-chip{font-size:9px;padding:4px 7px}.v127-target-values{gap:9px}.nx-card.v127-guidance .nx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.state-chip,.v127-guidance-body .smart-connected-link{transition:none}}
 
+
+/* V12.9 Today: training companion, not a second workout recorder */
+.today-active .obs-headline{display:none}
+.today-mode{max-width:760px;margin:0 auto;padding:0 16px 110px}
+.today-intro{padding:19px 3px 16px}
+.today-intro h2{font-size:clamp(25px,5vw,36px);font-weight:820;letter-spacing:-.04em;color:var(--tx);margin:8px 0 6px}
+.today-intro p{font-size:13px;line-height:1.6;color:var(--t2);margin:0}
+.today-mode .coach-card{margin:0 0 12px;max-width:none}
+.today-status-wrap{margin:6px 0 14px}
+.today-mode .stoggle-label{margin:0 0 9px}
+.today-mode .stoggle-row{margin:0;gap:7px;display:flex;flex-wrap:wrap}
+.today-mode .stoggle{min-height:42px;padding:10px 11px;font-size:12px}
+.today-mode #nextSessionCoachWrap{padding:0}
+.today-panel{background:var(--bg2);border:1px solid var(--bd2);border-radius:17px;padding:18px;margin:0 0 13px;min-width:0}
+.today-next{background:linear-gradient(155deg,var(--bg3),var(--bg2) 75%);border-color:var(--bd2)}
+.today-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--t2);line-height:1.6;display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.today-panel h3{color:var(--tx);font-size:20px;line-height:1.25;letter-spacing:-.025em;font-weight:800;margin:8px 0 10px}
+.today-muted{font-size:12px;color:var(--t2);line-height:1.65;margin:8px 0 12px}
+.today-small-chip{font-size:9px;letter-spacing:.025em;display:inline-flex;padding:4px 8px;border:1px solid var(--bd2);border-radius:30px;color:var(--t2);white-space:normal}
+.today-picker{margin-top:16px;min-width:0}
+.today-picker label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:7px}
+.today-picker select{box-sizing:border-box;width:100%;min-width:0;min-height:45px;color:var(--tx);border-radius:11px;background:var(--bg3);border:1px solid var(--bd2);padding:10px 35px 10px 12px;font-size:13px}
+.today-disclaimer{font-size:11px;line-height:1.55;color:var(--t3);margin:12px 0 0}
+.today-panel-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.today-panel-heading h3{margin:4px 0 10px}
+.today-link{border:none;background:transparent;color:var(--t2);font-size:11px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;white-space:nowrap;padding:7px 0}
+.today-focus-list{display:flex;flex-direction:column}
+.today-focus-item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--bd2)}
+.today-focus-details{display:flex;flex-direction:column;gap:4px;min-width:0}
+.today-focus-details strong{color:var(--tx);font-size:13px;font-weight:750}
+.today-focus-details span{font-size:11px;color:var(--t2);line-height:1.45}
+.today-focus-item .state-chip{flex:none;max-width:38%;text-align:center}
+.today-last{border:1px solid var(--bd2);border-radius:11px;background:var(--bg3);padding:12px 14px;display:flex;flex-direction:column;gap:4px;margin:12px 0 14px}
+.today-last span{color:var(--t2);font-size:11px}
+.today-last strong{color:var(--tx);font-size:13px}
+.today-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px;margin-top:14px}
+.today-button{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:11px;padding:10px 9px;text-decoration:none;font-size:12px;font-weight:750;cursor:pointer;text-align:center;line-height:1.35}
+.today-primary{color:var(--bg);background:var(--tx);border:1px solid var(--tx)}
+.today-secondary{color:var(--tx);background:var(--bg3);border:1px solid var(--bd2)}
+.today-button:focus-visible,.today-link:focus-visible,.today-picker select:focus-visible{outline:2px solid var(--tx);outline-offset:3px}
+.today-button:disabled{opacity:.55;cursor:wait}
+@media(max-width:360px){.today-mode{padding-left:12px;padding-right:12px}.today-panel{padding:14px}.today-actions{grid-template-columns:1fr}}
+
 </style>
 </head>
-<body>
+<body class="today-active">
 <input type="file" id="csvIn" accept=".csv" style="display:none" onchange="onFileSelect(event)">
 
 <header class="obs-header">
@@ -622,7 +665,7 @@ body[data-theme="light"]{
 </header>
 <div class="obs-headline"><span class="obs-eyebrow">YOUR PERFORMANCE, IN FOCUS</span><h1>Built for <em>progress.</em></h1></div>
 <nav class="topbar" aria-label="Main navigation">
-  <button class="tb on" onclick="setMode('gym',this)"><span class="obs-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 9v6M6 6v12M9 12h6M18 6v12M22 9v6"/></svg></span><span>Train</span></button>
+  <button class="tb on" onclick="setMode('gym',this)"><span class="obs-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 9v6M6 6v12M9 12h6M18 6v12M22 9v6"/></svg></span><span>Today</span></button>
   <button class="tb" onclick="setMode('ana',this)"><span class="obs-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17 9 11l4 4 8-9M16 6h5v5"/></svg></span><span>Intelligence</span></button>
 </nav>
 
@@ -636,46 +679,12 @@ body[data-theme="light"]{
     <div class="v3-titlebar"><h3>Dated best sets</h3><span class="v3-muted">Tap chart points for details</span></div><div id="historyRows" class="history-rows"></div>
   </div>
 </div>
-<!-- ═══ GYM MODE ═══ -->
-<div id="gym">
-  <!-- Coach Status Card -->
+<!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
+<div id="gym" class="today-mode">
+  <div class="today-intro"><span class="obs-eyebrow">YOUR TRAINING COMPANION</span><h2>Today, in focus.</h2><p>Prepare here. Log your workout in Hevy. Come back for a data-backed review.</p></div>
   <div class="coach-card" id="coachCard"></div>
-
-  <!-- Status toggles -->
-  <div class="stoggle-label">Today&#8217;s status</div>
-  <div class="stoggle-row" id="statusToggles"></div>
-
-  <!-- Next Session Coach -->
-  <div style="padding:0 16px" id="nextSessionCoachWrap"><div id="nextSessionCoach"></div></div>
-
-  <!-- Session Picker -->
-  <div class="sp">
-    <div class="sp-l">Session</div>
-    <div class="sp-w">
-      <button class="sb" onclick="pick('post',this)">Posterior Chain</button>
-      <button class="sb" onclick="pick('gq',this)">Glute &amp; Quad</button>
-      <button class="sb" onclick="pick('uni',this)">Unilateral (Apt)</button>
-      <button class="sb" onclick="pick('pull',this)">Upper Pull</button>
-      <button class="sb" onclick="pick('push',this)">Upper Push</button>
-    </div>
-  </div>
-
-  <!-- Step 2: Exercise Pool -->
-  <div id="exPool" style="display:none;padding:12px 16px">
-    <div id="poolList"></div>
-  </div>
-
-  <!-- Step 3: Active Session -->
-  <div id="activeSess" style="display:none">
-    <div id="timerBar">
-      <div style="flex:1;background:#2a2a2f;border-radius:4px;height:4px;overflow:hidden">
-        <div id="timerFill" style="height:100%;background:var(--or);width:100%;transition:width 1s linear;border-radius:4px"></div>
-      </div>
-      <span id="timerCount" style="font-size:20px;font-weight:800;font-family:monospace;color:var(--or);min-width:44px">0:00</span>
-      <button onclick="dismissTimer()" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer"><span class="icon-close">×</span></button>
-    </div>
-    <div class="el" id="el"></div>
-  </div>
+  <div class="today-status-wrap"><div class="stoggle-label">How you're feeling today</div><div class="stoggle-row" id="statusToggles"></div></div>
+  <div id="nextSessionCoachWrap"><div id="nextSessionCoach"></div></div>
 </div>
 
 <!-- ═══ INTELLIGENCE MODE ═══ -->
@@ -1273,7 +1282,7 @@ function nextWorkoutAnalysis(){
 }
 function nextWorkoutSelection(){var o=nextWorkoutAnalysis();if(NEXT_WORKOUT_OVERRIDE){var match=o.options.find(function(x){return x.name===NEXT_WORKOUT_OVERRIDE;});if(match)return {name:match.name,group:match.group,reason:'Manual override for this browser session. '+o.reason,manual:true,analysis:o};NEXT_WORKOUT_OVERRIDE='';}return {name:o.name,group:o.group,reason:o.reason,manual:false,analysis:o};}
 function suggestedSession(){return nextWorkoutSelection().name;}
-function nextWorkoutOverride(value){NEXT_WORKOUT_OVERRIDE=value||'';renderDashboard();renderNextSessionCoach();}
+function nextWorkoutOverride(value){NEXT_WORKOUT_OVERRIDE=value||'';renderNextSessionCoach();renderDashboard();}
 function nextWorkoutCard(){
  var pick=nextWorkoutSelection(),options=pick.analysis.options;
  var h="<div class='next-workout-card'><div class='v4-eyebrow'>"+v4Icon('calendar')+" NEXT WORKOUT · "+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+"</div><div class='next-workout-name'>"+v3Safe(pick.name)+"</div><p class='next-workout-reason'>"+v3Safe(pick.reason)+"</p>";
@@ -1284,62 +1293,84 @@ function nextWorkoutCard(){
  return h;
 }
 // ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
-function renderNextSessionCoach() {
-  var el = document.getElementById("nextSessionCoach");
-  if (!el) return;
-  if (!STATE.imported) {
-    el.innerHTML = "<div class='coach-brief'>" +
-      "<div class='coach-brief-hd'>"+v4Icon("spark")+" Next Session Coach</div>" +
-      "<div style='padding:12px 14px;font-size:11px;color:var(--t2);line-height:1.6'>" +
-      "Import your Hevy CSV (Intelligence &rarr; Import) and this card will tell you what to push, hold, and protect before you walk in.</div></div>";
-    return;
-  }
-
-  var push=[], hold=[], protect=[];
-  smartActivePriorityNames().forEach(function(lk) {
-    var r = STATE.recommendations[lk];
-    if (!r) return;
-    if (r.action==="increase") push.push(r);
-    else if (r.action==="hold"||r.action==="stall"||r.action==="building") hold.push(r);
-    else if (r.action==="injury"||r.action==="reduce"||r.action==="substitute") protect.push(r);
-  });
-
-  // Top 3 recommendations, ranked by urgency (same signal the Next tab shows)
-  var rank = {injury:0, substitute:1, stall:2, reduce:3, increase:4, hold:5, building:6};
-  var top3 = smartActivePriorityNames()
-    .map(function(lk){ return STATE.recommendations[lk]; })
-    .filter(function(r){ return r && r.action !== "building"; })
-    .sort(function(a,b){ return (rank[a.action]||9)-(rank[b.action]||9); })
-    .slice(0,3);
-  var aC = {increase:"var(--gr)",hold:"var(--bl)",reduce:"var(--re)",
-            stall:"var(--am)",injury:"var(--re)",substitute:"var(--re)"};
-
-  function nameRow(list, col) {
-    return list.length
-      ? list.map(function(r){ return "<span style='color:"+col+";font-weight:600'>"+shortName(r.lift)+"</span>"; }).join(", ")
-      : "<span style='color:var(--t3)'>None</span>";
-  }
-
-  el.innerHTML = "<div class='coach-brief'>" +
-    "<div class='coach-brief-hd'>"+v4Icon("spark")+" Next Session Coach</div>" +
-    "<div style='padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04)'>" +
-      nextWorkoutCard() +
-    "</div>" +
-    "<div style='padding:10px 14px;font-size:11px;line-height:2;border-bottom:1px solid rgba(255,255,255,0.04)'>" +
-      "<span style='color:var(--t3)'>Push:</span> "+nameRow(push,"var(--gr)")+"<br>" +
-      "<span style='color:var(--t3)'>Hold:</span> "+nameRow(hold,"var(--bl)")+"<br>" +
-      "<span style='color:var(--t3)'>Protect:</span> "+nameRow(protect,"var(--re)") +
-    "</div>" +
-    smartPriorityCompact("YOUR FOCUS · REVIEW EVIDENCE",2)+
-    top3.map(function(r){
-      var col = aC[r.action]||"var(--t2)";
-      return "<div class='cbrow'><span class='cbbadge' style='color:"+col+"'>"+r.badge+"</span>" +
-        "<div><div class='cbname'>"+shortName(r.lift)+" &rarr; "+r.target+" lbs</div>" +
-        "<div class='cbreason'>"+r.reason+"</div></div></div>";
-    }).join("") +
-  "</div>";
+// V12.9: Companion dashboard. No duplicate logging, timers, or Hevy writes.
+function todayOpenSync(){
+ var mode=document.querySelectorAll('.tb')[1];if(mode)setMode('ana',mode);
+ var tab=Array.from(document.querySelectorAll('.it')).find(function(b){return (b.textContent||'').trim()==='Sync';});
+ if(tab)iTab('import',tab);
 }
-
+function todayOpenTargets(){
+ var mode=document.querySelectorAll('.tb')[1];if(mode)setMode('ana',mode);
+ var tab=Array.from(document.querySelectorAll('.it')).find(function(b){return (b.textContent||'').trim()==='Targets';});
+ if(tab)iTab('next',tab);
+}
+function todayReviewAfterWorkout(){
+ if(_hevySyncBusy)return;
+ if(!_googleIdToken){todayOpenSync();return;}
+ // Full-history sync avoids replacing all-time progress with a partial import.
+ syncHevy(-1);
+}
+function todayPriorityMatches(name,group){
+ var n=String(name||'').toLowerCase();
+ var muscle=String(PROFILE.muscleMap[normalizeExerciseName(name)]||'').toLowerCase();
+ var lower=/glute|hamstring|quad|leg|hip|calf|abduct|adduct/.test(muscle+' '+n);
+ var upper=/chest|shoulder|back|lat|arm|bicep|tricep|press|row|pulldown|fly/.test(muscle+' '+n)&&!lower;
+ if(!group)return true;
+ if(group==='Upper body')return upper;
+ if(group==='Conditioning / recovery')return false;
+ if(group==='Glutes & hamstrings')return /glute|hamstring|hip|curl|rdl|deadlift|lunge/.test(muscle+' '+n);
+ if(group==='Glutes & quads')return /glute|quad|squat|lunge|leg extension/.test(muscle+' '+n);
+ if(group==='Unilateral glutes')return /glute|lunge|split|single|kickback|abduct/.test(muscle+' '+n);
+ return lower;
+}
+function todayFocusRows(group){
+ var names=smartActivePriorityNames().filter(function(n){return todayPriorityMatches(n,group);});
+ return names.map(function(name){
+   var h=historyEntries(name), last=h[h.length-1]||null;
+   var r=STATE.recommendations[name];
+   return {name:name,last:last,rec:r,chosen:['tracked','pinned'].includes(smartPriorityStatus(name))};
+ }).sort(function(a,b){return (Number(b.chosen)-Number(a.chosen))||(Number(!!b.last)-Number(!!a.last))||a.name.localeCompare(b.name);}).slice(0,3);
+}
+function todayLatestWorkout(){
+ var titles=(STATE.workoutTitles||[]).filter(function(x){return x&&x.date&&x.name;}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+ if(titles.length)return titles[0];
+ var days=Object.keys(STATE.dailyLog||{}).sort().reverse();
+ return days.length?{name:'Recorded strength workout',date:days[0]}:null;
+}
+function todayFocusHTML(pick){
+ var rows=todayFocusRows(pick.group);
+ if(!rows.length)return '<p class="today-muted">No selected priority movements matched this routine focus. See your full priority list under Targets. This does not mean you have no workouts for that body part.</p>';
+ return '<div class="today-focus-list">'+rows.map(function(o){
+  var line=o.last?(Math.round(o.last.weightLb*10)/10)+' lb × '+o.last.reps+' · '+uiLongDate(o.last.date):'No dated weighted set in the current import';
+  var act=o.rec?String(o.rec.action||''):'tracked';
+  var label=o.rec?v127Label(act,o.rec.badge):'Monitor';
+  var cls='state-chip v127-'+v127Tone(act);
+  return '<div class="today-focus-item"><div class="today-focus-details"><strong>'+v3Safe(shortName(o.name))+'</strong><span>'+v3Safe(line)+'</span></div><span class="'+cls+'">'+v3Safe(label)+'</span></div>';
+ }).join('')+'</div><p class="today-disclaimer">These are relevant priorities to check, not an exact list of exercises in the Hevy routine. Loading prescriptions need comparison with your latest session and recovery.</p>';
+}
+function renderNextSessionCoach(){
+ var el=document.getElementById('nextSessionCoach');if(!el)return;
+ var synced=Number(localStorage.getItem('ti_hevy_synced_at')||0);
+ var latest=todayLatestWorkout();
+ var syncLine=synced?'Last synced '+uiLongDate(synced):'Not synced with Hevy in this browser';
+ var html='';
+ if(!STATE.imported){
+   html='<section class="today-panel"><div class="today-kicker">START WITH YOUR HISTORY</div><h3>Connect your completed workouts</h3><p class="today-muted">Sign in and sync Hevy in Intelligence → Sync. LiftIQ will show your usual rotation and priorities here. Your workouts will still be logged in Hevy.</p><button class="today-button today-primary" type="button" onclick="todayOpenSync()">Go to Hevy Sync →</button></section>';
+ }else{
+   var pick=nextWorkoutSelection(),options=pick.analysis.options;
+   html+='<section class="today-panel today-next"><div class="today-kicker">BEFORE YOUR WORKOUT <span class="today-small-chip">'+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+'</span></div><h3>'+v3Safe(pick.name)+'</h3><p class="today-muted">'+v3Safe(pick.reason)+'</p>';
+   html+='<div class="today-picker"><label for="nextWorkoutSelect">Another routine in your history</label><select id="nextWorkoutSelect" onchange="nextWorkoutOverride(this.value)"><option value="">Use LiftIQ recommendation</option>';
+   options.forEach(function(x){html+='<option value="'+v3Safe(x.name)+'"'+(pick.manual&&pick.name===x.name?' selected':'')+'>'+v3Safe(x.name)+'</option>';});
+   html+='</select></div><p class="today-disclaimer">Suggested from completed Hevy sessions, not a confirmed calendar. Choosing a routine here never changes Hevy or your training plan.</p></section>';
+   html+='<section class="today-panel"><div class="today-panel-heading"><div><div class="today-kicker">EXERCISE FOCUS</div><h3>What to review</h3></div><button class="today-link" onclick="todayOpenTargets()" type="button">All targets →</button></div>'+todayFocusHTML(pick)+'</section>';
+ }
+ html+='<section class="today-panel today-after"><div class="today-panel-heading"><div><div class="today-kicker">AFTER YOUR WORKOUT</div><h3>Review what changed</h3></div><span class="today-small-chip">HEVY IS YOUR LOG</span></div>';
+ html+='<p class="today-muted">Finish and save your workout in Hevy, then sync your completed sessions to refresh LiftIQ’s Progress, Targets and Coach.</p>';
+ if(latest)html+='<div class="today-last"><span>Latest saved activity</span><strong>'+v3Safe(latest.name)+'</strong><span>'+v3Safe(uiLongDate(latest.date))+'</span></div>';
+ html+='<div class="today-actions"><a class="today-button today-secondary" href="https://hevy.com/" target="_blank" rel="noopener noreferrer">Hevy website ↗</a><button class="today-button today-primary" type="button" onclick="todayReviewAfterWorkout()"'+(_hevySyncBusy?' disabled':'')+'>'+(_hevySyncBusy?'Syncing…':_googleIdToken?'Sync completed workouts':'Sign in & sync →')+'</button></div>';
+ html+='<p class="today-disclaimer">'+v3Safe(syncLine)+' · The Hevy website link is not a direct link to a workout in the mobile app. Apple Watch data, achievements and posting remain in Hevy.</p></section>';
+ el.innerHTML=html;
+}
 
 // V12.6: Disclosure is presentation only. No workout, goal, or calculation is removed.
 var UI_FOLD_KEY='liftiq_ui_folds_v126';
@@ -2967,11 +2998,13 @@ function tog(id){var e=document.getElementById(id);if(e)e.classList.toggle("open
 // NAVIGATION
 // ═══════════════════════════════════════
 function setMode(m,b) {
+  document.body.classList.toggle('today-active',m==='gym');
   document.getElementById("gym").style.display=m==="gym"?"block":"none";
   document.getElementById("ana").style.display=m==="ana"?"block":"none";
   document.querySelectorAll(".tb").forEach(function(x){x.classList.remove("on");});
   b.classList.add("on");
   if(m==="ana") renderDashboard();
+  else {renderCoachCard();renderStatusToggles();renderNextSessionCoach();}
 }
 function iTab(id,b) {
   document.querySelectorAll(".ip").forEach(function(p){p.classList.remove("on");});
@@ -3363,6 +3396,7 @@ async function syncHevy(weeks,options){
     // It also keeps previous STATE intact on any empty/invalid analysis.
     try{localStorage.setItem("ti_hevy_synced_at",String(Date.now()));}catch(e){}
     renderImportTab(); renderWhatChanged();
+    renderCoachCard();renderNextSessionCoach();
     hevyStatus("✓ Synced "+fetched.length+" saved workouts from Hevy ("+pages+" pages). " +
       (stoppedForDate?"Older history not requested. ":"")+"Guidance and history are now updated.");
     if(!_hevySyncTimer){
@@ -3577,9 +3611,9 @@ function restoreState() {
 document.addEventListener("DOMContentLoaded",function(){
   restoreImportHistory();
   restoreCurrentStatus();
-  renderCoachCard();
   renderStatusToggles();
   var restored = restoreState();
+  renderCoachCard();
   renderNextSessionCoach();
   if (restored) {
     renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab(); renderAICoach(); renderSettings();
