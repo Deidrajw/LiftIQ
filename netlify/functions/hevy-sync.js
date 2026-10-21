@@ -1,27 +1,13 @@
 // Secure, read-only Hevy Pro bridge for a personal Netlify site.
-// Configure HEVY_API_KEY and TI_SYNC_SECRET in Netlify Environment Variables.
+// Configure HEVY_API_KEY, GOOGLE_CLIENT_ID, ALLOWED_GOOGLE_EMAIL in Netlify.
 // Never expose the Hevy API key in index.html or ship a .env file.
-const crypto = require('node:crypto');
-
-function matchesSecret(given, expected) {
-  if (typeof given !== 'string' || typeof expected !== 'string') return false;
-  const a = crypto.createHash('sha256').update(given).digest();
-  const b = crypto.createHash('sha256').update(expected).digest();
-  return crypto.timingSafeEqual(a,b);
-}
-const reply = (statusCode,body)=>({
-  statusCode, headers:{'Content-Type':'application/json; charset=utf-8',
-    'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff'},
-  body:JSON.stringify(body)
-});
+const {reply,verifyUser}=require('./auth-lib');
 exports.handler=async(event)=>{
   if (event.httpMethod !== 'GET') return reply(405,{error:'Only GET is supported.'});
   const apiKey=process.env.HEVY_API_KEY;
-  const expected=process.env.TI_SYNC_SECRET;
-  if(!apiKey || !expected || expected.length<24)
-    return reply(503,{error:'Netlify secrets not configured. Set HEVY_API_KEY and a 24+ character TI_SYNC_SECRET.'});
-  const provided=event.headers['x-ti-sync-secret'] || event.headers['X-Ti-Sync-Secret'] || '';
-  if(!matchesSecret(provided,expected))return reply(401,{error:'Invalid sync passphrase.'});
+  if(!apiKey) return reply(503,{error:'HEVY_API_KEY is missing from Netlify environment variables.'});
+  const user=await verifyUser(event);
+  if(user.error)return reply(user.status,{error:user.error});
   const page=Number(event.queryStringParameters?.page||1);
   if(!Number.isInteger(page)||page<1||page>250)
     return reply(400,{error:'Invalid workout page.'});

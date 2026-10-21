@@ -206,7 +206,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
 .hevy-sync-actions button{flex:1;min-width:130px;border:0;padding:12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;background:var(--or);color:white}
 .hevy-sync-actions button.secondary{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx)}
 .hevy-sync-actions button:disabled{opacity:.5;cursor:wait}
-.hevy-status{font-size:11px;line-height:1.6;color:var(--t2);margin-top:10px;white-space:pre-wrap}
+.hevy-signin{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px}.hevy-signin button{border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);border-radius:9px;padding:9px 12px;cursor:pointer;font-size:12px}.hevy-signin #googleButton{min-height:40px}.hevy-status{font-size:11px;line-height:1.6;color:var(--t2);margin-top:10px;white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -295,6 +295,7 @@ body{background:var(--bg);color:var(--tx);max-width:480px;margin:0 auto;min-heig
     <div id="exModalList" style="overflow-y:auto;flex:1;padding:6px 0"></div>
   </div>
 </div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 
 
@@ -1542,11 +1543,11 @@ function renderImportTab() {
     "<div style='font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Hevy is the training log. Training Intelligence uses your saved Hevy workouts to provide coaching before, during, and after training.</div>" +
     "<div class='hevy-sync-card'>" +
       "<div class='cl' style='color:var(--gr)'>Hevy Pro — API Sync</div>" +
-      "<div style='font-size:11px;color:var(--t2);line-height:1.6'>Use your private Training Intelligence sync passphrase (NOT your Hevy API key). Your Hevy key stays in Netlify's server-side environment settings. This fetches finished/saved workouts; Hevy does not document real-time access to unfinished sets.</div>" +
-      "<input id='hevyPassphrase' type='password' autocomplete='off' placeholder='Private sync passphrase (your Netlify setting)'>" +
+      "<div style='font-size:11px;color:var(--t2);line-height:1.6'>Sign in with your approved Google account to sync completed Hevy workouts. Your Hevy API key stays securely on Netlify. Unfinished Hevy sets are not available through the API.</div>" +
+      "<div class='hevy-signin'><div id='googleButton'></div><span id='googleUser' style='font-size:11px;color:var(--t2)'>Not signed in</span><button id='googleSignOut' style='display:none' onclick='signOutLiftIQ()'>Sign out</button></div>" +
       "<div class='hevy-sync-actions'><button type='button' onclick='syncHevy(12)'>Sync last 12 weeks</button><button class='secondary' type='button' onclick='syncHevy(-1)'>Sync all history</button></div>" +
       "<div id='hevySyncStatus' role='status' aria-live='polite' class='hevy-status'>"+ syncInfo + "</div>" +
-      "<div style='font-size:10px;color:var(--t3);margin-top:7px'>After the first sync, this page checks for new saved workouts every 3 minutes while open. Passphrase is held only in this tab's memory.</div>" +
+      "<div style='font-size:10px;color:var(--t3);margin-top:7px'>After signing in, the page checks for new saved workouts every 3 minutes while open. Sign-in tokens are kept only in this tab's memory.</div>" +
     "</div>" +
     "<div class='cc'><div class='cl'>Backup: Import Hevy CSV</div>" +
       "<div style='font-size:11px;color:var(--t2);margin-bottom:12px'>If API sync is unavailable: Hevy &rarr; Profile &rarr; Settings &rarr; Export Workouts, then upload your CSV.</div>" +
@@ -1582,6 +1583,7 @@ function renderImportTab() {
         "Skipped — no reps: " + window._lastDiag.skippedMissingReps + "<br>" +
       "</div>" +
     "</div>" : "");
+  setTimeout(initializeGoogleLogin,0);
 }
 
 // ── Helpers ──
@@ -2229,7 +2231,48 @@ function iTab(id,b) {
 // Hevy key exists ONLY in Netlify Function environment variables.
 // The personal sync passphrase is only retained in this tab's memory.
 // ═══════════════════════════════════════
-var _hevySyncSecret="", _hevySyncBusy=false, _hevySyncWeeks=12, _hevySyncTimer=null;
+var _googleIdToken="", _googleClientId="", _googleSignedInEmail="", _googleReady=false;
+var _hevySyncBusy=false, _hevySyncWeeks=12, _hevySyncTimer=null;
+function signedInUI(){
+  var user=document.getElementById('googleUser'), out=document.getElementById('googleSignOut');
+  if(user)user.textContent=_googleSignedInEmail?'Signed in: '+_googleSignedInEmail:'Not signed in';
+  if(out)out.style.display=_googleSignedInEmail?'inline-block':'none';
+}
+function signOutLiftIQ(){
+  _googleIdToken='';_googleSignedInEmail='';
+  if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();
+  signedInUI();hevyStatus('Signed out. Your existing locally saved workout analysis is still available.');
+}
+async function handleGoogleCredential(result){
+  try{
+    var token=result&&result.credential;
+    if(!token)throw new Error('Google did not return a sign-in token.');
+    var verify=await fetch('/.netlify/functions/auth-session',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+    var data=await verify.json();
+    if(!verify.ok)throw new Error(data.error||'Sign-in was rejected.');
+    _googleIdToken=token;_googleSignedInEmail=data.email;
+    signedInUI();hevyStatus('Google account verified. Ready to sync Hevy.');
+  }catch(e){_googleIdToken='';_googleSignedInEmail='';signedInUI();hevyStatus('Sign-in failed: '+e.message,true);}
+}
+async function initializeGoogleLogin(){
+  if(!_googleClientId){
+    try{
+      var response=await fetch('/.netlify/functions/auth-config',{cache:'no-store'});
+      var config=await response.json();
+      if(!response.ok)throw new Error(config.error||'Unable to load sign-in configuration.');
+      _googleClientId=config.clientId;
+    }catch(e){hevyStatus('Sign-in setup: '+e.message,true);return;}
+  }
+  if(!window.google||!google.accounts||!google.accounts.id){
+    if(!_googleReady){setTimeout(initializeGoogleLogin,500);}
+    return;
+  }
+  if(!_googleReady){google.accounts.id.initialize({client_id:_googleClientId,callback:handleGoogleCredential,auto_select:false});_googleReady=true;}
+  var holder=document.getElementById('googleButton');
+  if(holder){holder.replaceChildren();google.accounts.id.renderButton(holder,{theme:'filled_black',size:'large',text:'signin_with',width:225});}
+  signedInUI();
+}
+
 function hevyStatus(msg,isError){
   var e=document.getElementById("hevySyncStatus");
   if(e){e.textContent=msg;e.style.color=isError?"var(--re)":"var(--t2)";}
@@ -2253,7 +2296,7 @@ function hevyWorkoutsToCSV(workouts){
 async function getHevyPage(page){
   var response=await fetch("/.netlify/functions/hevy-sync?page="+page,{
     method:"GET",
-    headers:{"x-ti-sync-secret":_hevySyncSecret},
+    headers:{"Authorization":"Bearer "+_googleIdToken},
     cache:"no-store"
   });
   var data=null;
@@ -2268,13 +2311,8 @@ async function getHevyPage(page){
 async function syncHevy(weeks,options){
   options=options||{};
   if(_hevySyncBusy)return;
-  var field=document.getElementById("hevyPassphrase");
-  if(field&&field.value.trim()){
-    _hevySyncSecret=field.value.trim();
-    field.value="";
-  }
-  if(!_hevySyncSecret){
-    if(!options.quiet)hevyStatus("Enter your private sync passphrase first. This is NOT your Hevy API key.",true);
+  if(!_googleIdToken){
+    if(!options.quiet)hevyStatus('Sign in with Google first, using your approved account.',true);
     return;
   }
   _hevySyncBusy=true;
@@ -2330,13 +2368,13 @@ async function syncHevy(weeks,options){
       (stoppedForDate?"Older history not requested. ":"")+"Guidance and history are now updated.");
     if(!_hevySyncTimer){
       _hevySyncTimer=setInterval(function(){
-        if(!document.hidden && _hevySyncSecret && !_hevySyncBusy){
+        if(!document.hidden && _googleIdToken && !_hevySyncBusy){
           syncHevy(_hevySyncWeeks,{quiet:true});
         }
       },180000);
     }
   } catch(err){
-    hevyStatus("Sync failed: "+err.message+". If this is a local HTML preview, deploy the Netlify Function first.",true);
+    hevyStatus("Sync failed: "+err.message+". If your sign-in expired, sign in again.",true);
   } finally{
     _hevySyncBusy=false;
     document.querySelectorAll(".hevy-sync-actions button").forEach(function(b){b.disabled=false;});
