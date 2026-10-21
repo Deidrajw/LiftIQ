@@ -459,6 +459,12 @@ body[data-theme=light] .it.on{background:linear-gradient(180deg,#2f3944,#1f262e)
 .history-rows{border:1px solid var(--bd);border-radius:13px;max-height:235px;overflow:auto}
 .history-rows>div{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;gap:10px;font-size:11px}
 .history-rows>div:last-child{border-bottom:0}
+/* V12.4: Full month names wrap cleanly on narrow iPhones. */
+.history-chart-dates{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px 14px;padding:9px 3px 4px;color:var(--t2);font-size:11px;line-height:1.5}
+.history-rows>div{flex-wrap:wrap;line-height:1.5}
+.history-rows>div span:first-child{font-weight:650;white-space:normal}
+.history-rows>div span:last-child{overflow-wrap:anywhere}
+.v3-muted,.v3-sub,.v4-sub,.next-workout-reason,.next-workout-last{overflow-wrap:break-word}
 .history-library{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0 18px}
 .history-library button{padding:11px 12px;text-align:left;border:1px solid var(--bd2);border-radius:10px;background:var(--bg3);color:var(--tx);font-size:12px;cursor:pointer;overflow-wrap:anywhere}
 .history-library button small{display:block;font-size:10px;color:var(--t2);margin-top:3px}
@@ -502,6 +508,47 @@ body[data-theme=light] .next-workout-card{background:#f6f8fa}
 .smart-connected-link{margin-top:9px;padding:7px 10px;font-size:11px;color:var(--tx);background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;cursor:pointer}
 .smart-audit-line{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;font-size:12px}
 .smart-audit-line span{font-size:11px;color:var(--t2)}.smart-plan-item{display:block;padding:7px 0;border-bottom:1px solid var(--bd);font-size:11px}
+
+/* V12.5: Actionable next-session targets before deeper trend and history exploration. */
+.v125-next-targets{margin:14px 0 20px;}
+.v125-next-targets .v3-titlebar{margin:0 0 4px;}
+.v125-next-targets .v3-titlebar h3{font-size:14px;letter-spacing:-.015em;}
+.v125-next-caption{margin:0 0 9px;}
+.v125-next-targets .v3-rows{background:var(--bg2);}
+.v125-next-targets .v3-row{padding:10px 12px;}
+.v125-more-targets{margin:7px 0 0;}
+.v125-more-targets summary{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:11px;font-weight:700;cursor:pointer;list-style:none;}
+.v125-more-targets summary::-webkit-details-marker{display:none;}
+.v125-more-targets[open] summary{margin-bottom:7px;}
+.v125-more-targets summary span{font-size:16px;color:var(--t2)}
+@media (max-width:390px){.v125-next-targets .v3-line{flex-wrap:wrap}.v125-next-targets .v3-line strong{min-width:0;flex:1}}
+
+
+
+/* V12.6 · Quiet dashboard: reusable, accessible progressive disclosure */
+.ui-fold{margin:12px 0;border:1px solid var(--bd2);background:var(--bg2);border-radius:14px;overflow:hidden}
+.ui-fold>summary{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:15px;list-style:none;cursor:pointer;min-height:58px}
+.ui-fold>summary::-webkit-details-marker{display:none}
+.ui-fold>summary:focus-visible{outline:2px solid var(--or);outline-offset:-4px;border-radius:10px}
+.ui-fold-title{color:var(--tx);font-weight:800;font-size:13px;letter-spacing:-.01em;line-height:1.4}
+.ui-fold-hint{display:block;color:var(--t2);font-size:11px;font-weight:500;line-height:1.5;margin-top:3px}
+.ui-fold-right{display:flex;align-items:center;flex-shrink:0;gap:8px}
+.ui-fold-count{color:var(--t2);font-weight:600;font-size:10px;white-space:nowrap}
+.ui-fold-chevron{color:var(--t2);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid var(--bd2);border-radius:8px;transform:rotate(0);transition:transform .15s}
+.ui-fold[open] .ui-fold-chevron{transform:rotate(180deg)}
+.ui-fold-body{border-top:1px solid var(--bd);padding:8px 14px 14px}
+.ui-fold-body>.v3-rows:first-child{margin-top:5px}
+.ui-fold-body .movement-panel{margin:0;padding:0;border:0;background:none}
+.ui-fold-body>.cc{margin:5px 0}
+.ui-fold-body .phase-row{margin-top:5px}
+.ui-fold-body .v3-titlebar{margin-top:12px}
+.ui-fold-body .v3-row{overflow-wrap:anywhere}
+.ui-small-rows>.v3-row:last-child{border-bottom:0}
+.ui-muted-foot{font-size:11px;color:var(--t2);line-height:1.55;margin:10px 1px}
+.ui-highlights{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.ui-highlights span{font-size:10px;color:var(--t2);background:var(--bg3);border:1px solid var(--bd);padding:5px 9px;border-radius:20px}
+@media(max-width:390px){.ui-fold>summary{padding:12px}.ui-fold-right{gap:5px}.ui-fold-body{padding:8px 10px 12px}.ui-fold-count{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.ui-fold-chevron{transition:none}}
 </style>
 </head>
 <body>
@@ -523,7 +570,7 @@ body[data-theme=light] .next-workout-card{background:#f6f8fa}
   <div class="history-sheet">
     <div class="history-head"><div><div class="v3-eyebrow">Exercise history · all time</div><div class="history-title" id="historyName"></div><div class="v3-muted" id="historyCount"></div></div><button class="history-close" type="button" onclick="closeExerciseHistory()" aria-label="Close exercise history">Close</button></div>
     <div class="history-controls"><label>Metric <select id="historyMetric" onchange="renderExerciseHistoryDetail()"><option value="e1rmLb">Estimated 1RM</option><option value="weightLb">Working weight</option><option value="reps">Repetitions</option></select></label><label>Range <select id="historyRange" onchange="renderExerciseHistoryDetail()"><option value="all">All time</option><option value="365">365 days</option><option value="84">84 days</option></select></label></div>
-    <svg id="historySvg" class="history-chart" viewBox="0 0 360 230" role="img" aria-label="Exercise progression chart"></svg><div id="historySelected" class="history-detail" aria-live="polite"></div>
+    <svg id="historySvg" class="history-chart" viewBox="0 0 360 198" role="img" aria-label="Exercise progression chart"></svg><div id="historyChartDates" class="history-chart-dates" aria-label="First and last chart dates"></div><div id="historySelected" class="history-detail" aria-live="polite"></div>
     <div class="v3-titlebar"><h3>Dated best sets</h3><span class="v3-muted">Tap chart points for details</span></div><div id="historyRows" class="history-rows"></div>
   </div>
 </div>
@@ -715,11 +762,27 @@ var DEFAULT_MESO_PLAN=JSON.parse(JSON.stringify(MESO_PLAN));
 var CYCLE_PAUSE=null;
 function v3Iso(d){return new Date(d).toISOString().slice(0,10);}
 function v3Date(s){return new Date(s+'T12:00:00');}
+// V12.4 — One display-only date formatter throughout LiftIQ.
+// All persisted dates, HTML date inputs, comparisons, and Hevy/Gemini records stay ISO.
+function uiLongDate(value){
+ if(value===null||value===undefined||value==='')return '—';
+ var d;
+ if(value instanceof Date)d=value;
+ else if(typeof value==='number')d=new Date(value);
+ else if(typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)){
+   var y=Number(value.slice(0,4)),m=Number(value.slice(5,7)),day=Number(value.slice(8,10));
+   d=new Date(y,m-1,day,12,0,0);
+   if(d.getFullYear()!==y||d.getMonth()!==m-1||d.getDate()!==day)return String(value);
+ }else d=new Date(value);
+ return !Number.isFinite(d.getTime())?String(value):new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(d);
+}
+function uiLongDateRange(start,end){return uiLongDate(start)+' → '+uiLongDate(end);}
+function uiLongDateTime(value){var d=new Date(value);return Number.isFinite(d.getTime())?uiLongDate(d)+' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'—';}
 function v3AddDays(s,n){var d=v3Date(s);d.setDate(d.getDate()+n);return v3Iso(d);}
 function v3Today(){var d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
 function v3Safe(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function v5CycleDates(a,b){if(!a||!b)return 'Unscheduled';var s=v3Date(a),e=v3Date(b),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];if(s.getFullYear()===e.getFullYear()&&s.getMonth()===e.getMonth())return m[s.getMonth()]+' '+s.getDate()+' – '+e.getDate()+', '+e.getFullYear();if(s.getFullYear()===e.getFullYear())return m[s.getMonth()]+' '+s.getDate()+' – '+m[e.getMonth()]+' '+e.getDate()+', '+e.getFullYear();return m[s.getMonth()]+' '+s.getDate()+', '+s.getFullYear()+' – '+m[e.getMonth()]+' '+e.getDate()+', '+e.getFullYear();}
-function v4Date(s){if(!s)return '—';var d=v3Date(s);return isNaN(d)?s:d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});}
+function v5CycleDates(a,b){if(!a||!b)return 'Unscheduled';return uiLongDateRange(a,b);}
+function v4Date(s){return uiLongDate(s);}
 function v4Icon(name){var paths={
 alert:'<path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/>',
 barbell:'<path d="M2 9v6M6 6v12M9 12h6M18 6v12M22 9v6"/>',
@@ -768,7 +831,7 @@ function v5CycleTrainingDays(){
  var c=v3ActiveCycle();if(!c||!STATE.dailyLog)return '—';
  return Object.keys(STATE.dailyLog).filter(function(day){return /^\d{4}-\d{2}-\d{2}$/.test(day)&&day>=c.start&&day<=c.end;}).length;
 }
-function v4CycleReview(){var m=v3ActiveCycle();if(!m){alert('Select an active cycle before requesting a cycle review.');return;}var question='Review my current mesocycle '+m.label+' ('+m.name+'), scheduled '+m.start+' to '+m.end+', RPE '+m.rpe+', reps '+m.reps+'. Based ONLY on available 7/28/84 day training trends, should I extend, shorten, deload or keep it? Identify data limitations and suggest a specific adjustment for my approval. Do not claim to edit the plan.';_aiQuestion=question.slice(0,350);var coach=document.querySelector('.it[onclick*="ai"]');if(coach){iTab('ai',coach);}else{document.querySelectorAll('.it').forEach(function(b){if(b.textContent.toLowerCase().includes('coach'))iTab('ai',b);});}renderAICoach();var textarea=document.getElementById('aiQuestion');if(textarea){textarea.value=_aiQuestion;textarea.focus();}}
+function v4CycleReview(){var m=v3ActiveCycle();if(!m){alert('Select an active cycle before requesting a cycle review.');return;}var question='Review my current mesocycle '+m.label+' ('+m.name+'), scheduled '+uiLongDate(m.start)+' to '+uiLongDate(m.end)+', RPE '+m.rpe+', reps '+m.reps+'. Based ONLY on available 7/28/84 day training trends, should I extend, shorten, deload or keep it? Identify data limitations and suggest a specific adjustment for my approval. Do not claim to edit the plan.';_aiQuestion=question.slice(0,350);var coach=document.querySelector('.it[onclick*="ai"]');if(coach){iTab('ai',coach);}else{document.querySelectorAll('.it').forEach(function(b){if(b.textContent.toLowerCase().includes('coach'))iTab('ai',b);});}renderAICoach();var textarea=document.getElementById('aiQuestion');if(textarea){textarea.value=_aiQuestion;textarea.focus();}}
 var _cycleEditorOpen=false;
 var USER_SETTINGS={name:'Athlete',goal:'Glute growth and posterior chain strength',units:'lb',theme:'dark',notes:'',experience:'Intermediate',sessionsPerWeek:4,sessionMinutes:75,equipment:'Gym machines, free weights and Smith machine',limitations:'',routinePreference:''};
 function loadUserSettings(){try{var j=JSON.parse(localStorage.getItem('liftiq_user_settings_v1')||'null');if(j&&typeof j==='object')Object.assign(USER_SETTINGS,j);}catch(e){}applyTheme(USER_SETTINGS.theme||'dark');}
@@ -993,7 +1056,7 @@ function renderCoachCard() {
   if (!anyFlag) chips += "<span class='chip chip-g'>&#10003; Ready &mdash; no active cautions</span>";
   var hevySyncedAt=Number(localStorage.getItem("ti_hevy_synced_at")||0);
   if (hevySyncedAt) chips += "<span class='chip chip-b'>Hevy saved data synced " +
-    new Date(hevySyncedAt).toLocaleDateString("en-CA",{month:"short",day:"numeric"})+"</span>";
+    uiLongDate(hevySyncedAt)+"</span>";
   el.innerHTML =
     "<div class='cc-header'>" +
       "<span class='cc-meso'>" + b.label + " &middot; " + b.name + "</span>" +
@@ -1135,7 +1198,7 @@ function nextWorkoutAnalysis(){
  var name=candidates[0]?candidates[0].name:selected;
  var matches=transitions[latest.group]&&transitions[latest.group][selected]||0;
  var total=Object.values(transitions[latest.group]||{}).reduce(function(a,b){return a+b;},0);
- var reason='Your latest recorded strength workout was '+latest.name+' ('+latest.date+'). ';
+ var reason='Your latest recorded strength workout was '+latest.name+' ('+uiLongDate(latest.date)+'). ';
  if(matches>0)reason+='In your recent rotation, '+selected+' followed '+latest.group+' '+matches+' time'+(matches===1?'':'s')+' out of '+total+' observed transitions. ';
  else reason+='This routine appears in your recent history and provides a change from the last recorded focus. ';
  var m=v3ActiveCycle();if(m)reason+='Current block: '+m.label+' · '+m.name+'. Follow the block’s effort and volume targets. ';
@@ -1152,7 +1215,7 @@ function nextWorkoutOverride(value){NEXT_WORKOUT_OVERRIDE=value||'';renderDashbo
 function nextWorkoutCard(){
  var pick=nextWorkoutSelection(),options=pick.analysis.options;
  var h="<div class='next-workout-card'><div class='v4-eyebrow'>"+v4Icon('calendar')+" NEXT WORKOUT · "+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+"</div><div class='next-workout-name'>"+v3Safe(pick.name)+"</div><p class='next-workout-reason'>"+v3Safe(pick.reason)+"</p>";
- if(pick.analysis.latest)h+="<div class='next-workout-last'>Last recorded · "+v3Safe(pick.analysis.latest.name)+" · "+v3Safe(pick.analysis.latest.date)+"</div>";
+ if(pick.analysis.latest)h+="<div class='next-workout-last'>Last recorded · "+v3Safe(pick.analysis.latest.name)+" · "+v3Safe(uiLongDate(pick.analysis.latest.date))+"</div>";
  h+="<label class='next-workout-label' for='nextWorkoutSelect'>Choose a different session</label><select id='nextWorkoutSelect' onchange='nextWorkoutOverride(this.value)'><option value=''>Use recommendation</option>";
  options.forEach(function(x){h+="<option value='"+v3Safe(x.name)+"'"+(pick.manual&&x.name===pick.name?' selected':'')+">"+v3Safe(x.name)+"</option>";});
  h+="</select>"+(options.length?"":"<div class='next-workout-note'>No routine choices yet. Use Sync all history to rebuild routine titles.</div>")+"<div class='next-workout-note'>Based on recorded routines, not a confirmed workout calendar. This choice does not modify Hevy or your mesocycle.</div></div>";
@@ -1215,6 +1278,25 @@ function renderNextSessionCoach() {
   "</div>";
 }
 
+
+// V12.6: Disclosure is presentation only. No workout, goal, or calculation is removed.
+var UI_FOLD_KEY='liftiq_ui_folds_v126';
+var UI_FOLD_STATE={};
+try { UI_FOLD_STATE=JSON.parse(localStorage.getItem(UI_FOLD_KEY)||'{}')||{}; } catch(e) {UI_FOLD_STATE={};}
+function uiFoldRemember(el){
+ if(!el||!el.dataset.fold)return;
+ UI_FOLD_STATE[el.dataset.fold]=!!el.open;
+ try{localStorage.setItem(UI_FOLD_KEY,JSON.stringify(UI_FOLD_STATE));}catch(e){}
+}
+function uiFold(key,title,description,content,defaultOpen,count){
+ var isOpen=Object.prototype.hasOwnProperty.call(UI_FOLD_STATE,key)?!!UI_FOLD_STATE[key]:!!defaultOpen;
+ return '<details class="ui-fold" data-fold="'+v3Safe(key)+'"'+(isOpen?' open':'')+' ontoggle="uiFoldRemember(this)">'+
+ '<summary><span><span class="ui-fold-title">'+v3Safe(title)+'</span><span class="ui-fold-hint">'+v3Safe(description||'Tap to explore')+'</span></span>'+
+ '<span class="ui-fold-right">'+(count!=null?'<span class="ui-fold-count">'+v3Safe(String(count))+'</span>':'')+
+ '<span class="ui-fold-chevron" aria-hidden="true">'+'⌄'+'</span></span></summary>'+
+ '<div class="ui-fold-body">'+content+'</div></details>';
+}
+
 // ── Dashboard ──
 function renderDashboard() {
   var el = document.getElementById("t-dash");
@@ -1246,7 +1328,7 @@ function renderDashboard() {
       statBox("Current cycle",v5CycleTrainingDays()+"","training days logged") +
     "</div>" +
     // Your manually selected focus, without modifying historical workout totals
-    smartPriorityCompact('YOUR TRAINING FOCUS',3) +
+    uiFold('overview-focus','Your training focus','Selected lifts and their recent evidence',smartPriorityCompact('YOUR TRAINING FOCUS',3),false,smartActivePriorityNames().length+' lifts') +
     // Biggest win
     "<div class='dash-sec'>Biggest win</div>" +
     (win
@@ -1292,7 +1374,7 @@ function v10TrendAssessment(name,days){
  var sameLoad=Math.abs(first.weightLb-last.weightLb)<.25;
  var improved=delta>Math.max(2,first.e1rmLb*.025),declined=delta<-Math.max(2,first.e1rmLb*.025);
  var status=improved?'Progressing':declined?'Needs context':'Stable / mixed';
- var evidence=first.date+': '+first.weightLb+' lb × '+first.reps+' → '+last.date+': '+last.weightLb+' lb × '+last.reps+' · '+rows.length+' dated performances.';
+ var evidence=uiLongDate(first.date)+': '+first.weightLb+' lb × '+first.reps+' → '+uiLongDate(last.date)+': '+last.weightLb+' lb × '+last.reps+' · '+rows.length+' dated performances.';
  if(sameLoad&&last.reps>first.reps){status='Rep progression';}
  // This is a comparison signal, not a diagnosis of a plateau or fatigue.
  return {status:status,rows:rows,delta:Math.round(delta),evidence:evidence};
@@ -1332,14 +1414,15 @@ function historyEntries(name){
  if(!result.length)Object.keys(STATE.dailyLog||{}).forEach(function(d){var log=STATE.dailyLog[d].ex||{};Object.keys(log).forEach(function(k){if(normalizeExerciseName(k)!==want)return;var x=log[k];if(x&&x.w>0&&x.r>0&&x.e1>0)result.push({date:d,weightLb:Number(x.w),reps:Number(x.r),e1rmLb:Number(x.e1),rpe:x.rpe});});});
  var byDate={};result.forEach(function(x){if(!byDate[x.date]||x.e1rmLb>byDate[x.date].e1rmLb)byDate[x.date]=x;});return Object.keys(byDate).sort().map(function(d){return byDate[d];});
 }
-function historyDate(s){return new Date(s+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});}
+function historyDate(s){return uiLongDate(s);}
 function historyLibrary(){var all=Object.keys(STATE.exerciseHistory||{}).filter(function(k){return (STATE.exerciseHistory[k]||[]).length;}).sort();return all;}
 function renderHistoryLibrary(){var list=historyLibrary();return "<details style='margin:14px 0'><summary class='v3-titlebar' style='cursor:pointer'><h3>Browse all exercise histories</h3><span class='v3-muted'>"+list.length+" movements · Expand</span></summary><div class='v3-muted'>Open any movement to view its full recorded progression, even if it has no workouts in the last 84 days.</div><div class='history-library'>"+list.map(function(name){return "<button type='button' data-history='"+v3Safe(name)+"' onclick='openExerciseHistory(this.dataset.history)'>"+v3Safe(shortName(name))+"<small>"+historyEntries(name).length+" training dates · View chart →</small></button>";}).join('')+"</div></details>";}
 function openExerciseHistory(name){selectedHistoryExercise=normalizeExerciseName(name);var m=document.getElementById('exerciseHistoryModal');if(!m)return;document.getElementById('historyName').textContent=shortName(selectedHistoryExercise);document.getElementById('historyRange').value='all';document.getElementById('historyMetric').value='e1rmLb';m.classList.add('open');m.setAttribute('aria-hidden','false');renderExerciseHistoryDetail();}
 function closeExerciseHistory(){var m=document.getElementById('exerciseHistoryModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}}
 function selectHistoryPoint(index){var rows=window._visibleHistory||[],row=rows[index],el=document.getElementById('historySelected');if(!row||!el)return;el.textContent=historyDate(row.date)+' · '+row.weightLb+' lb × '+row.reps+' reps · Estimated 1RM '+Math.round(row.e1rmLb)+' lb'+(Number.isFinite(row.rpe)&&row.rpe>0?' · RPE '+row.rpe:'');}
-function renderExerciseHistoryDetail(){var rows=historyEntries(selectedHistoryExercise),n=rows.length,range=document.getElementById('historyRange').value,metric=document.getElementById('historyMetric').value;document.getElementById('historyCount').textContent=n+' recorded training dates';var shown=rows;if(range!=='all'&&rows.length){var last=new Date(rows[rows.length-1].date+'T12:00:00').getTime(),edge=last-(Number(range)-1)*86400000;shown=rows.filter(function(x){return new Date(x.date+'T12:00:00').getTime()>=edge;});}window._visibleHistory=shown;var svg=document.getElementById('historySvg');if(!shown.length){svg.innerHTML='<text x="20" y="112" fill="currentColor" font-size="12">No weighted history available for this range.</text>';document.getElementById('historySelected').textContent='No dated qualifying sets found.';document.getElementById('historyRows').innerHTML='';return;}
- var vals=shown.map(function(x){return Number(x[metric]);}),min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),pad=Math.max((max-min)*.15,metric==='reps'?1:5),low=Math.max(0,min-pad),high=max+pad,w=320,h=165,x0=24,y0=14;var x=function(i){return x0+(shown.length===1?w/2:i*w/(shown.length-1));},y=function(v){return y0+h-(v-low)/(high-low)*h;};var path=shown.map(function(r,i){return (i?'L':'M')+x(i).toFixed(2)+' '+y(vals[i]).toFixed(2);}).join(' ');var tick=Math.round((low+high)/2);svg.innerHTML='<path d="M24 179H344" stroke="currentColor" opacity=".16" fill="none"/><path d="M24 96H344" stroke="currentColor" opacity=".10" fill="none"/><path d="'+path+'" stroke="currentColor" stroke-width="2" fill="none"/>'+shown.map(function(r,i){return '<circle class="history-point" data-index="'+i+'" onclick="selectHistoryPoint('+i+')" cx="'+x(i).toFixed(2)+'" cy="'+y(vals[i]).toFixed(2)+'" r="'+(shown.length>28?3.5:5)+'" fill="currentColor"><title>'+historyDate(r.date)+': '+r.weightLb+' lb x '+r.reps+'</title></circle>';}).join('')+'<text x="24" y="202" font-size="10" fill="currentColor" opacity=".65">'+historyDate(shown[0].date)+'</text><text x="344" y="202" text-anchor="end" font-size="10" fill="currentColor" opacity=".65">'+historyDate(shown[shown.length-1].date)+'</text><text x="24" y="12" font-size="10" fill="currentColor" opacity=".65">'+Math.round(high)+'</text>';
+function renderExerciseHistoryDetail(){var rows=historyEntries(selectedHistoryExercise),n=rows.length,range=document.getElementById('historyRange').value,metric=document.getElementById('historyMetric').value;document.getElementById('historyCount').textContent=n+' recorded training dates';var shown=rows;if(range!=='all'&&rows.length){var last=new Date(rows[rows.length-1].date+'T12:00:00').getTime(),edge=last-(Number(range)-1)*86400000;shown=rows.filter(function(x){return new Date(x.date+'T12:00:00').getTime()>=edge;});}window._visibleHistory=shown;var svg=document.getElementById('historySvg');if(!shown.length){svg.innerHTML='<text x="20" y="112" fill="currentColor" font-size="12">No weighted history available for this range.</text>';document.getElementById('historySelected').textContent='No dated qualifying sets found.';document.getElementById('historyRows').innerHTML='';document.getElementById('historyChartDates').textContent='';return;}
+ var vals=shown.map(function(x){return Number(x[metric]);}),min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),pad=Math.max((max-min)*.15,metric==='reps'?1:5),low=Math.max(0,min-pad),high=max+pad,w=320,h=165,x0=24,y0=14;var x=function(i){return x0+(shown.length===1?w/2:i*w/(shown.length-1));},y=function(v){return y0+h-(v-low)/(high-low)*h;};var path=shown.map(function(r,i){return (i?'L':'M')+x(i).toFixed(2)+' '+y(vals[i]).toFixed(2);}).join(' ');var tick=Math.round((low+high)/2);svg.innerHTML='<path d="M24 179H344" stroke="currentColor" opacity=".16" fill="none"/><path d="M24 96H344" stroke="currentColor" opacity=".10" fill="none"/><path d="'+path+'" stroke="currentColor" stroke-width="2" fill="none"/>'+shown.map(function(r,i){return '<circle class="history-point" data-index="'+i+'" onclick="selectHistoryPoint('+i+')" cx="'+x(i).toFixed(2)+'" cy="'+y(vals[i]).toFixed(2)+'" r="'+(shown.length>28?3.5:5)+'" fill="currentColor"><title>'+historyDate(r.date)+': '+r.weightLb+' lb x '+r.reps+'</title></circle>';}).join('')+'<text x="24" y="12" font-size="10" fill="currentColor" opacity=".65">'+Math.round(high)+'</text>';
+ document.getElementById('historyChartDates').innerHTML='<span>First · '+v3Safe(uiLongDate(shown[0].date))+'</span><span>Latest · '+v3Safe(uiLongDate(shown[shown.length-1].date))+'</span>';
  var lastRow=shown[shown.length-1];document.getElementById('historyRows').innerHTML=shown.slice().reverse().map(function(r){return '<div><span>'+historyDate(r.date)+'</span><span>'+r.weightLb+' lb × '+r.reps+' · e1RM '+Math.round(r.e1rmLb)+' lb</span></div>';}).join('');selectHistoryPoint(shown.length-1);
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExerciseHistory();});
@@ -1434,12 +1517,37 @@ function smartCloseGoal(){var p=document.getElementById('smartGoalEditor');if(p)
 function smartPriorityAction(name,status){if(status==='tracked'){smartEditGoal(name);return;}smartSetPriority(name,status);}
 function smartPriorityControls(item){var buttons=[['pinned','Pin'],['tracked','Track target'],['supporting','Supporting'],['dismissed','Dismiss']];return '<div class="smart-actions">'+buttons.filter(function(b){return b[0]!==item.status;}).map(function(b){return '<button type="button" data-name="'+v3Safe(item.name)+'" data-status="'+b[0]+'" onclick="smartPriorityAction(this.dataset.name,this.dataset.status)">'+b[1]+'</button>';}).join('')+'</div>';}
 function smartPriorityPanel(compact){var suggestions=smartScores().filter(function(x){return x.status==='suggested'&&x.dates>=3;});return '<details class="smart-card smart-discover"><summary class="smart-discovery-head"><strong>Discover new movements</strong><span class="smart-tag">'+suggestions.length+' suggestions</span></summary><div class="smart-muted">Only unreviewed exercises appear here. After you choose an action, the exercise leaves this inbox. Supporting and dismissed movements remain in your training history.</div>'+(suggestions.length?suggestions.slice(0,compact?5:16).map(function(x){return '<div class="smart-row"><div class="smart-head"><button class="history-launch smart-name" type="button" data-history="'+v3Safe(x.name)+'" onclick="openExerciseHistory(this.dataset.history)">'+v3Safe(shortName(x.name))+'</button><span class="smart-tag">Suggested</span></div><div class="smart-muted">'+v3Safe(smartWhy(x))+'</div>'+smartPriorityControls(x)+'</div>';}).join(''):'<p class="smart-empty">You’re all caught up. No new movement suggestions right now.</p>')+'</details>';}
-function smartTargetsPanel(){var rows=smartPinned(),pins=rows.filter(function(x){return x.status==='pinned';}),tracked=rows.filter(function(x){return x.status==='tracked';});
- return '<div class="smart-card"><div class="v4-eyebrow">YOUR TRAINING PRIORITIES</div><div class="v11-heading">Active priorities <span class="smart-tag">'+rows.length+'</span></div><div class="smart-muted">Pinned movements are highlighted in coaching. Tracked movements have editable goals and follow your actual Hevy best sets.</div><div class="smart-editor-space" id="smartGoalEditor" hidden></div>'+
- '<div class="smart-minihead">TRACKED TARGETS · '+tracked.length+'</div>'+(tracked.length?tracked.map(function(x){return '<div class="smart-row"><div class="smart-head"><button class="history-launch smart-name" data-history="'+v3Safe(x.name)+'" onclick="openExerciseHistory(this.dataset.history)">'+v3Safe(shortName(x.name))+'</button><span class="smart-tag">Tracked</span></div>'+smartGoalProgress(x.name)+'<div class="smart-actions"><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartEditGoal(this.dataset.name)">Edit goal</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'pinned\')">Pin instead</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'supporting\')">Remove from targets</button></div></div>';}).join(''):'<p class="smart-empty">No numerical goals yet. Track a movement from Discoveries.</p>')+
- '<div class="smart-minihead">PINNED MOVEMENTS · '+pins.length+'</div>'+(pins.length?pins.map(function(x){return '<div class="smart-compact"><button class="history-launch smart-name" data-history="'+v3Safe(x.name)+'" onclick="openExerciseHistory(this.dataset.history)">'+v3Safe(shortName(x.name))+'</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'tracked\')">Create goal</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'supporting\')">Remove</button></div>';}).join(''):'<p class="smart-empty">No pinned lifts yet.</p>')+'</div>'+smartPriorityPanel(false);
+function smartTrackedItem(x){
+ return '<div class="smart-row"><div class="smart-head"><button class="history-launch smart-name" data-history="'+v3Safe(x.name)+'" onclick="openExerciseHistory(this.dataset.history)">'+v3Safe(shortName(x.name))+'</button><span class="smart-tag">Tracked</span></div>'+smartGoalProgress(x.name)+
+ '<div class="smart-actions"><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartEditGoal(this.dataset.name)">Edit goal</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'pinned\')">Pin instead</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'supporting\')">Remove from targets</button></div></div>';
+}
+function smartTargetsPanel(){
+ var rows=smartPinned(),pins=rows.filter(function(x){return x.status==='pinned';}),tracked=rows.filter(function(x){return x.status==='tracked';});
+ var pinnedBody=pins.map(function(x){return '<div class="smart-compact"><button class="history-launch smart-name" data-history="'+v3Safe(x.name)+'" onclick="openExerciseHistory(this.dataset.history)">'+v3Safe(shortName(x.name))+'</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'tracked\')">Create goal</button><button type="button" data-name="'+v3Safe(x.name)+'" onclick="smartPriorityAction(this.dataset.name,\'supporting\')">Remove</button></div>';}).join('');
+ return '<div class="smart-card"><div class="v4-eyebrow">YOUR TRAINING PRIORITIES</div><div class="v11-heading">Active priorities <span class="smart-tag">'+rows.length+'</span></div><div class="smart-muted">Your approved goals appear first. Pin and discover other movements below when needed.</div><div class="smart-editor-space" id="smartGoalEditor" hidden></div>'+
+ '<div class="smart-minihead">TRACKED TARGETS · '+tracked.length+'</div>'+
+ (tracked.length?tracked.slice(0,2).map(smartTrackedItem).join(''):'<p class="smart-empty">No numerical goals yet. Track a movement from Discoveries.</p>')+
+ (tracked.length>2?uiFold('targets-more-tracked','More tracked goals','Edit or review the rest of your numerical targets',tracked.slice(2).map(smartTrackedItem).join(''),false,(tracked.length-2)+' goals'):'')+
+ '</div>'+
+ (pins.length?uiFold('targets-pins','Pinned movements','Important lifts without numerical goals',pinnedBody,false,pins.length+' pinned'):'')+
+ smartPriorityPanel(false);
 }
 function smartPlanSummary(){var selected=smartPinned();return '<details class="smart-card smart-plan"><summary class="smart-discovery-head"><strong>Key movements</strong><span class="smart-tag">'+selected.length+' selected · Manage in Targets</span></summary><p class="smart-muted">'+(selected.length?selected.map(function(x){var t=v10TrendAssessment(x.name,84);return '<span class="smart-plan-item">'+v3Safe(shortName(x.name))+' · '+v3Safe(t.status)+(x.status==='tracked'&&smartGoalState(x.name)?' · '+v3Safe(smartGoalState(x.name).achieved?'Goal reached':'Goal active'):'')+'</span>';}).join(''): 'No selected movements. Add them under Targets.')+'</p><button class="v3-mini" type="button" onclick="smartOpenTargets()">Manage in Targets →</button></details>';}
+
+// V12.5: Keep next-session guidance near the top of Progress; preserve all targets.
+function v125NextSessionTargets(target){
+ var limit=3;
+ function targetRow(r){
+   var val=r.target!=null?r.target+' lbs':'—';
+   return '<div class="v3-row"><div class="v3-line"><strong>'+v3Safe(shortName(r.lift))+'</strong><span>'+v3Safe(val)+'</span></div><div class="v3-muted">'+v3Safe(r.badge||'Review')+' · '+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set</div></div>';
+ }
+ return '<section class="v125-next-targets" aria-label="Next-session targets">'+
+ '<div class="v3-titlebar"><h3>Next-session targets</h3><button class="v3-mini" type="button" onclick="v3OpenTargets()">All targets →</button></div>'+
+ '<div class="v3-muted v125-next-caption">Your next-step lift guidance. These are not a confirmed workout schedule.</div>'+
+ '<div class="v3-rows">'+(target.length?target.slice(0,limit).map(targetRow).join(''):'<div class="v3-row v3-muted">Sync Hevy to populate your lift targets.</div>')+'</div>'+
+ (target.length>limit?'<details class="v125-more-targets"><summary>Show '+(target.length-limit)+' more targets <span aria-hidden="true">⌄</span></summary><div class="v3-rows">'+target.slice(limit).map(targetRow).join('')+'</div></details>':'')+
+ '</section>';
+}
 
 function v3ProgressTop(){
  var target=smartActivePriorityNames().map(function(l){return STATE.recommendations[l];}).filter(Boolean);
@@ -1448,6 +1556,7 @@ function v3ProgressTop(){
  var flagged=target.filter(function(r){return ['stall','injury','reduce'].includes(r.action);}).length;
  var h="<div class='v3-hero'><div class='v3-eyebrow'>Performance snapshot</div><div class='v3-h1'>Your progress at a glance</div><div class='v3-sub'>Actionable targets appear first. Comparisons follow below.</div></div>";
  h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+pushes+"</strong><span>Ready to progress</span></div><div class='v3-kpi'><strong>"+holds+"</strong><span>Building / hold</span></div><div class='v3-kpi'><strong>"+flagged+"</strong><span>Need review</span></div></div>";
+ h+=v125NextSessionTargets(target);
  h+="<div class='v3-titlebar'><h3>Recent priority-lift trends</h3><span class='v3-muted'>Last 84 days</span></div>";
  var trendInfo=trainingTrends(),history=trendInfo.windows['84d'].priorityLiftHistory||{};
  var stored=STATE.exerciseHistory||{},anchor=trendInfo.anchorDate||v3Today();
@@ -1458,16 +1567,17 @@ function v3ProgressTop(){
    if(!direct) { var k=matchingKeys.find(function(k){return normalizeExerciseName(k)===normalizeExerciseName(n);});direct=k?stored[k]:null; }
    if(direct&&direct.length)history[n]=direct.filter(function(x){var d=Date.parse(x.date+'T12:00:00');return Number.isFinite(d)&&d>=edge&&d<=Date.parse(anchor+'T12:00:00');}).slice(-12);
  });
- h+="<div class='v3-rows'>"+smartActivePriorityNames().slice(0,12).map(function(n){
-   var t=v10TrendAssessment(n,84);
-   var full=historyEntries(n),status=t.status;if(!t.rows.length&&full.length)status='Older history available';return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View all-time chart →</span></button></div>";
- }).join('')+"</div>";
- h+=smartPriorityCompact('YOUR SELECTED MOVEMENTS',3);
- h+=renderMovementPanel();
- h+="<div class='smart-progress-bridge'><strong>Your tracked targets</strong><span>Manage goals and priorities in Targets.</span><button type='button' onclick='smartOpenTargets()'>Open Targets →</button></div>";
+ var trendNames=smartActivePriorityNames().slice(0,12);
+ function trendRow(n){
+  var t=v10TrendAssessment(n,84),full=historyEntries(n),status=t.status;
+  if(!t.rows.length&&full.length)status='Older history available';
+  return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View all-time chart →</span></button></div>";
+ }
+ h+='<div class="v3-rows ui-small-rows">'+trendNames.slice(0,3).map(trendRow).join('')+'</div>';
+ if(trendNames.length>3)h+=uiFold('progress-more-trends','More priority-lift trends','Additional lifts with clickable all-time charts','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' lifts');
+ var families=Object.keys(movementGroups()).length;
+ h+=uiFold('progress-movements','Movement families','Explore related variations without combining their working weights',renderMovementPanel(),false,families+' families');
  h+=renderHistoryLibrary();
- h+="<div class='v3-titlebar'><h3>Next-session targets</h3><button class='v3-mini' onclick='v3OpenTargets()'>All targets</button></div>";
- h+="<div class='v3-rows'>"+target.slice(0,5).map(function(r){var val=r.target!=null?r.target+' lbs':'—';return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(shortName(r.lift))+"</strong><span>"+v3Safe(val)+"</span></div><div class='v3-muted'>"+v3Safe(r.badge||'Review')+" · "+v3Safe(r.lastW+' lbs × '+r.lastR)+' last set'+'</div></div>';}).join('')+(target.length?'':"<div class='v3-row v3-muted'>Sync Hevy to populate your lift targets.</div>")+"</div>";
  return h;
 }
 
@@ -1498,7 +1608,7 @@ function renderWhatChanged() {
       impStat("Sessions",STATE.sessions+"") +
       impStat("Exercises",allKeys.length+"") +
       impStat("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1):"—") +
-      impStat("Date range",STATE.dateRange.start+" \u2192 "+STATE.dateRange.end) +
+      impStat("Date range",uiLongDateRange(STATE.dateRange.start,STATE.dateRange.end)) +
       "</div></div>";
     return;
   }
@@ -1541,7 +1651,7 @@ function renderWhatChanged() {
       impStat("Sessions",STATE.sessions+(sessDiff!==0?" ("+(sessDiff>0?"+":"")+sessDiff+")":"")) +
       impStat("Avg RPE",STATE.avgRPE?STATE.avgRPE.toFixed(1)+(rpeDiff2?" ("+(parseFloat(rpeDiff2)>0?"+":"")+rpeDiff2+")":""):"—") +
       impStat("Exercises",STATE.exercisesAnalyzed+"") +
-      impStat("vs import",IMPORT_HISTORY.length>=2?new Date(prevH.importedAt).toLocaleDateString("en-CA",{month:"short",day:"numeric"}):"—") +
+      impStat("vs import",IMPORT_HISTORY.length>=2?uiLongDate(prevH.importedAt):"—") +
       "</div></div>";
   }
 
@@ -1550,7 +1660,7 @@ function renderWhatChanged() {
     var ordered=['Glutes','Hamstrings','Quads','Back','Chest','Shoulders','Arms','Core','Other'];var found=new Set(held.map(function(item){return v4Group(item.name);}));var groups=['All'].concat(ordered.filter(function(g){return found.has(g);}));
     var groupButtons=groups.map(function(g){return "<button type='button' data-group='"+v3Safe(g)+"' aria-pressed='"+(g==='All'?'true':'false')+"' class='"+(g==='All'?'active':'')+"' onclick='v4FilterHeld(this.dataset.group)'>"+v3Safe(g)+"</button>";}).join('');
     var heldRows=held.map(function(item){var group=v4Group(item.name);return "<div class='change-row' data-muscle='"+v3Safe(group)+"'><span class='change-icon b'>&rarr;</span><div><div class='change-name'>"+v3Safe(item.name)+"</div><div class='change-reason'>"+v3Safe(item.reason)+"</div></div></div>";}).join('');
-    html += "<div class='dash-sec'>Held / Steady · "+held.length+" exercises</div><div class='v3-muted'>Filter by muscle group instead of scrolling through every exercise.</div><div id='v4-held-filter' class='v4-filter'>"+groupButtons+"</div><div id='v4-held-count' class='v3-muted' aria-live='polite'>"+held.length+" exercises shown</div><div id='v4-held-list' class='change-list'>"+heldRows+"</div>";
+    html += uiFold('progress-held','Held / steady exercises','Filter by muscle group or review individual changes',"<div id='v4-held-filter' class='v4-filter'>"+groupButtons+"</div><div id='v4-held-count' class='v3-muted' aria-live='polite'>"+held.length+" exercises shown</div><div id='v4-held-list' class='change-list'>"+heldRows+"</div>",false,held.length+' exercises');
   }
   if (regressed.length) html += "<div class='dash-sec'>Regressed</div>"+changeList(regressed,"r","&#8595;");
   if (newLifts.length) {
@@ -1579,7 +1689,7 @@ function renderNextWeek() {
              stall:"var(--am)",injury:"var(--re)",building:"var(--t2)"};
   var aBg = {increase:"#30d15812",hold:"#0a84ff10",reduce:"#ff453a10",
               stall:"#ffd60a10",injury:"#ff453a10",building:"#ffffff06"};
-  var html = "<div style='font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Generated from your last import &bull; "+STATE.dateRange.end+". Keep logging in Hevy.</div>";
+  var html = "<div style='font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Generated from your last import &bull; "+uiLongDate(STATE.dateRange.end)+". Keep logging in Hevy.</div>";
 
   smartActivePriorityNames().forEach(function(lk) {
     var rec = STATE.recommendations[lk];
@@ -1610,7 +1720,7 @@ function renderNextWeek() {
 
   // Volume diagnostics live in the Audit screen, not after the lift targets.
 
-  el.innerHTML = smartTargetsPanel()+html;
+  el.innerHTML = smartTargetsPanel()+uiFold("targets-prescriptions","Next-session guidance","Lift-specific prescriptions and evidence for your next session",html,false,smartActivePriorityNames().length+" lifts");
 }
 
 // ── Training Map ──
@@ -1696,12 +1806,13 @@ function renderMap() {
    "<div class='v4-level'><div class='v4-levelhead'><strong>Microcycle · Training week</strong><span class='v4-pill'>Week "+(activeCycle?b.week:'—')+"</span></div><div class='v4-sub'>"+(activeCycle?v3Safe(b.phase+' · '+b.focus):'No scheduled weekly phase')+"</div></div></div>";
   var cycleReview="<div class='v4-cycle-ai'><div class='v4-eyebrow'>"+v4Icon('spark')+" Gemini · Cycle advisor</div><div style='font-weight:800;margin-top:8px'>Should this block change?</div><div class='v3-muted'>Review your actual performance trends and ask Gemini whether to extend, hold, deload, or adjust the cycle. Advice is not automatically applied.</div><button onclick='v4CycleReview()' "+(!activeCycle?'disabled':'')+">Review my current cycle</button><div class='v3-muted'>After reviewing advice, use Edit cycle to approve a date change. Hevy data is never overwritten.</div></div>";
   el.innerHTML =
-    hero + hierarchy + v11CyclePanel(activeCycle) + smartPlanSummary() + cycleReview + phaseRow + phaseDetail + editor +
-    "<div class='cc'><div class='cl'>Week in block</div>" +
-      weekDots +
-      "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" \u00b7 "+b.phase+"</div>" +
-      weekDetail +
-    "</div>" +
+    hero +
+    uiFold('plan-cycle-review','Cycle review and goals','Training frequency, set evidence and optional cycle-extension proposal',v11CyclePanel(activeCycle),false,'Review') +
+    smartPlanSummary() + editor +
+    uiFold('plan-roadmap','Training roadmap','Macrocycle, mesocycles and weekly progression',hierarchy + phaseRow + phaseDetail +
+      "<div class='cc'><div class='cl'>Week in block</div>"+weekDots+
+      "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" · "+b.phase+"</div>"+weekDetail+"</div>",false,MESO_PLAN.length+' blocks') +
+    uiFold('plan-cycle-advisor','Ask Gemini about this cycle','Optional advice; no plan changes without your approval',cycleReview,false,'Optional') +
     "<details class='smart-card smart-plan'><summary class='smart-discovery-head'><strong>Legacy M8 benchmarks · optional reference</strong><span class='smart-tag'>Expand</span></summary><p class='v3-muted'>These historical benchmarks are not current user-approved targets. Set active goals in Targets.</p>"+liftRows+"</details>" +
     "<div class='v3-muted' style='margin:12px 0'>The current plan is not automatically rewritten when priorities change. Your selected focus is reflected in the cycle review and in future coaching context.</div>";
 
@@ -2021,9 +2132,9 @@ function renderInsights(){
  var h="<div class='v3-hero'><div class='v3-eyebrow'>Training diagnostics</div><div class='v3-h1'>Audit your workload.</div><div class='v3-sub'>Exercise exposure, effort and review signals. Numbers below cover the most recently synced data window unless noted otherwise.</div></div>";
  h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+STATE.sessions+"</strong><span>Sessions in import</span></div><div class='v3-kpi'><strong>"+(STATE.avgRPE==null?'—':STATE.avgRPE.toFixed(1))+"</strong><span>Average RPE</span></div><div class='v3-kpi'><strong>"+STATE.warnings.length+"</strong><span>Review signals</span></div></div>";
  h+="<div class='v3-titlebar'><h3>Last 7 days</h3></div><div class='v3-rows'><div class='v3-row'><div class='v3-line'><strong>Training days</strong><span>"+recentDays.length+"</span></div><div class='v3-muted'>"+recentSets+" logged sets in available history</div></div></div>";
- h+="<div class='v3-titlebar'><h3>Muscle group volume</h3></div><div class='v3-rows'>"+keys.map(function(k){var n=vol[k];return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(k)+"</strong><span>"+n+" sets</span></div><div class='v3-track'><div class='v3-fill' style='width:"+Math.round(100*n/max)+"%'></div></div><div class='v3-meter-label'>Relative to the highest recorded group</div></div>";}).join('')+(keys.length?'':"<div class='v3-row v3-muted'>No volume data yet.</div>")+"</div>";
- h+="<div class='v3-titlebar'><h3>Signals to review</h3><span class='v3-muted'>"+STATE.warnings.length+" flags</span></div><div class='v3-rows'>"+(STATE.warnings.length?STATE.warnings.slice(0,8).map(function(w){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(humanizeSignalName(w.lift||w.flag||w.type||'Review'))+"</strong><span class='sig-arrow'>"+v4Icon('arrow')+"</span></div><div class='v3-muted'>"+v3Safe(w.msg||'Check this with your coach.')+"</div></div>";}).join(''):"<div class='v3-row v3-muted'>No current warning signals.</div>")+"</div>";
- h+="<div class='v3-titlebar'><h3>Interpretation</h3></div><div class='v3-rows v3-compact-list'>"+insights.slice(0,5).map(function(x){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(x.title)+"</strong></div><div class='v3-muted'>"+v3Safe(x.body)+"</div></div>";}).join('')+"</div>";
+ h+=uiFold('audit-volume','Muscle group volume','Full imported set distribution by classified muscle','<div class="v3-rows">'+keys.map(function(k){var n=vol[k];return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(k)+"</strong><span>"+n+" sets</span></div><div class='v3-track'><div class='v3-fill' style='width:"+Math.round(100*n/max)+"%'></div></div><div class='v3-meter-label'>Relative to the highest recorded group</div></div>";}).join('')+(keys.length?'':"<div class='v3-row v3-muted'>No volume data yet.</div>")+'</div>',false,keys.length+' groups');
+ h+=uiFold('audit-signals','Signals to review','Exercise-specific flags that may need context','<div class="v3-rows">'+(STATE.warnings.length?STATE.warnings.slice(0,8).map(function(w){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(humanizeSignalName(w.lift||w.flag||w.type||'Review'))+"</strong><span class='sig-arrow'>"+v4Icon('arrow')+"</span></div><div class='v3-muted'>"+v3Safe(w.msg||'Check this with your coach.')+"</div></div>";}).join(''):"<div class='v3-row v3-muted'>No current warning signals.</div>")+'</div>',STATE.warnings.length>0,STATE.warnings.length+' flags');
+ h+=uiFold('audit-interpretation','Interpretation details','How to read workload and effort signals','<div class="v3-rows v3-compact-list">'+insights.slice(0,5).map(function(x){return "<div class='v3-row'><div class='v3-line'><strong>"+v3Safe(x.title)+"</strong></div><div class='v3-muted'>"+v3Safe(x.body)+"</div></div>";}).join('')+'</div>',false,insights.slice(0,5).length+' notes');
  el.innerHTML=h;
 }
 
@@ -2060,7 +2171,7 @@ function renderImportTab() {
     summaryHtml = "<div class='cc' style='border-color:#30d15830;margin-top:10px'>" +
       "<div class='cl' style='color:var(--gr)'>Last import</div>" +
       "<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>" +
-        impStat("Date range",STATE.dateRange.start+" &rarr; "+STATE.dateRange.end) +
+        impStat("Date range",uiLongDateRange(STATE.dateRange.start,STATE.dateRange.end)) +
         impStat("Sessions",STATE.sessions+"") +
         impStat("Exercises",STATE.exercisesAnalyzed+"") +
         impStat("Improved",STATE.improved.length+"") +
@@ -2071,7 +2182,7 @@ function renderImportTab() {
     "</div>";
   }
   var syncAt = Number(localStorage.getItem("ti_hevy_synced_at")||0);
-  var syncInfo = syncAt ? "Last synced " + new Date(syncAt).toLocaleString() : "Not synced yet";
+  var syncInfo = syncAt ? "Last synced " + uiLongDateTime(syncAt) : "Not synced yet";
   el.innerHTML =
     "<div style='font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Hevy is the training log. Training Intelligence uses your saved Hevy workouts to provide coaching before, during, and after training.</div>" +
     "<div class='hevy-sync-card'>" +
@@ -2874,8 +2985,8 @@ function renderAICoach(){
  "<div class='ai-feedback'>Observed evidence comes from recent dated workout sets. Existing rule-based targets are marked as suggestions, not facts. Training plans are never changed automatically.</div>"+
  "<div class='ai-feedback'>Coach review is cached until your workout history or readiness flags change. Approvals expire when underlying data changes. Data reflects saved Hevy sessions, not unfinished workouts.</div>"+
  "<div class='ai-feedback'>AI analysis sends summarized workout metrics to Gemini. Free-tier Gemini use may allow Google to use submitted content to improve its products. No names or raw Hevy session details are included in this request. AI can be mistaken.</div></div>";
- if(STATE.imported){html+="<div class='cc'><div class='cl'>Discovered key movements</div><div class='v3-muted'>Your pinned and suggested exercises are included in the AI snapshot. Review them under Targets before approving any programming changes.</div>"+smartPinned().slice(0,8).map(function(x){return "<div class='v3-row'>"+v3Safe(shortName(x.name))+" · "+x.dates+" recorded training dates</div>";}).join('')+"</div>";}
- if(STATE.imported){html+="<div class='cc'><div class='cl'>Workout evidence sent to Gemini</div><div class='v3-muted'>Up to 6 recent best sets per priority exercise over 84 days. Open an exercise to inspect the supporting observations.</div>"+smartActivePriorityNames().slice(0,12).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join('')+"</div>";}
+ if(STATE.imported){html+=uiFold('coach-key-movements','Priority context','Your selected exercises included in coaching analysis',"<div class='v3-muted'>Review priorities under Targets before approving any programming changes.</div>"+smartPinned().slice(0,8).map(function(x){return "<div class='v3-row'>"+v3Safe(shortName(x.name))+" · "+x.dates+" recorded training dates</div>";}).join(''),false,smartPinned().length+' selected');}
+ if(STATE.imported){html+=uiFold('coach-evidence','Workout evidence sent to Gemini','Inspect dated best-set observations by exercise',"<div class='v3-muted'>Up to 6 recent best sets per priority exercise over 84 days.</div>"+smartActivePriorityNames().slice(0,12).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join(''),false,smartActivePriorityNames().length+' lifts');}
  if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
  if(_aiNotice)html+="<div class='cc' style='color:var(--gr)'>"+aiSafe(_aiNotice)+"</div>";
  if(_aiResult){html+="<div class='cc'><div class='cl'>Coach interpretation</div><div class='ai-result'>"+aiSafe(_aiResult.answer||_aiResult.summary)+"</div>";
@@ -3288,7 +3399,7 @@ document.addEventListener("DOMContentLoaded",function(){
   if (restored) {
     renderDashboard(); renderWhatChanged(); renderNextWeek(); renderMap(); renderInsights(); renderAudit(); renderImportTab(); renderAICoach(); renderSettings();
     var banner = document.getElementById("importBanner");
-    banner.innerHTML = v4Icon("check") + "Restored from last import &bull; " + (STATE.dateRange.end||"");
+    banner.innerHTML = v4Icon("check") + "Restored from last import &bull; " + uiLongDate(STATE.dateRange.end);
     banner.style.display = "flex";
   } else {
     renderDashboard();
