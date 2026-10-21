@@ -467,6 +467,15 @@ body[data-theme=light] .it.on{background:linear-gradient(180deg,#2f3944,#1f262e)
 
 /* V11: planning and settings continuity */
 .v11-card{padding:16px;border:1px solid #596575;border-radius:15px;background:linear-gradient(145deg,#222a34,#14191f);margin:12px 0}.v11-heading{font-weight:800;font-size:16px;margin:9px 0 10px}.v11-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:11px}.v11-stats span{padding:11px 8px;border-radius:10px;border:1px solid #3c4652;font-size:10px;color:#b8c4cf;line-height:1.4}.v11-stats strong{display:block;font-size:20px;color:#f2f5f8;margin-bottom:4px}.v11-label{display:block;color:var(--t2);font-size:11px;margin:11px 0 5px}.v11-input{width:100%;min-height:72px;resize:vertical;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:11px;font-size:14px;color:var(--tx)}.v11-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.v11-proposal{margin-top:12px;border:1px solid #5e6e7d;border-radius:12px;padding:12px}.v11-proposal p{font-size:11px;color:var(--t2);line-height:1.6;margin:8px 0}.settings-row input[type=number]{font-variant-numeric:tabular-nums}body[data-theme=light] .v11-card{background:#fff;border-color:#c8d1dc}body[data-theme=light] .v11-stats span{border-color:#d6dce3;color:#65707d}body[data-theme=light] .v11-stats strong{color:#19212b}
+
+/* V11.1 · Next workout recommendations */
+.next-workout-card{padding:14px 15px;border-bottom:1px solid var(--bd);background:linear-gradient(145deg,rgba(185,198,212,.08),transparent)}
+.next-workout-name{font:800 19px 'Manrope',sans-serif;letter-spacing:-.04em;margin:8px 0 6px;color:var(--tx)}
+.next-workout-reason{font-size:11px;line-height:1.65;color:var(--t2)}
+.next-workout-last,.next-workout-note{font-size:10px;line-height:1.5;color:var(--t2);margin-top:9px}
+.next-workout-label{display:block;color:var(--t2);font-size:11px;font-weight:700;margin:14px 0 6px}
+#nextWorkoutSelect{width:100%;border:1px solid var(--bd2);border-radius:10px;padding:12px 36px 12px 12px;background:var(--bg3);color:var(--tx);font-size:13px}
+body[data-theme=light] .next-workout-card{background:#f6f8fa}
 </style>
 </head>
 <body>
@@ -1047,14 +1056,70 @@ function runEngine() {
 // INTELLIGENCE RENDERERS
 // ═══════════════════════════════════════
 
-function suggestedSession() {
-  var h=(STATE.workoutTitles||[]).filter(function(x){return x&&x.name&&x.date;}).sort(function(a,b){return b.date.localeCompare(a.date);});
-  if(!h.length)return 'Select a session from your Hevy routine';
-  var groups={};h.slice(0,24).forEach(function(x){var name=x.name.trim();if(name)groups[name]=(groups[name]||0)+1;});
-  var frequent=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a];});
-  return frequent.length?'Recent Hevy routines: '+frequent.slice(0,3).join(' · '):'Select a session from your Hevy routine';
+// V11.1: infer a *likely* next routine from recorded Hevy rotation (not a calendar promise).
+var NEXT_WORKOUT_OVERRIDE='';
+function nextWorkoutCategory(name){
+ var t=String(name||'').toLowerCase();
+ if(/cardio|walk|hike|run|yoga|mobility|stretch|cycling|cycle|bike|treadmill|recovery/.test(t))return 'Conditioning / recovery';
+ if(/unilateral.*glute|glute.*unilateral/.test(t))return 'Unilateral glutes';
+ if(/glute|lower|leg|quad|ham|posterior|hip|booty/.test(t)){
+   if(/quad/.test(t))return 'Glutes & quads';
+   if(/ham|posterior/.test(t))return 'Glutes & hamstrings';
+   if(/unilateral/.test(t))return 'Unilateral glutes';
+   return 'Lower body';
+ }
+ if(/upper|push|pull|chest|back|shoulder|arms|arm/.test(t))return 'Upper body';
+ return '';
 }
-
+function nextWorkoutAnalysis(){
+ var titles=(STATE.workoutTitles||[]).filter(function(x){return x&&x.date&&x.name&&/^\d{4}-\d{2}-\d{2}$/.test(x.date);}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+ var typed=titles.map(function(x){return {name:x.name,date:x.date,group:nextWorkoutCategory(x.name)};}).filter(function(x){return x.group;});
+ var strength=typed.filter(function(x){return x.group!=='Conditioning / recovery';});
+ // Sample only recent history. Prefer distinct recent rotations, and do not treat two sessions on one date as multiple day gaps.
+ var recent=strength.slice(0,28),latest=recent[0];
+ if(!latest)return {name:'No routine detected',group:'',reason:'Import workout titles from Hevy to identify your usual rotation. Until then, choose a session manually.',options:[],latest:null,confidence:'No history'};
+ var groups={};recent.forEach(function(x){groups[x.group]=(groups[x.group]||0)+1;});
+ var unique=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a];});
+ var transitions={};for(var i=recent.length-1;i>0;i--){var from=recent[i].group,to=recent[i-1].group;if(from===to)continue;if(!transitions[from])transitions[from]={};transitions[from][to]=(transitions[from][to]||0)+1;}
+ var available=unique.filter(function(g){return g!==latest.group;});
+ // Fall back to known latest group when user consistently trains one routine.
+ if(!available.length)available=unique.slice();
+ var scores={};available.forEach(function(g){
+   var lastIndex=recent.findIndex(function(r){return r.group===g;});
+   var transition=(transitions[latest.group]||{})[g]||0;
+   var patternTotal=Object.values(transitions[latest.group]||{}).reduce(function(a,b){return a+b;},0);
+   var minutesBetween=(lastIndex>=0)?Math.max(0,(v3Date(latest.date)-v3Date(recent[lastIndex].date))/86400000):7;
+   var frequency=groups[g]||0;
+   scores[g]=((patternTotal?transition/patternTotal:0)*5)+(Math.min(minutesBetween,10)/10)*2+Math.min(frequency,8)/8;
+ });
+ var ranked=available.slice().sort(function(a,b){return scores[b]-scores[a]||a.localeCompare(b);});
+ var selected=ranked[0]||latest.group;
+ var candidates=recent.filter(function(x){return x.group===selected;});
+ var name=candidates[0]?candidates[0].name:selected;
+ var matches=transitions[latest.group]&&transitions[latest.group][selected]||0;
+ var total=Object.values(transitions[latest.group]||{}).reduce(function(a,b){return a+b;},0);
+ var reason='Your latest recorded strength workout was '+latest.name+' ('+latest.date+'). ';
+ if(matches>0)reason+='In your recent rotation, '+selected+' followed '+latest.group+' '+matches+' time'+(matches===1?'':'s')+' out of '+total+' observed transitions. ';
+ else reason+='This routine appears in your recent history and provides a change from the last recorded focus. ';
+ var m=v3ActiveCycle();if(m)reason+='Current block: '+m.label+' · '+m.name+'. Follow the block’s effort and volume targets. ';
+ var wanted=Math.min(7,Math.max(1,Number(USER_SETTINGS.sessionsPerWeek)||4));
+ reason+='Preference: '+wanted+' training days/week.';
+ if(USER_SETTINGS.limitations)reason+=' Review your saved training limitations before starting.';
+ var opts=unique.map(function(g){var x=recent.find(function(w){return w.group===g;});return {group:g,name:x?x.name:g};});
+ return {name:name,group:selected,reason:reason,latest:latest,options:opts,confidence:matches&&total>=2?'Rotation-informed':'History-based',scores:scores};
+}
+function nextWorkoutSelection(){var o=nextWorkoutAnalysis();if(NEXT_WORKOUT_OVERRIDE){var match=o.options.find(function(x){return x.name===NEXT_WORKOUT_OVERRIDE;});if(match)return {name:match.name,group:match.group,reason:'Manual override for this browser session. '+o.reason,manual:true,analysis:o};NEXT_WORKOUT_OVERRIDE='';}return {name:o.name,group:o.group,reason:o.reason,manual:false,analysis:o};}
+function suggestedSession(){return nextWorkoutSelection().name;}
+function nextWorkoutOverride(value){NEXT_WORKOUT_OVERRIDE=value||'';renderDashboard();renderNextSessionCoach();}
+function nextWorkoutCard(){
+ var pick=nextWorkoutSelection(),options=pick.analysis.options;
+ var h="<div class='next-workout-card'><div class='v4-eyebrow'>"+v4Icon('calendar')+" NEXT WORKOUT · "+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+"</div><div class='next-workout-name'>"+v3Safe(pick.name)+"</div><p class='next-workout-reason'>"+v3Safe(pick.reason)+"</p>";
+ if(pick.analysis.latest)h+="<div class='next-workout-last'>Last recorded · "+v3Safe(pick.analysis.latest.name)+" · "+v3Safe(pick.analysis.latest.date)+"</div>";
+ h+="<label class='next-workout-label' for='nextWorkoutSelect'>Choose a different session</label><select id='nextWorkoutSelect' onchange='nextWorkoutOverride(this.value)'><option value=''>Use recommendation</option>";
+ options.forEach(function(x){h+="<option value='"+v3Safe(x.name)+"'"+(pick.manual&&x.name===pick.name?' selected':'')+">"+v3Safe(x.name)+"</option>";});
+ h+="</select><div class='next-workout-note'>Based on recorded routines, not a confirmed workout calendar. This choice does not modify Hevy or your mesocycle.</div></div>";
+ return h;
+}
 // ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
 function renderNextSessionCoach() {
   var el = document.getElementById("nextSessionCoach");
@@ -1095,8 +1160,7 @@ function renderNextSessionCoach() {
   el.innerHTML = "<div class='coach-brief'>" +
     "<div class='coach-brief-hd'>"+v4Icon("spark")+" Next Session Coach</div>" +
     "<div style='padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04)'>" +
-      "<div style='font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px'>Suggested session</div>" +
-      "<div style='font-size:14px;font-weight:800;color:var(--or)'>"+suggestedSession()+"</div>" +
+      nextWorkoutCard() +
     "</div>" +
     "<div style='padding:10px 14px;font-size:11px;line-height:2;border-bottom:1px solid rgba(255,255,255,0.04)'>" +
       "<span style='color:var(--t3)'>Push:</span> "+nameRow(push,"var(--gr)")+"<br>" +
@@ -1153,8 +1217,8 @@ function renderDashboard() {
     // Coach note
     "<div class='dash-sec'>Today</div>" +
     dashCard("coach",v4Icon("barbell"),b.phase + " phase",note) +
-    "<div class='dash-sec'>Suggested session</div>" +
-    dashCard("suggest",v4Icon("calendar"),suggested,"Switch to Gym tab to build your session.");
+    "<div class='dash-sec'>Next workout</div>" +
+    dashCard("suggest",v4Icon("calendar"),suggested,nextWorkoutSelection().reason+" Open Train to review or override.");
 }
 
 // ── What Changed ──
