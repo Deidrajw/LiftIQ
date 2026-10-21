@@ -654,6 +654,41 @@ body[data-theme="light"]{
 .today-button:disabled{opacity:.55;cursor:wait}
 @media(max-width:360px){.today-mode{padding-left:12px;padding-right:12px}.today-panel{padding:14px}.today-actions{grid-template-columns:1fr}}
 
+
+/* V13 consistency audit: one layout for all next-session guidance statuses. */
+.nx-card.v13-guidance{--v13-space:16px;border:1px solid var(--bd2);border-left:3px solid var(--tone-edge,var(--bd2));border-radius:15px;background:var(--bg2);margin:0 0 12px;overflow:hidden;box-shadow:none;min-width:0}
+.nx-card.v13-guidance .nx-head{display:flex;gap:12px;align-items:center;padding:16px var(--v13-space);border-bottom:1px solid var(--bd)}
+.nx-card.v13-guidance .nx-name{margin:0;flex:1;min-width:0;font:800 15px/1.45 'Manrope',system-ui,sans-serif;letter-spacing:-.025em;color:var(--tx);overflow-wrap:anywhere}
+.nx-card.v13-guidance .nx-badge{padding:0;background:none;border:0;flex-shrink:0;max-width:54%}
+.nx-card.v13-guidance .state-chip{font-size:10px}
+.guidance-dated{display:flex;gap:4px 12px;flex-wrap:wrap;justify-content:space-between;padding:11px var(--v13-space);border-bottom:1px solid var(--bd);color:var(--t2);font-size:11px;line-height:1.6}
+.guidance-dated strong{color:var(--tx);font-weight:750}
+.guidance-dated>span{min-width:0;overflow-wrap:anywhere}
+.nx-card.v13-guidance .nx-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:15px var(--v13-space);border-bottom:1px solid var(--bd)}
+.nx-card.v13-guidance .nx-stat-l{color:var(--t2);font-size:10px;letter-spacing:.075em;margin-bottom:6px}
+.nx-card.v13-guidance .nx-stat-v{color:var(--tx);font-size:14px;line-height:1.5;overflow-wrap:anywhere;letter-spacing:-.015em}
+.nx-card.v13-guidance .nx-stats>div:last-child .nx-stat-v{font-size:19px;font-weight:800;letter-spacing:-.035em}
+.guidance-coaching{padding:14px var(--v13-space) 13px;border-bottom:1px solid var(--bd)}
+.guidance-reason{font-size:12px;line-height:1.65;color:var(--tx);margin:0;overflow-wrap:anywhere}
+.guidance-caution{display:flex;align-items:flex-start;gap:10px;color:var(--tone,var(--t2));font-size:11px;line-height:1.6;margin-top:12px}
+.guidance-caution svg{flex-shrink:0;width:16px;height:16px;margin-top:1px}
+.guidance-goal{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)}
+.guidance-goal .smart-goal{margin:0}
+.guidance-actions{padding:13px var(--v13-space) 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nx-card.v13-guidance .guidance-actions .smart-connected-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:9px 14px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin:0;line-height:1.5;max-width:100%}
+.nx-card.v13-guidance .guidance-actions .smart-connected-link:hover{border-color:var(--t2)}
+.nx-card.v13-guidance .guidance-actions .smart-connected-link:focus-visible{outline:2px solid var(--or);outline-offset:3px}
+.guidance-intro{color:var(--t2);font-size:12px;line-height:1.65;padding:2px 2px 6px;margin:0 0 12px}
+.guidance-intro strong{color:var(--tx)}
+/* Reuse consistent inset and focus styling across the other tabs. */
+.smart-card .smart-row,.v3-rows .v3-row{min-width:0}
+.ui-fold summary:focus-visible,.smart-discover summary:focus-visible,.history-launch:focus-visible,.smart-plan summary:focus-visible{outline:2px solid var(--or);outline-offset:3px}
+.ui-fold .ui-fold-body{min-width:0}
+.smart-card button,.ui-fold button{max-width:100%}
+.ai-proposal,.settings-card,.dash-card,.today-panel{min-width:0;overflow-wrap:anywhere}
+@media(max-width:430px){.guidance-dated{display:block}.guidance-dated>span{display:block}.nx-card.v13-guidance .nx-head{align-items:flex-start}.nx-card.v13-guidance .nx-stats{gap:10px}.nx-card.v13-guidance .nx-stats>div:last-child .nx-stat-v{font-size:18px}}
+@media(max-width:345px){.nx-card.v13-guidance .nx-head{flex-wrap:wrap}.nx-card.v13-guidance .nx-badge{max-width:100%}.nx-card.v13-guidance .nx-stats{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body class="today-active">
@@ -838,6 +873,7 @@ function v3Date(s){return new Date(s+'T12:00:00');}
 function uiLongDate(value){
  if(value===null||value===undefined||value==='')return '—';
  var d;
+ if(typeof value==='string'&&/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}$/.test(value.trim()))return value.trim()+' (year not recorded)';
  if(value instanceof Date)d=value;
  else if(typeof value==='number')d=new Date(value);
  else if(typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)){
@@ -1434,7 +1470,7 @@ function renderDashboard() {
     "<div class='dash-sec'>Today</div>" +
     dashCard("coach",v4Icon("barbell"),b.phase + " phase",note) +
     "<div class='dash-sec'>Next workout</div>" +
-    dashCard("suggest",v4Icon("calendar"),suggested,nextWorkoutSelection().reason+" Open Train to review or override.");
+    dashCard("suggest",v4Icon("calendar"),suggested,nextWorkoutSelection().reason+" Open Today to review or override.");
 }
 
 // ── What Changed ──
@@ -1498,7 +1534,7 @@ function setMovementFamily(name,family){var map=movementOverrides();map[normaliz
 function movementGroups(){var groups={};Object.keys(STATE.exerciseHistory||{}).forEach(function(name){var id=movementFamilyFor(name);if(!id||!(STATE.exerciseHistory[name]||[]).length)return;(groups[id]||(groups[id]=[])).push(name);});return groups;}
 function renderMovementPanel(){var groups=movementGroups();var ids=Object.keys(groups).sort(function(a,b){return groups[b].length-groups[a].length;});return '<section class="movement-panel"><div class="v3-eyebrow">Movement intelligence</div><div class="movement-title">Related exercises, connected</div><p class="movement-intro">LiftIQ recognizes related patterns without combining their weights or estimated one-rep maximums. Explore each variation or correct a family assignment.</p>'+(ids.length?ids.map(function(id){var g=MOVEMENT_FAMILIES[id];return '<button type="button" class="movement-family" data-family="'+id+'" onclick="openMovementFamily(this.dataset.family)"><span><strong>'+v3Safe(g.label)+'</strong><small>'+groups[id].length+' recorded variation'+(groups[id].length===1?'':'s')+'</small></span><span>'+v4Icon('arrow')+'</span></button>';}).join(''):'<p class="movement-empty">Sync complete Hevy history to identify exercise families.</p>')+'<details id="movementDetail" style="margin-top:13px"><summary class="v3-muted" style="cursor:pointer">Explore movement family details</summary><div style="margin-top:12px"><label class="v3-muted" for="movementSelectedFamily">Family</label><select id="movementSelectedFamily" class="movement-select" onchange="renderMovementDetail(this.value)">'+ids.map(function(id){return '<option value="'+id+'">'+v3Safe(MOVEMENT_FAMILIES[id].label)+'</option>';}).join('')+'</select><div id="movementDetailContent"></div></div></details></section>';}
 function openMovementFamily(id){var d=document.getElementById('movementDetail');if(!d)return;d.open=true;var select=document.getElementById('movementSelectedFamily');select.value=id;renderMovementDetail(id);d.scrollIntoView({behavior:'smooth',block:'nearest'});}
-function renderMovementDetail(id){var el=document.getElementById('movementDetailContent');if(!el)return;var groups=movementGroups(),members=groups[id]||[],family=MOVEMENT_FAMILIES[id];if(!family){el.textContent='No family selected.';return;}el.innerHTML='<p class="movement-intro">'+v3Safe(family.description)+'</p><div class="v3-muted">'+members.length+' recorded variations · Exercise-specific charts remain separate</div>'+members.map(function(name){var entries=historyEntries(name),last=entries[entries.length-1];return '<div class="movement-member"><div><strong>'+v3Safe(name)+'</strong><small>'+entries.length+' dated best sets'+(last?' · Latest '+historyDate(last.date):'')+'</small><label class="v3-muted" for="family'+v3Safe(name.replace(/[^a-z0-9]/gi,''))+'">Reclassify</label><select class="movement-select" data-exercise="'+v3Safe(name)+'" onchange="setMovementFamily(this.dataset.exercise,this.value)">'+Object.keys(MOVEMENT_FAMILIES).map(function(key){return '<option value="'+key+'"'+(key===id?' selected':'')+'>'+v3Safe(MOVEMENT_FAMILIES[key].label)+'</option>';}).join('')+'<option value="">No family</option></select></div><button type="button" data-history="'+v3Safe(name)+'" onclick="openExerciseHistory(this.dataset.history)">View chart</button></div>';}).join('');}
+function renderMovementDetail(id){var el=document.getElementById('movementDetailContent');if(!el)return;var groups=movementGroups(),members=groups[id]||[],family=MOVEMENT_FAMILIES[id];if(!family){el.textContent='No family selected.';return;}el.innerHTML='<p class="movement-intro">'+v3Safe(family.description)+'</p><div class="v3-muted">'+members.length+' recorded variations · Exercise-specific charts remain separate</div>'+members.map(function(name){var entries=historyEntries(name),last=entries[entries.length-1];return '<div class="movement-member"><div><strong>'+v3Safe(name)+'</strong><small>'+entries.length+' dated best sets'+(last?' · Latest '+historyDate(last.date):'')+'</small><label class="v3-muted" for="family'+v3Safe(name.replace(/[^a-z0-9]/gi,''))+'">Reclassify</label><select class="movement-select" data-exercise="'+v3Safe(name)+'" onchange="setMovementFamily(this.dataset.exercise,this.value)">'+Object.keys(MOVEMENT_FAMILIES).map(function(key){return '<option value="'+key+'"'+(key===id?' selected':'')+'>'+v3Safe(MOVEMENT_FAMILIES[key].label)+'</option>';}).join('')+'<option value="">No family</option></select></div><button type="button" data-history="'+v3Safe(name)+'" onclick="openExerciseHistory(this.dataset.history)">View progression</button></div>';}).join('');}
 
 var selectedHistoryExercise='';
 function historyEntries(name){
@@ -1509,7 +1545,7 @@ function historyEntries(name){
 }
 function historyDate(s){return uiLongDate(s);}
 function historyLibrary(){var all=Object.keys(STATE.exerciseHistory||{}).filter(function(k){return (STATE.exerciseHistory[k]||[]).length;}).sort();return all;}
-function renderHistoryLibrary(){var list=historyLibrary();return "<details style='margin:14px 0'><summary class='v3-titlebar' style='cursor:pointer'><h3>Browse all exercise histories</h3><span class='v3-muted'>"+list.length+" movements · Expand</span></summary><div class='v3-muted'>Open any movement to view its full recorded progression, even if it has no workouts in the last 84 days.</div><div class='history-library'>"+list.map(function(name){return "<button type='button' data-history='"+v3Safe(name)+"' onclick='openExerciseHistory(this.dataset.history)'>"+v3Safe(shortName(name))+"<small>"+historyEntries(name).length+" training dates · View chart →</small></button>";}).join('')+"</div></details>";}
+function renderHistoryLibrary(){var list=historyLibrary();return "<details style='margin:14px 0'><summary class='v3-titlebar' style='cursor:pointer'><h3>Browse all exercise histories</h3><span class='v3-muted'>"+list.length+" movements · Expand</span></summary><div class='v3-muted'>Open any movement to view its full recorded progression, even if it has no workouts in the last 84 days.</div><div class='history-library'>"+list.map(function(name){return "<button type='button' data-history='"+v3Safe(name)+"' onclick='openExerciseHistory(this.dataset.history)'>"+v3Safe(shortName(name))+"<small>"+historyEntries(name).length+" training dates · View progression →</small></button>";}).join('')+"</div></details>";}
 function openExerciseHistory(name){selectedHistoryExercise=normalizeExerciseName(name);var m=document.getElementById('exerciseHistoryModal');if(!m)return;document.getElementById('historyName').textContent=shortName(selectedHistoryExercise);document.getElementById('historyRange').value='all';document.getElementById('historyMetric').value='e1rmLb';m.classList.add('open');m.setAttribute('aria-hidden','false');renderExerciseHistoryDetail();}
 function closeExerciseHistory(){var m=document.getElementById('exerciseHistoryModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}}
 function selectHistoryPoint(index){var rows=window._visibleHistory||[],row=rows[index],el=document.getElementById('historySelected');if(!row||!el)return;el.textContent=historyDate(row.date)+' · '+row.weightLb+' lb × '+row.reps+' reps · Estimated 1RM '+Math.round(row.e1rmLb)+' lb'+(Number.isFinite(row.rpe)&&row.rpe>0?' · RPE '+row.rpe:'');}
@@ -1638,6 +1674,7 @@ function smartPlanSummary(){var selected=smartPinned();return '<details class="s
 // V12.7: presentation-only status mapping; no prescription or analytics changes.
 function v127Tone(action){
  var name=String(action||'baseline').toLowerCase();
+ if(name==='substitute')return 'injury';
  return ['stall','building','increase','hold','injury','reduce','tracked','pinned','baseline'].indexOf(name)>=0?name:'baseline';
 }
 function v127Label(action,label){
@@ -1689,7 +1726,7 @@ function v3ProgressTop(){
  function trendRow(n){
   var t=v10TrendAssessment(n,84),full=historyEntries(n),status=t.status;
   if(!t.rows.length&&full.length)status='Older history available';
-  return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status state-chip state-tone--"+v127TrendTone(status)+"'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View all-time chart →</span></button></div>";
+  return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status state-chip state-tone--"+v127TrendTone(status)+"'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View progression →</span></button></div>";
  }
  h+='<div class="v3-rows ui-small-rows">'+trendNames.slice(0,3).map(trendRow).join('')+'</div>';
  if(trendNames.length>3)h+=uiFold('progress-more-trends','More priority-lift trends','Additional lifts with clickable all-time charts','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' lifts');
@@ -1797,50 +1834,41 @@ function renderWhatChanged() {
 }
 
 
+// V13: One semantic card component for prescribed, tracked, and pinned lifts.
+// No guessed numerical target is introduced for movements lacking an approved prescription.
+function v13GuidanceCard(lk){
+ var rec=STATE.recommendations[lk]||null;
+ var priority=smartPriorityStatus(lk),goal=smartGoalState(lk);
+ var trend=v10TrendAssessment(lk,84),history=historyEntries(lk),last=history.length?history[history.length-1]:null;
+ var tone=v127Tone(rec?rec.action:priority),tag=v127StatusChip(tone,rec?rec.badge:null);
+ var when=last?uiLongDate(last.date):'No dated weighted sets';
+ var lastSet=last?Number(last.weightLb).toLocaleString('en-US',{maximumFractionDigits:1})+' lb × '+last.reps+(last.rpe!=null?' · RPE '+last.rpe:''):
+   (rec&&rec.lastW?rec.lastW+' lb × '+rec.lastR+(rec.lastRPE?' · RPE '+rec.lastRPE:''):'Not recorded');
+ var metricLabel=rec?'Next target':goal?'Approved goal':'Tracking mode';
+ var metricValue=rec&&Number.isFinite(Number(rec.target))?Number(rec.target).toLocaleString('en-US',{maximumFractionDigits:1})+' lb':
+   goal?goal.target+(goal.metric==='reps'?' reps':' lb'):'Monitor';
+ var explanation=rec?rec.reason:goal?'Working toward your saved goal. Review comparable sets before changing it.':
+   (priority==='tracked'?'No numerical goal saved. Set an editable goal in Active priorities.':'Pinned for monitoring. No numerical load prescription.');
+ var evidence=(trend.rows&&trend.rows.length>=2)?trend.rows.length+' comparable training dates in the last 84 days':
+   last?(history.length+' recorded training date'+(history.length===1?'':'s')+' all time'):'No qualified history available';
+ var caution=rec&&rec.caution?'<div class="guidance-caution" role="note">'+v4Icon('alert')+'<span>'+v3Safe(rec.caution)+'</span></div>':'';
+ return '<article class="nx-card v13-guidance state-tone--'+tone+'" aria-label="Guidance for '+v3Safe(shortName(lk))+'">'+
+  '<div class="nx-head"><h3 class="nx-name">'+v3Safe(shortName(lk))+'</h3><div class="nx-badge">'+tag+'</div></div>'+
+  '<div class="guidance-dated"><span>Last recorded <strong>'+v3Safe(when)+'</strong></span><span>'+v3Safe(evidence)+'</span></div>'+
+  '<div class="nx-stats">'+nxStat('Last top set',v3Safe(lastSet))+nxStat(metricLabel,v3Safe(metricValue))+'</div>'+
+  '<div class="guidance-coaching"><p class="guidance-reason">'+v3Safe(explanation)+'</p>'+caution+
+   (goal?'<div class="guidance-goal">'+smartGoalProgress(lk)+'</div>':'')+'</div>'+
+  '<div class="guidance-actions"><button class="smart-connected-link" type="button" data-history="'+v3Safe(lk)+'" onclick="openExerciseHistory(this.dataset.history)">View progression <span aria-hidden="true">→</span></button></div>'+
+  '</article>';
+}
 function renderNextWeek() {
-  var el = document.getElementById("t-next");
-  if (!el) return;
-  if (!STATE.imported) {
-    el.innerHTML = emptyState("Import Hevy CSV to generate next-week prescriptions.",""); return;
-  }
-  var aC = {increase:"var(--gr)",hold:"var(--bl)",reduce:"var(--re)",
-             stall:"var(--am)",injury:"var(--re)",building:"var(--t2)"};
-  var aBg = {increase:"#30d15812",hold:"#0a84ff10",reduce:"#ff453a10",
-              stall:"#ffd60a10",injury:"#ff453a10",building:"#ffffff06"};
-  var html = "<div class='v127-goal-note'>Based on completed workouts through "+uiLongDate(STATE.dateRange.end)+". Not a confirmed workout schedule.</div>";
-
-  smartActivePriorityNames().forEach(function(lk) {
-    var rec = STATE.recommendations[lk];
-    if(!rec){
-      var review=smartPriorityEvidence(lk,84),g=smartGoalState(lk);
-      var st=v127Tone(smartPriorityStatus(lk));
-      html+='<div class="nx-card v127-guidance state-tone--'+st+'"><div class="nx-head"><div class="nx-name">'+v3Safe(shortName(lk))+'</div><span class="nx-badge">'+v127StatusChip(st)+'</span></div>'+
-       '<div class="nx-reason">'+v3Safe(review.observation)+'</div>'+
-       '<div class="v127-guidance-body">'+(g?smartGoalProgress(lk):'<p class="v127-guidance-note">'+(st==='tracked'?'Tracking activity · No measurable goal saved yet. Set one in Active priorities.':'Pinned for monitoring · No numerical load prescription.')+'</p>')+
-       '<button class="smart-connected-link" type="button" data-history="'+v3Safe(lk)+'" onclick="openExerciseHistory(this.dataset.history)">View progression →</button></div></div>';
-      return;
-    }
-    var col = aC[rec.action]||"var(--t2)";
-    var bg  = aBg[rec.action]||"var(--bg3)";
-    var tone=v127Tone(rec.action);
-    var name = shortName(lk);
-    html += "<div class='nx-card v127-guidance state-tone--"+tone+"'>" +
-      "<div class='nx-head'>" +
-        "<div class='nx-name'>"+name+"</div>" +
-        "<span class='nx-badge'>"+v127StatusChip(tone,rec.badge)+"</span>" +
-      "</div>" +
-      "<div class='nx-stats'>" +
-        nxStat("Last top set", rec.lastW ? rec.lastW+" lbs &times;"+rec.lastR+(rec.lastRPE?" @RPE"+rec.lastRPE:"") : "—") +
-        nxStat("Next target","<span>"+rec.target+" lb</span>") +
-      "</div>" +
-      "<div class='nx-reason'>"+v3Safe(rec.reason)+"</div>" +
-      (rec.caution?"<div class='nx-caution'>"+v4Icon("alert")+" "+rec.caution+"</div>":"") +
-    "</div>";
-  });
-
-  // Volume diagnostics live in the Audit screen, not after the lift targets.
-
-  el.innerHTML = smartTargetsPanel()+uiFold("targets-prescriptions","Next-session guidance","Prescriptions, monitoring and dated workout evidence",html,false,smartActivePriorityNames().length+" lifts")+smartTargetsExtras();
+ var el=document.getElementById('t-next');
+ if(!el)return;
+ if(!STATE.imported){el.innerHTML=emptyState('Import Hevy workouts to generate next-session guidance.','');return;}
+ var names=smartActivePriorityNames();
+ var content='<p class="guidance-intro">Based on completed workouts through <strong>'+v3Safe(uiLongDate(STATE.dateRange.end))+'</strong>. Not a confirmed workout schedule.</p>'+
+   (names.length?names.map(v13GuidanceCard).join(''):'<p class="v3-muted">Choose a priority in Targets to start monitoring it.</p>');
+ el.innerHTML=smartTargetsPanel()+uiFold('targets-prescriptions','Next-session guidance','Performance, monitoring and dated workout evidence',content,false,names.length+' lifts')+smartTargetsExtras();
 }
 
 // ── Training Map ──
@@ -2304,7 +2332,7 @@ function renderImportTab() {
   var syncAt = Number(localStorage.getItem("ti_hevy_synced_at")||0);
   var syncInfo = syncAt ? "Last synced " + uiLongDateTime(syncAt) : "Not synced yet";
   el.innerHTML =
-    "<div style='font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Hevy is the training log. Training Intelligence uses your saved Hevy workouts to provide coaching before, during, and after training.</div>" +
+    "<div style='font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6'>Hevy is the training log. LiftIQ uses your saved Hevy workouts to provide coaching before, during, and after training.</div>" +
     "<div class='hevy-sync-card'>" +
       "<div class='cl' style='color:var(--gr)'>Hevy Pro — API Sync</div>" +
       "<div style='font-size:11px;color:var(--t2);line-height:1.6'>Sign in with your approved Google account to sync completed Hevy workouts. Your Hevy API key stays securely on Netlify. Unfinished Hevy sets are not available through the API.</div>" +
@@ -2652,12 +2680,12 @@ function parseHevy(text, options) {
       "  Skipped (no reps):     " + diag.skippedMissingReps + "\n\n" +
       "Try: All time range, or check your CSV export settings.";
     var banner = document.getElementById("importBanner");
-    banner.innerHTML = "&#8212; Import failed — " + diag.totalRows + " rows read, 0 matched. Check Import tab for details.";
+    banner.innerHTML = "&#8212; Import failed — " + diag.totalRows + " rows read, 0 matched. Check Sync for details.";
     banner.style.background = "#ff453a14";
     banner.style.borderBottomColor = "#ff453a30";
     banner.style.color = "var(--re)";
     banner.style.display = "flex";
-    // Store diagnostics for Import tab to display
+    // Store diagnostics for Sync tab to display
     window._lastDiag = diag;
     renderImportTab();
     alert(diagMsg);
@@ -2665,10 +2693,9 @@ function parseHevy(text, options) {
   }
 
   window._lastDiag = null; // clear diagnostics on success
-  var mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  function fd(s) { var p=s.split("-"); return mo[parseInt(p[1])-1]+" "+parseInt(p[2]); }
+  // Store canonical YYYY-MM-DD range values: display formatting is handled by uiLongDate.
   populateState(byEx, rawRPEs, distinctWorkouts.size,
-    {start: minDate ? fd(minDate) : "\u2014", end: maxDate ? fd(maxDate) : "\u2014"}, byDate);
+    {start: minDate || null, end: maxDate || null}, byDate);
   // Session count reports all saved workouts; lifting calculations still exclude nonweighted sets.
   STATE.workoutTitles=Object.values(routineMap).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,120);STATE.recordMetrics={sessions:distinctWorkouts.size, strengthSets:qualifiedSets,
     rpeRecorded:rawRPEs.length, rpeEligible:rpeEligible, daysWithWorkouts:Object.keys(sessionDates).length,
@@ -3187,7 +3214,7 @@ function renderAICoach(){
  loadCachedAIReview();
  var cached=Object.prototype.hasOwnProperty.call(_aiReviewCache,trainingFingerprint());
  var html="<div class='cc'><div class='cl'>Adaptive Coach · Evidence-led</div>"+
- "<div class='ai-result'>Uses your imported Hevy performance summary and existing LiftIQ calculations. AI suggestions are optional. No changes reach Hevy. Sign in with Google in the Import tab first.</div>"+
+ "<div class='ai-result'>Uses your imported Hevy performance summary and existing LiftIQ calculations. AI suggestions are optional. No changes reach Hevy. Sign in with Google in the Sync tab first.</div>"+
  "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':(cached?'Refresh AI review':'Analyze my training'))+"</button></div>"+
  "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='Ask about stalls, volume, or progression…'>"+aiSafe(_aiQuestion)+"</textarea>"+
  "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(\"question\")' "+(_aiBusy?'disabled':'')+">Ask LiftIQ</button></div>"+
@@ -3216,7 +3243,7 @@ async function askAI(mode){
  if(_aiBusy)return;
  var textarea=document.getElementById('aiQuestion');if(textarea)_aiQuestion=textarea.value.slice(0,350);
  _aiError='';_aiNotice='';
- if(!_googleIdToken){_aiError='Please sign in with Google under Intelligence → Import first.';renderAICoach();return;}
+ if(!_googleIdToken){_aiError='Please sign in with Google under Intelligence → Sync first.';renderAICoach();return;}
  if(!STATE.imported){_aiError='Sync or import your Hevy workouts first.';renderAICoach();return;}
  if(mode==='question'&&!_aiQuestion.trim()){_aiError='Enter your question first.';renderAICoach();return;}
  var fp=trainingFingerprint();
@@ -3597,6 +3624,15 @@ function restoreState() {
     STATE.workoutTitles = saved.workoutTitles || [];
     STATE.sessions = saved.sessions || 0; STATE.recordMetrics=saved.recordMetrics||null;
     STATE.dateRange = saved.dateRange || {start:null,end:null};
+    // V13 migration: previous versions stored `Oct 19` without a year.
+    // Reconstruct the complete ISO range from the actual recorded dates, never infer a year.
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(STATE.dateRange.end||''))){
+      var dateKeys=Object.keys(STATE.dailyLog||{}).filter(function(k){return /^\d{4}-\d{2}-\d{2}$/.test(k);});
+      if(!dateKeys.length)Object.values(STATE.exerciseHistory||{}).forEach(function(a){(a||[]).forEach(function(x){if(x.date&&/^\d{4}-\d{2}-\d{2}$/.test(x.date))dateKeys.push(x.date);});});
+      dateKeys.sort();
+      STATE.dateRange={start:dateKeys[0]||null,end:dateKeys[dateKeys.length-1]||null};
+    }
+
     STATE.exercisesAnalyzed = saved.exercisesAnalyzed || 0;
     STATE.avgRPE = saved.avgRPE || null;
     STATE.imported = saved.imported || false;
