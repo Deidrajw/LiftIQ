@@ -828,7 +828,7 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 @media(max-width:375px){.obs-wordmark{font-size:19px}.obs-subbrand{font-size:7px}.obs-edition{display:none}.ux-primary-nav{gap:0}.ux-dest{font-size:10px}.ux-utility-btn{padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-</style>
+.li-panel,.li-searchbox{background:var(--bg2,#1a2129);color:var(--tx,#eaf1f7);border:1px solid #495666;border-radius:14px;padding:15px;margin:14px 0}.li-panel button,.li-searchbox button{min-height:44px;border-radius:9px;border:1px solid #566679;background:#283544;color:#eaf1f7;padding:10px;margin:4px}.li-panel input,.li-panel select,.li-panel textarea,.li-searchbox input{width:100%;padding:11px;box-sizing:border-box;min-height:44px;font-size:16px;background:#111923;border:1px solid #526273;border-radius:9px;color:#fff}.li-panel label{display:block;margin-top:10px;font-size:13px}.li-entry{border-top:1px solid #394957;padding:12px 0}.li-search{position:fixed;z-index:9900;inset:0;background:#05080cde;overflow:auto;padding:20px 12px;display:none}.li-search.open{display:block}.li-searchbox{max-width:600px;margin:0 auto}</style>
 </head>
 <body class="today-active">
 <input type="file" id="csvIn" accept=".csv" style="display:none" onchange="onFileSelect(event)">
@@ -836,7 +836,7 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 <header class="obs-header">
   <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
   <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 04</span></div>
-  <div class="ux-utility-actions">
+  <div class="ux-utility-actions"><button type="button" class="ux-utility-btn" onclick="liOpenSearch()">Search</button>
   <button type="button" class="ux-utility-btn" onclick="uiNavigate('sync')" aria-label="Sync workouts" title="Sync workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v-4l-4 4h4a8 8 0 0 0-14 2M4 17v4l4-4H4a8 8 0 0 0 14-2"/></svg><span>Sync</span></button>
   <button type="button" class="ux-utility-btn" onclick="uiNavigate('settings')" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></svg><span>Settings</span></button>
 </div>
@@ -854,7 +854,7 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
     <div class="v3-titlebar"><h3>Dated best sets</h3><span class="v3-muted">Tap chart points for details</span></div><div id="historyRows" class="history-rows"></div>
   </div>
 </div>
-<!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
+<div class="li-search" id="liSearch" role="dialog" aria-label="Exercise search"><div class="li-searchbox"><h3>Exercise search</h3><button onclick="liCloseSearch()">Close</button><input id="liQuery" type="search" aria-label="Exercise name" placeholder="Reverse lunge…" oninput="liRenderSearch()"><div id="liResults"></div></div></div><!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
 <div id="gym" class="today-mode">
   <div class="today-intro"><span class="obs-eyebrow">YOUR TRAINING COMPANION</span><h2>Today, in focus.</h2><p>Prepare here. Log your workout in Hevy. Come back for a data-backed review.</p></div>
   <div class="coach-card" id="coachCard"></div>
@@ -1561,7 +1561,8 @@ function renderNextSessionCoach(){
    html+='</select></div><p class="today-disclaimer">Suggested from completed Hevy sessions, not a confirmed calendar. Choosing a routine here never changes Hevy or your training plan.</p></section>';
    html+='<section class="today-panel"><div class="today-panel-heading"><div><div class="today-kicker">EXERCISE FOCUS</div><h3>What to review</h3></div><button class="today-link" onclick="todayOpenTargets()" type="button">All targets →</button></div>'+todayFocusHTML(pick)+'</section>';
  }
- html+='<section class="today-panel today-after"><div class="today-panel-heading"><div><div class="today-kicker">AFTER YOUR WORKOUT</div><h3>Review what changed</h3></div><span class="today-small-chip">HEVY IS YOUR LOG</span></div>';
+ html+=liJournalHTML();
+  html+='<section class="today-panel today-after"><div class="today-panel-heading"><div><div class="today-kicker">AFTER YOUR WORKOUT</div><h3>Review what changed</h3></div><span class="today-small-chip">HEVY IS YOUR LOG</span></div>';
  html+='<p class="today-muted">Finish and save your workout in Hevy, then sync your completed sessions to refresh LiftIQ’s Progress, Targets and Coach.</p>';
  if(latest)html+='<div class="today-last"><span>Latest saved activity</span><strong>'+v3Safe(latest.name)+'</strong><span>'+v3Safe(uiLongDate(latest.date))+'</span></div>';
  html+='<div class="today-actions"><a class="today-button today-secondary" href="https://hevy.com/" target="_blank" rel="noopener noreferrer">Hevy website ↗</a><button class="today-button today-primary" type="button" onclick="todayReviewAfterWorkout()"'+(_hevySyncBusy?' disabled':'')+'>'+(_hevySyncBusy?'Syncing…':_googleIdToken?'Sync completed workouts':'Sign in & sync →')+'</button></div>';
@@ -3926,6 +3927,24 @@ document.addEventListener("DOMContentLoaded",function(){
 
 
 
+
+
+var LI_KEY='liftiq_training_context_v142',LI={active:null,history:[]};try{var j=JSON.parse(localStorage.getItem(LI_KEY)||'null');if(j){LI.active=j.active||null;LI.history=j.history||[]}}catch(e){}
+function liSave(){localStorage.setItem(LI_KEY,JSON.stringify(LI))}
+function liEsc(x){return v3Safe(String(x==null?'':x))}
+function liStart(){var r=STATE.imported?nextWorkoutSelection():null;LI.active={id:'s'+Date.now(),name:r?r.name:'Training session',at:new Date().toISOString(),events:[]};liSave();renderNextSessionCoach()}
+function liFinish(){if(!confirm('Finish the journal? Save your workout in Hevy separately.'))return;LI.active.ended=new Date().toISOString();LI.history.unshift(LI.active);LI.history=LI.history.slice(0,30);LI.active=null;liSave();renderNextSessionCoach()}
+function liAdd(){var note=document.getElementById('liNote').value.trim();if(!note)return;LI.active.events.push({id:'e'+Date.now(),type:document.getElementById('liType').value,ex:document.getElementById('liEx').value.trim().slice(0,100),note:note.slice(0,1000),at:new Date().toISOString()});liSave();renderNextSessionCoach()}
+function liEdit(id){var x=LI.active?.events.find(e=>e.id===id);if(!x)return;var v=prompt('Edit note',x.note);if(v&&v.trim()){x.note=v.trim().slice(0,1000);liSave();renderNextSessionCoach()}}
+function liDelete(id){if(!confirm('Delete this note?'))return;LI.active.events=LI.active.events.filter(x=>x.id!==id);liSave();renderNextSessionCoach()}
+function liDeleteSession(id){if(!confirm('Delete this finished journal?'))return;LI.history=LI.history.filter(x=>x.id!==id);liSave();renderNextSessionCoach()}
+function liCoach(id,old){var a=old?LI.history.find(x=>x.id===id):LI.active;if(!a?.events?.length)return;if(!confirm('Prepare a Gemini question containing these notes? You will review it before submission.'))return;_aiQuestion=('During '+a.name+' I observed: '+a.events.slice(-3).map(x=>(x.ex?x.ex+': ':'')+x.note).join(' | ')+'. Using my completed training history, what cautious adjustments might be appropriate? Do not diagnose pain.').slice(0,350);uiNavigate('coach');renderAICoach();var e=document.getElementById('aiQuestion');if(e){e.value=_aiQuestion;e.focus()}}
+function liJournalHTML(){var a=LI.active,h='<section class="li-panel"><h3>Training Mode</h3>';if(!a)h+='<p>Keep tracking sets in Hevy. Log why you change, swap, or stop an exercise.</p><button onclick="liStart()">▶ I’m currently training</button><p>Saved only in this browser · Never shared with Gemini automatically.</p>';else{h+='<strong>'+liEsc(a.name)+'</strong><p>Active journal · '+new Date(a.at).toLocaleString()+'</p><label>What happened?</label><select id="liType"><option value="pain">Pain or discomfort</option><option value="swap">Exercise substitution</option><option value="load">Weight adjustment</option><option value="fatigue">Fatigue</option><option value="equipment">Equipment unavailable</option><option value="other">Other</option></select><label>Exercise</label><input id="liEx" maxlength="100" placeholder="RDL"><label>Reason or observation</label><textarea id="liNote" rows="3" maxlength="1000"></textarea><button onclick="liAdd()">Save note</button><button onclick="liFinish()">Finish journal</button><p>Stop and assess painful exercises. This is not medical advice or a diagnosis.</p>';a.events.slice().reverse().forEach(function(e){h+='<div class="li-entry"><strong>'+liEsc(e.ex||e.type)+'</strong><p>'+liEsc(e.type)+' · '+new Date(e.at).toLocaleString()+'</p><p>'+liEsc(e.note)+'</p><button onclick="liEdit(\''+e.id+'\')">Edit</button><button onclick="liDelete(\''+e.id+'\')">Delete</button></div>'});if(a.events.length)h+='<button onclick="liCoach(\''+a.id+'\',false)">Ask Gemini about these notes</button>'}h+='</section>';if(LI.history.length){h+='<details class="li-panel"><summary>Finished journals ('+LI.history.length+')</summary>';LI.history.slice(0,12).forEach(function(a){h+='<div class="li-entry"><strong>'+liEsc(a.name)+'</strong>';a.events.forEach(e=>h+='<p>'+liEsc(e.ex)+' · '+liEsc(e.note)+'</p>');h+='<button onclick="liCoach(\''+a.id+'\',true)">Ask Gemini with notes</button><button onclick="liDeleteSession(\''+a.id+'\')">Delete journal</button></div>'});h+='</details>'}return h}
+function liOpenSearch(){document.getElementById('liSearch').classList.add('open');document.getElementById('liQuery').focus();liRenderSearch()}
+function liCloseSearch(){document.getElementById('liSearch').classList.remove('open')}
+function liRenderSearch(){var words=document.getElementById('liQuery').value.toLowerCase().split(/\s+/).filter(Boolean),all=[...new Set([...Object.keys(STATE.exerciseHistory||{}),...Object.keys(STATE.lifts||{})])],names=all.filter(x=>words.every(w=>x.toLowerCase().includes(w))).slice(0,15),h=document.getElementById('liResults');if(!words.length){h.textContent='Search '+all.length+' exercises from your imported Hevy history.';return}if(!names.length){h.textContent='No matches. Try a broader exercise name.';return}h.innerHTML=names.map(function(n,i){var x=historyEntries(n),last=x.at(-1);return '<div class="li-entry"><strong>'+liEsc(n)+'</strong><p>'+(last?'Latest: '+Math.round(last.weightLb*10)/10+' lb × '+last.reps+' · '+liEsc(uiLongDate(last.date)):'No comparable weighted sets')+' · '+x.length+' dates</p><button data-chart="'+i+'">View progression</button><button data-ask="'+i+'">Ask about increasing weight</button></div>'}).join('');h.querySelectorAll('[data-chart]').forEach(b=>b.onclick=()=>{var n=names[+b.dataset.chart];liCloseSearch();openExerciseHistory(n)});h.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>liAskLoad(names[+b.dataset.ask]))}
+function liAskLoad(n){var e=historyEntries(n).slice(-4).map(x=>uiLongDate(x.date)+': '+Math.round(x.weightLb*10)/10+' lb × '+x.reps+(x.rpe!=null?' RPE '+x.rpe:'')).join('; ');_aiQuestion=('Should I increase weight for '+n+'? My completed Hevy sets: '+(e||'No recent comparable sets')+'. Consider technique, RPE, reps, readiness and current set performance.').slice(0,350);liCloseSearch();uiNavigate('coach');renderAICoach();var q=document.getElementById('aiQuestion');if(q){q.value=_aiQuestion;q.focus()}}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('liSearch')?.classList.contains('open'))liCloseSearch()});
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
