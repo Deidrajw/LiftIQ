@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>LiftIQ · Obsidian</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LiftIQ · Obsidian V14</title>
 <meta name="theme-color" content="#0a0b0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -760,6 +760,74 @@ body[data-theme="light"]{
 .v132-bench-card button:focus-visible,.v132-more>summary:focus-visible{outline:2px solid var(--or);outline-offset:3px;border-radius:3px}
 @media(max-width:370px){.v132-bench-card{padding:11px}.v132-bar-row{gap:6px;grid-template-columns:34px minmax(0,1fr) 48px}}
 
+
+/* V14 · Navigation, clarity, accessibility and responsive layouts */
+:root{--ux-subtle:#aebbc9;--ux-muted:#9daab7;--t2:#b1bdca;--t3:#9baaba}
+body[data-theme="light"]{--ux-subtle:#505f6d;--ux-muted:#596a78;--t2:#536170;--t3:#586775}
+.cl,.dash-sec,.settings-head,.v3-eyebrow,.v4-eyebrow,.obs-eyebrow{font-size:11px;letter-spacing:.075em}
+.guidance-reason,.guidance-dated,.guidance-coaching,.nx-reason{line-height:1.55}
+body{padding-bottom:calc(100px + env(safe-area-inset-bottom));max-width:100%;overflow-x:hidden}
+.obs-header{position:sticky;top:0;z-index:88;height:auto;min-height:65px;padding:calc(12px + env(safe-area-inset-top)) 16px 10px;max-width:1100px;margin:auto;background:var(--bg)}
+.obs-edition{font-size:11px}
+.obs-edition{display:none}
+.ux-utility-actions{position:static!important;display:flex;flex-shrink:0;gap:6px}
+.obs-headline{display:none!important}
+.ux-utility-actions{position:absolute;top:calc(13px + env(safe-area-inset-top));right:max(16px,calc((100vw - 1060px)/2));z-index:94;display:flex;gap:8px}
+.ux-utility-btn{display:flex;gap:6px;align-items:center;justify-content:center;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2);border-radius:12px;min-height:44px;padding:7px 10px;font-size:12px;cursor:pointer}
+.ux-utility-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ux-utility-active{border-color:var(--or)}
+.topbar.ux-legacy-nav,.its.ux-legacy-tabs{display:none!important}
+.ux-primary-nav{position:fixed;z-index:120;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:620px;background:rgba(17,20,24,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--bd2);border-bottom:0;border-radius:18px 18px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:8px 5px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -18px 40px #0009}
+.ux-dest{border:0;background:transparent;color:var(--ux-muted);display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;min-width:0;min-height:54px;border-radius:12px;cursor:pointer;font-size:clamp(10px,2.5vw,12px);font-weight:700}
+.ux-dest svg{height:21px;width:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ux-dest.active{color:var(--tx);background:#a1afbe2a;border:1px solid #a1afbe60}
+body[data-theme=light] .ux-primary-nav{background:rgba(248,250,252,.97);box-shadow:0 -9px 30px #64748b25}
+body[data-theme=light] .ux-dest.active{background:#e3e8ef}
+.iw{padding:13px 16px 20px;max-width:1100px;margin:auto}
+.today-mode{max-width:1100px;padding-top:14px}
+.ux-page-heading{margin:3px 0 16px}
+.ux-page-heading span{color:var(--ux-subtle);font-size:11px;font-weight:800;letter-spacing:.1em}
+.ux-page-heading h2{font:800 26px/1.18 'Manrope',sans-serif;letter-spacing:-.04em;margin:7px 0}
+.ux-page-heading p{color:var(--ux-subtle);font-size:14px}
+.ux-deeper{border:1px solid var(--bd2);background:var(--bg2);padding:0;border-radius:14px;margin:15px 0}
+.ux-deeper>summary{cursor:pointer;list-style:none;padding:16px;font-size:15px;color:var(--tx);font-weight:750;min-height:60px}
+.ux-deeper>summary::-webkit-details-marker{display:none}
+.ux-deeper>summary span{display:block;font-weight:400;font-size:13px;color:var(--ux-subtle);margin-top:3px}
+.ux-deeper>summary:after{content:'+';position:absolute;right:17px;top:15px;font-size:22px;font-weight:400}
+.ux-deeper[open]>summary:after{content:'−'}
+.ux-deeper{position:relative}
+.ux-deeper>div{padding:0 13px 13px}
+.ux-deeper:not([open])>div{display:none}
+.ux-status-stack{display:flex;justify-content:flex-end;align-items:center;gap:5px;flex-wrap:wrap}
+.ux-tracking-tag{display:inline-flex;align-items:center;min-height:24px;border:1px solid var(--bd2);border-radius:7px;padding:4px 7px;font-size:11px;font-weight:600;color:var(--ux-subtle)}
+.ux-coach-intro{font-size:14px;line-height:1.55;color:var(--ux-subtle);margin-bottom:12px}
+.ux-coach-explain{border-top:1px solid var(--bd);margin-top:15px;padding-top:5px;font-size:13px;color:var(--ux-subtle);line-height:1.6}
+.ux-coach-explain>summary{min-height:44px;padding:12px 0;cursor:pointer;font-weight:650;color:var(--tx)}
+.ux-coach-explain>p{margin-bottom:12px}
+.ai-input{font-size:16px;min-height:88px}
+.ai-btn{min-height:44px;font-size:14px;padding:11px 15px}
+.ux-ai-review{background:var(--bg3);color:var(--tx);border:1px solid var(--bd2)}
+.history-point{cursor:pointer}
+.history-point:focus-visible{stroke:#d1e6fb;stroke-width:3px}
+.ux-history-row{display:flex;justify-content:space-between;gap:8px}
+.ux-history-row span{overflow-wrap:anywhere}
+.history-sheet{padding-top:max(24px,env(safe-area-inset-top))}
+:where(button,select,input,textarea,summary,[role="button"]):focus-visible{outline:3px solid #95b9d6!important;outline-offset:3px}
+.v3-muted,.guidance-dated,.history-chart-dates,.v132-evidence{color:var(--ux-subtle)}
+.v132-evidence,.v132-glance-note,.v132-legend,.v132-bar-topline span{font-size:12px}
+@media(min-width:900px){
+ .obs-header{max-width:1100px;padding-left:24px;padding-right:24px}
+ #t-progress.on{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(295px,1fr);column-gap:20px;align-items:start}
+ #t-progress .ux-page-heading{grid-column:1/-1}
+ #t-progress #t-changed{grid-row:2 / span 4;grid-column:1;min-width:0}
+ #ux-overview-fold,#ux-audit-fold{grid-column:2;margin-top:0}
+ .ux-primary-nav{bottom:16px;max-width:640px;border:1px solid var(--bd2);border-radius:18px;padding:8px;box-shadow:0 14px 45px #0009}
+ body{padding-bottom:128px}
+ #t-next,#t-map,#t-ai,#t-import,#t-settings{max-width:900px;margin:auto}
+}
+@media(max-width:375px){.obs-wordmark{font-size:19px}.obs-subbrand{font-size:7px}.obs-edition{display:none}.ux-primary-nav{gap:0}.ux-dest{font-size:10px}.ux-utility-btn{padding:7px 8px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
 </style>
 </head>
 <body class="today-active">
@@ -768,13 +836,14 @@ body[data-theme="light"]{
 <header class="obs-header">
   <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
   <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 04</span></div>
+  <div class="ux-utility-actions">
+  <button type="button" class="ux-utility-btn" onclick="uiNavigate('sync')" aria-label="Sync workouts" title="Sync workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v-4l-4 4h4a8 8 0 0 0-14 2M4 17v4l4-4H4a8 8 0 0 0 14-2"/></svg><span>Sync</span></button>
+  <button type="button" class="ux-utility-btn" onclick="uiNavigate('settings')" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></svg><span>Settings</span></button>
+</div>
 </header>
-<div class="obs-headline"><span class="obs-eyebrow">YOUR PERFORMANCE, IN FOCUS</span><h1>Built for <em>progress.</em></h1></div>
-<nav class="topbar" aria-label="Main navigation">
-  <button class="tb on" onclick="setMode('gym',this)"><span class="obs-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 9v6M6 6v12M9 12h6M18 6v12M22 9v6"/></svg></span><span>Today</span></button>
-  <button class="tb" onclick="setMode('ana',this)"><span class="obs-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17 9 11l4 4 8-9M16 6h5v5"/></svg></span><span>Intelligence</span></button>
-</nav>
 
+<!-- Hidden legacy navigation keeps internal links to the original panes compatible. -->
+<nav class="topbar ux-legacy-nav" aria-hidden="true"><button class="tb on" onclick="setMode('gym',this)">Today</button><button class="tb" onclick="setMode('ana',this)">Intelligence</button></nav>
 <div class="imp-banner" id="importBanner"></div>
 
 <div id="exerciseHistoryModal" class="history-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Exercise progression">
@@ -796,8 +865,8 @@ body[data-theme="light"]{
 <!-- ═══ INTELLIGENCE MODE ═══ -->
 <div id="ana" style="display:none">
   <div class="iw">
-    <div class="its">
-      <button class="it on" onclick="iTab('dash',this)">Overview</button>
+    <div class="its ux-legacy-tabs" aria-hidden="true">
+      <button class="it" onclick="iTab('dash',this)">Overview</button>
       <button class="it" onclick="iTab('changed',this)">Progress</button>
       <button class="it" onclick="iTab('next',this)">Targets</button>
       <button class="it" onclick="iTab('map',this)">Plan</button>
@@ -806,16 +875,26 @@ body[data-theme="light"]{
       <button class="it" onclick="iTab('import',this)">Sync</button>
       <button class="it" onclick="iTab('settings',this)">Settings</button>
     </div>
-    <div id="t-dash"     class="ip on"></div>
-    <div id="t-changed"  class="ip"></div>
-    <div id="t-next"     class="ip"></div>
-    <div id="t-map"      class="ip"></div>
-    <div id="t-insights" class="ip"></div>
-    <div id="t-import"   class="ip"></div>
+    <section id="t-progress" class="ip">
+      <div class="ux-page-heading"><span>TRAINING INTELLIGENCE</span><h2>Progress</h2><p>What changed, what matters, and why.</p></div>
+      <div id="t-changed"></div>
+      <details class="ux-deeper" id="ux-overview-fold"><summary>Performance overview <span>Workout totals and key metrics</span></summary><div id="t-dash"></div></details>
+      <details class="ux-deeper" id="ux-audit-fold" ontoggle="if(this.open){renderInsights();renderAudit()}"><summary>Training diagnostics <span>Workload, warnings and audit</span></summary><div id="t-insights"></div><div id="t-audit"></div></details>
+    </section>
+    <div id="t-next" class="ip"></div>
+    <div id="t-map" class="ip"></div>
     <div id="t-ai" class="ip"></div>
+    <div id="t-import" class="ip"></div>
     <div id="t-settings" class="ip"></div>
   </div>
 </div>
+<nav class="ux-primary-nav" aria-label="Primary navigation">
+  <button type="button" class="ux-dest active" data-destination="today" aria-current="page" onclick="uiNavigate('today')"><span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg></span><span>Today</span></button>
+  <button type="button" class="ux-dest" data-destination="progress" onclick="uiNavigate('progress')"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 18 7-7 5 4 6-8M16 7h5v5"/></svg></span><span>Progress</span></button>
+  <button type="button" class="ux-dest" data-destination="goals" onclick="uiNavigate('goals')"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span><span>Goals</span></button>
+  <button type="button" class="ux-dest" data-destination="plan" onclick="uiNavigate('plan')"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 5h18v16H3zM7 2v6M17 2v6M3 11h18"/></svg></span><span>Plan</span></button>
+  <button type="button" class="ux-dest" data-destination="coach" onclick="uiNavigate('coach')"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg></span><span>Coach</span></button>
+</nav>
 
 <!-- EXERCISE SELECTOR MODAL -->
 <div id="exModal" style="display:none;position:fixed;inset:0;background:#000a;z-index:200;align-items:flex-end;justify-content:center">
@@ -845,6 +924,25 @@ body[data-theme="light"]{
 
 
 
+
+
+// V14: Presentation-only rounding for long floating-point artifacts from kg→lb conversion.
+// Source Hevy values and internal comparison calculations are not altered.
+function uxPolishNumericText(root){
+ if(!root)return;var iter=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);var nodes=[];
+ while(iter.nextNode())nodes.push(iter.currentNode);
+ nodes.forEach(function(n){var original=n.nodeValue;
+  var result=original.replace(/\b(\d+\.\d{4,})(?=\s*(?:lbs?\b|kg\b|×|reps?\b))/gi,function(v){return Number(v).toLocaleString('en-US',{maximumFractionDigits:1});});
+  if(result!==original)n.nodeValue=result;
+ });
+}
+var uxPolishPending=false;
+function uxSetupPolish(){
+ var observer=new MutationObserver(function(){if(uxPolishPending)return;uxPolishPending=true;queueMicrotask(function(){uxPolishPending=false;uxPolishNumericText(document.getElementById('ana'));uxPolishNumericText(document.getElementById('gym'));});});
+ ['ana','gym'].forEach(function(id){var node=document.getElementById(id);if(node)observer.observe(node,{childList:true,subtree:true,characterData:true});});
+ uxPolishNumericText(document.getElementById('ana'));uxPolishNumericText(document.getElementById('gym'));
+}
+document.addEventListener('DOMContentLoaded',uxSetupPolish);
 
 // ═══════════════════════════════════════
 // LAYER 1: TRAINING PROFILE (static, never changes)
@@ -1401,16 +1499,8 @@ function nextWorkoutCard(){
 }
 // ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
 // V12.9: Companion dashboard. No duplicate logging, timers, or Hevy writes.
-function todayOpenSync(){
- var mode=document.querySelectorAll('.tb')[1];if(mode)setMode('ana',mode);
- var tab=Array.from(document.querySelectorAll('.it')).find(function(b){return (b.textContent||'').trim()==='Sync';});
- if(tab)iTab('import',tab);
-}
-function todayOpenTargets(){
- var mode=document.querySelectorAll('.tb')[1];if(mode)setMode('ana',mode);
- var tab=Array.from(document.querySelectorAll('.it')).find(function(b){return (b.textContent||'').trim()==='Targets';});
- if(tab)iTab('next',tab);
-}
+function todayOpenSync(){uiNavigate('sync');}
+function todayOpenTargets(){uiNavigate('goals');}
 function todayReviewAfterWorkout(){
  if(_hevySyncBusy)return;
  if(!_googleIdToken){todayOpenSync();return;}
@@ -1545,7 +1635,7 @@ function renderDashboard() {
 }
 
 // ── What Changed ──
-function v3OpenTargets(){var b=document.querySelector('.it[onclick*=\"next\"]');if(b)iTab('next',b);}
+function v3OpenTargets(){uiNavigate('goals');}
 function v10ComparableHistory(name,days){
  var log=STATE.exerciseHistory||{},want=normalizeExerciseName(name),all=[];
  Object.keys(log).forEach(function(key){
@@ -1607,7 +1697,7 @@ function renderMovementPanel(){var groups=movementGroups();var ids=Object.keys(g
 function openMovementFamily(id){var d=document.getElementById('movementDetail');if(!d)return;d.open=true;var select=document.getElementById('movementSelectedFamily');select.value=id;renderMovementDetail(id);d.scrollIntoView({behavior:'smooth',block:'nearest'});}
 function renderMovementDetail(id){var el=document.getElementById('movementDetailContent');if(!el)return;var groups=movementGroups(),members=groups[id]||[],family=MOVEMENT_FAMILIES[id];if(!family){el.textContent='No family selected.';return;}el.innerHTML='<p class="movement-intro">'+v3Safe(family.description)+'</p><div class="v3-muted">'+members.length+' recorded variations · Exercise-specific charts remain separate</div>'+members.map(function(name){var entries=historyEntries(name),last=entries[entries.length-1];return '<div class="movement-member"><div><strong>'+v3Safe(name)+'</strong><small>'+entries.length+' dated best sets'+(last?' · Latest '+historyDate(last.date):'')+'</small><label class="v3-muted" for="family'+v3Safe(name.replace(/[^a-z0-9]/gi,''))+'">Reclassify</label><select class="movement-select" data-exercise="'+v3Safe(name)+'" onchange="setMovementFamily(this.dataset.exercise,this.value)">'+Object.keys(MOVEMENT_FAMILIES).map(function(key){return '<option value="'+key+'"'+(key===id?' selected':'')+'>'+v3Safe(MOVEMENT_FAMILIES[key].label)+'</option>';}).join('')+'<option value="">No family</option></select></div><button type="button" data-history="'+v3Safe(name)+'" onclick="openExerciseHistory(this.dataset.history)">View progression</button></div>';}).join('');}
 
-var selectedHistoryExercise='';
+var selectedHistoryExercise='',uxHistoryReturnFocus=null;
 function historyEntries(name){
  var want=normalizeExerciseName(name),result=[];
  Object.keys(STATE.exerciseHistory||{}).forEach(function(k){if(normalizeExerciseName(k)!==want)return;(STATE.exerciseHistory[k]||[]).forEach(function(x){if(!x||!/\d{4}-\d{2}-\d{2}/.test(x.date))return;var w=Number(x.weightLb),r=Number(x.reps),e=Number(x.e1rmLb);if(w>0&&r>0&&e>0)result.push({date:x.date,weightLb:w,reps:r,e1rmLb:e,rpe:x.rpe==null?null:Number(x.rpe)});});});
@@ -1617,15 +1707,25 @@ function historyEntries(name){
 function historyDate(s){return uiLongDate(s);}
 function historyLibrary(){var all=Object.keys(STATE.exerciseHistory||{}).filter(function(k){return (STATE.exerciseHistory[k]||[]).length;}).sort();return all;}
 function renderHistoryLibrary(){var list=historyLibrary();return "<details style='margin:14px 0'><summary class='v3-titlebar' style='cursor:pointer'><h3>Browse all exercise histories</h3><span class='v3-muted'>"+list.length+" movements · Expand</span></summary><div class='v3-muted'>Open any movement to view its full recorded progression, even if it has no workouts in the last 84 days.</div><div class='history-library'>"+list.map(function(name){return "<button type='button' data-history='"+v3Safe(name)+"' onclick='openExerciseHistory(this.dataset.history)'>"+v3Safe(shortName(name))+"<small>"+historyEntries(name).length+" training dates · View progression →</small></button>";}).join('')+"</div></details>";}
-function openExerciseHistory(name){selectedHistoryExercise=normalizeExerciseName(name);var m=document.getElementById('exerciseHistoryModal');if(!m)return;document.getElementById('historyName').textContent=shortName(selectedHistoryExercise);document.getElementById('historyRange').value='all';document.getElementById('historyMetric').value='e1rmLb';m.classList.add('open');m.setAttribute('aria-hidden','false');renderExerciseHistoryDetail();}
-function closeExerciseHistory(){var m=document.getElementById('exerciseHistoryModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}}
-function selectHistoryPoint(index){var rows=window._visibleHistory||[],row=rows[index],el=document.getElementById('historySelected');if(!row||!el)return;el.textContent=historyDate(row.date)+' · '+row.weightLb+' lb × '+row.reps+' reps · Estimated 1RM '+Math.round(row.e1rmLb)+' lb'+(Number.isFinite(row.rpe)&&row.rpe>0?' · RPE '+row.rpe:'');}
+function openExerciseHistory(name){selectedHistoryExercise=normalizeExerciseName(name);var m=document.getElementById('exerciseHistoryModal');if(!m)return;document.getElementById('historyName').textContent=shortName(selectedHistoryExercise);document.getElementById('historyRange').value='all';document.getElementById('historyMetric').value='e1rmLb';uxHistoryReturnFocus=document.activeElement;m.classList.add('open');m.setAttribute('aria-hidden','false');renderExerciseHistoryDetail();document.querySelector('#exerciseHistoryModal .history-close')?.focus();}
+function closeExerciseHistory(){var m=document.getElementById('exerciseHistoryModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');if(uxHistoryReturnFocus&&uxHistoryReturnFocus.isConnected)uxHistoryReturnFocus.focus();}}
+function selectHistoryPoint(index){var rows=window._visibleHistory||[],row=rows[index],el=document.getElementById('historySelected');if(!row||!el)return;el.textContent=historyDate(row.date)+' · '+Number(row.weightLb).toLocaleString('en-US',{maximumFractionDigits:1})+' lb × '+row.reps+' reps · Estimated 1RM '+Math.round(row.e1rmLb)+' lb'+(Number.isFinite(row.rpe)&&row.rpe>0?' · RPE '+row.rpe:'');}
 function renderExerciseHistoryDetail(){var rows=historyEntries(selectedHistoryExercise),n=rows.length,range=document.getElementById('historyRange').value,metric=document.getElementById('historyMetric').value;document.getElementById('historyCount').textContent=n+' recorded training dates';var shown=rows;if(range!=='all'&&rows.length){var last=new Date(rows[rows.length-1].date+'T12:00:00').getTime(),edge=last-(Number(range)-1)*86400000;shown=rows.filter(function(x){return new Date(x.date+'T12:00:00').getTime()>=edge;});}window._visibleHistory=shown;var svg=document.getElementById('historySvg');if(!shown.length){svg.innerHTML='<text x="20" y="112" fill="currentColor" font-size="12">No weighted history available for this range.</text>';document.getElementById('historySelected').textContent='No dated qualifying sets found.';document.getElementById('historyRows').innerHTML='';document.getElementById('historyChartDates').textContent='';return;}
- var vals=shown.map(function(x){return Number(x[metric]);}),min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),pad=Math.max((max-min)*.15,metric==='reps'?1:5),low=Math.max(0,min-pad),high=max+pad,w=320,h=165,x0=24,y0=14;var x=function(i){return x0+(shown.length===1?w/2:i*w/(shown.length-1));},y=function(v){return y0+h-(v-low)/(high-low)*h;};var path=shown.map(function(r,i){return (i?'L':'M')+x(i).toFixed(2)+' '+y(vals[i]).toFixed(2);}).join(' ');var tick=Math.round((low+high)/2);svg.innerHTML='<path d="M24 179H344" stroke="currentColor" opacity=".16" fill="none"/><path d="M24 96H344" stroke="currentColor" opacity=".10" fill="none"/><path d="'+path+'" stroke="currentColor" stroke-width="2" fill="none"/>'+shown.map(function(r,i){return '<circle class="history-point" data-index="'+i+'" onclick="selectHistoryPoint('+i+')" cx="'+x(i).toFixed(2)+'" cy="'+y(vals[i]).toFixed(2)+'" r="'+(shown.length>28?3.5:5)+'" fill="currentColor"><title>'+historyDate(r.date)+': '+r.weightLb+' lb x '+r.reps+'</title></circle>';}).join('')+'<text x="24" y="12" font-size="10" fill="currentColor" opacity=".65">'+Math.round(high)+'</text>';
+ var vals=shown.map(function(x){return Number(x[metric]);}),min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),pad=Math.max((max-min)*.15,metric==='reps'?1:5),low=Math.max(0,min-pad),high=max+pad,w=320,h=165,x0=24,y0=14;var x=function(i){return x0+(shown.length===1?w/2:i*w/(shown.length-1));},y=function(v){return y0+h-(v-low)/(high-low)*h;};var path=shown.map(function(r,i){return (i?'L':'M')+x(i).toFixed(2)+' '+y(vals[i]).toFixed(2);}).join(' ');var tick=Math.round((low+high)/2);svg.innerHTML='<path d="M24 179H344" stroke="currentColor" opacity=".16" fill="none"/><path d="M24 96H344" stroke="currentColor" opacity=".10" fill="none"/><path d="'+path+'" stroke="currentColor" stroke-width="2" fill="none"/>'+shown.map(function(r,i){return '<circle class="history-point" role="button" tabindex="0" aria-label="View dated performance '+v3Safe(historyDate(r.date))+'" data-index="'+i+'" onclick="selectHistoryPoint('+i+')" onkeydown="if(event.key===&quot;Enter&quot;||event.key===&quot; &quot;){event.preventDefault();selectHistoryPoint('+i+')}" cx="'+x(i).toFixed(2)+'" cy="'+y(vals[i]).toFixed(2)+'" r="'+(shown.length>28?3.5:5)+'" fill="currentColor"><title>'+historyDate(r.date)+': '+Number(r.weightLb).toLocaleString('en-US',{maximumFractionDigits:1})+' lb x '+r.reps+'</title></circle>';}).join('')+'<text x="24" y="12" font-size="10" fill="currentColor" opacity=".65">'+Math.round(high)+'</text>';
  document.getElementById('historyChartDates').innerHTML='<span>First · '+v3Safe(uiLongDate(shown[0].date))+'</span><span>Latest · '+v3Safe(uiLongDate(shown[shown.length-1].date))+'</span>';
- var lastRow=shown[shown.length-1];document.getElementById('historyRows').innerHTML=shown.slice().reverse().map(function(r){return '<div><span>'+historyDate(r.date)+'</span><span>'+r.weightLb+' lb × '+r.reps+' · e1RM '+Math.round(r.e1rmLb)+' lb</span></div>';}).join('');selectHistoryPoint(shown.length-1);
+ var lastRow=shown[shown.length-1];document.getElementById('historyRows').innerHTML=shown.slice().reverse().map(function(r){return '<div class="ux-history-row"><span>'+historyDate(r.date)+'</span><span>'+Number(r.weightLb).toLocaleString('en-US',{maximumFractionDigits:1})+' lb × '+r.reps+' · e1RM '+Math.round(r.e1rmLb)+' lb</span></div>';}).join('');selectHistoryPoint(shown.length-1);
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExerciseHistory();});
+document.addEventListener('keydown',function(e){
+ var dialog=document.getElementById('exerciseHistoryModal');if(!dialog||!dialog.classList.contains('open'))return;
+ if(e.key==='Escape'){e.preventDefault();closeExerciseHistory();return;}
+ if(e.key==='Tab'){
+  var focusable=Array.from(dialog.querySelectorAll('button:not([disabled]),select:not([disabled]),[tabindex="0"]')).filter(function(x){return x.getClientRects().length;});
+  if(!focusable.length)return;
+  var first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ }
+});
 
 
 /* V12.1: user-controlled discovery from dated exercise history. Never mixes machine loads. */
@@ -1676,7 +1776,7 @@ function smartWhy(item){return item.dates+' recorded training dates · '+item.re
 var SMART_TARGETS={};
 try{SMART_TARGETS=JSON.parse(localStorage.getItem('liftiq_smart_targets_v1')||'{}')||{};}catch(e){}
 function smartSaveTargets(){try{localStorage.setItem('liftiq_smart_targets_v1',JSON.stringify(SMART_TARGETS));}catch(e){}}
-function smartOpenTargets(){var b=document.querySelector('.it[onclick*="next"]');if(b){setMode('ana',document.querySelector('.tb[onclick*="ana"]'));iTab('next',b);} }
+function smartOpenTargets(){uiNavigate('goals');}
 function smartGoal(name){return SMART_TARGETS[smartKey(name)]||null;}
 function smartGoalMetric(goal,entry){if(!goal||!entry)return null;return goal.metric==='reps'?entry.reps:goal.metric==='weightLb'?entry.weightLb:entry.e1rmLb;}
 function smartGoalState(name){
@@ -1911,7 +2011,9 @@ function v13GuidanceCard(lk){
  var rec=STATE.recommendations[lk]||null;
  var priority=smartPriorityStatus(lk),goal=smartGoalState(lk);
  var trend=v10TrendAssessment(lk,84),history=historyEntries(lk),last=history.length?history[history.length-1]:null;
- var tone=v127Tone(rec?rec.action:priority),tag=v127StatusChip(tone,rec?rec.badge:null);
+ var inferred=(trend.status==='Progressing'||trend.status==='Rep progression')?'Progressing':(trend.status==='Needs context'?'Review':(trend.status==='Stable / mixed'?'Stable':(trend.status==='One training date'?'Limited evidence':'Older history')));
+ var tone=v127Tone(rec?rec.action:inferred),tag=v127StatusChip(tone,rec?rec.badge:inferred);
+ var modeTag=(priority==='pinned'||priority==='tracked')?'<span class="ux-tracking-tag">'+(priority==='pinned'?'Pinned':'Tracked')+'</span>':'';
  var when=last?uiLongDate(last.date):'No dated weighted sets';
  var lastSet=last?Number(last.weightLb).toLocaleString('en-US',{maximumFractionDigits:1})+' lb × '+last.reps+(last.rpe!=null?' · RPE '+last.rpe:''):
    (rec&&rec.lastW?rec.lastW+' lb × '+rec.lastR+(rec.lastRPE?' · RPE '+rec.lastRPE:''):'Not recorded');
@@ -1924,7 +2026,7 @@ function v13GuidanceCard(lk){
    last?(history.length+' recorded training date'+(history.length===1?'':'s')+' all time'):'No qualified history available';
  var caution=rec&&rec.caution?'<div class="guidance-caution" role="note">'+v4Icon('alert')+'<span>'+v3Safe(rec.caution)+'</span></div>':'';
  return '<article class="nx-card v13-guidance state-tone--'+tone+'" aria-label="Guidance for '+v3Safe(shortName(lk))+'">'+
-  '<div class="nx-head"><h3 class="nx-name">'+v3Safe(shortName(lk))+'</h3><div class="nx-badge">'+tag+'</div></div>'+
+  '<div class="nx-head"><h3 class="nx-name">'+v3Safe(shortName(lk))+'</h3><div class="ux-status-stack"><div class="nx-badge">'+tag+'</div>'+modeTag+'</div></div>'+
   '<div class="guidance-dated"><span>Last recorded <strong>'+v3Safe(when)+'</strong></span><span>'+v3Safe(evidence)+'</span></div>'+
   '<div class="nx-stats">'+nxStat('Last top set',v3Safe(lastSet))+nxStat(metricLabel,v3Safe(metricValue))+'</div>'+
   '<div class="guidance-coaching"><p class="guidance-reason">'+v3Safe(explanation)+'</p>'+caution+
@@ -3154,23 +3256,41 @@ function tog(id){var e=document.getElementById(id);if(e)e.classList.toggle("open
 // ═══════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════
+var UX_ACTIVE_DESTINATION='today';
+function uxUpdateNav(destination){
+ var map={gym:'today',changed:'progress',dash:'progress',insights:'progress',audit:'progress',next:'goals',map:'plan',ai:'coach',import:'sync',settings:'settings'};
+ UX_ACTIVE_DESTINATION=map[destination]||destination||'today';
+ document.querySelectorAll('.ux-dest').forEach(function(btn){var on=btn.dataset.destination===UX_ACTIVE_DESTINATION;btn.classList.toggle('active',on);if(on)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current');});
+ document.querySelectorAll('.ux-utility-btn').forEach(function(b){b.classList.toggle('ux-utility-active',(UX_ACTIVE_DESTINATION==='sync'&&b.textContent.trim()==='Sync')||(UX_ACTIVE_DESTINATION==='settings'&&b.textContent.trim()==='Settings'));});
+}
+function uiNavigate(destination){
+ var map={progress:'changed',goals:'next',plan:'map',coach:'ai',sync:'import',settings:'settings',today:'gym'};
+ var id=map[destination]||'changed';
+ if(id==='gym')setMode('gym',document.querySelectorAll('.tb')[0]);
+ else {setMode('ana',document.querySelectorAll('.tb')[1]);var b=Array.from(document.querySelectorAll('.it')).find(function(x){return (x.getAttribute('onclick')||'').includes("'"+id+"'");});iTab(id,b);}
+ uxUpdateNav(destination);window.scrollTo({top:0,behavior:'instant'});
+}
 function setMode(m,b) {
-  document.body.classList.toggle('today-active',m==='gym');
-  document.getElementById("gym").style.display=m==="gym"?"block":"none";
-  document.getElementById("ana").style.display=m==="ana"?"block":"none";
-  document.querySelectorAll(".tb").forEach(function(x){x.classList.remove("on");});
-  b.classList.add("on");
-  if(m==="ana") renderDashboard();
-  else {renderCoachCard();renderStatusToggles();renderNextSessionCoach();}
+ document.body.classList.toggle('today-active',m==='gym');
+ document.getElementById('gym').style.display=m==='gym'?'block':'none';
+ document.getElementById('ana').style.display=m==='ana'?'block':'none';
+ document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on')});
+ if(b)b.classList.add('on');
+ if(m==='ana'){renderDashboard();uxUpdateNav(document.querySelector('.ip.on')?.id==='t-next'?'goals':UX_ACTIVE_DESTINATION==='today'?'progress':UX_ACTIVE_DESTINATION);}
+ else {renderCoachCard();renderStatusToggles();renderNextSessionCoach();uxUpdateNav('today');}
 }
 function iTab(id,b) {
-  document.querySelectorAll(".ip").forEach(function(p){p.classList.remove("on");});
-  document.querySelectorAll(".it").forEach(function(x){x.classList.remove("on");});
-  var pane=document.getElementById("t-"+id);
-  if(pane) pane.classList.add("on");
-  b.classList.add("on");
-  var fns={dash:renderDashboard,changed:renderWhatChanged,next:renderNextWeek,map:renderMap,insights:renderInsights,audit:renderAudit,ai:renderAICoach,import:renderImportTab,settings:renderSettings};
-  if(fns[id]) fns[id]();
+ document.querySelectorAll('.ip').forEach(function(p){p.classList.remove('on');});
+ document.querySelectorAll('.it').forEach(function(x){x.classList.remove('on');});
+ var viewId={dash:'progress',changed:'progress',insights:'progress',audit:'progress'}[id]||id;
+ var pane=document.getElementById('t-'+viewId);
+ if(pane)pane.classList.add('on');
+ if(b)b.classList.add('on');
+ var fns={dash:renderDashboard,changed:renderWhatChanged,next:renderNextWeek,map:renderMap,insights:renderInsights,audit:renderAudit,ai:renderAICoach,import:renderImportTab,settings:renderSettings};
+ if(fns[id])fns[id]();
+ if(id==='dash')document.getElementById('ux-overview-fold').open=true;
+ if(id==='insights'||id==='audit')document.getElementById('ux-audit-fold').open=true;
+ uxUpdateNav(viewId);
 }
 
 
@@ -3344,13 +3464,13 @@ function renderAICoach(){
  loadCachedAIReview();
  var cached=Object.prototype.hasOwnProperty.call(_aiReviewCache,trainingFingerprint());
  var html="<div class='cc'><div class='cl'>Adaptive Coach · Evidence-led</div>"+
- "<div class='ai-result'>Uses your imported Hevy performance summary and existing LiftIQ calculations. AI suggestions are optional. No changes reach Hevy. Sign in with Google in the Sync tab first.</div>"+
- "<div class='ai-actions'><button class='ai-btn' onclick='askAI(\"review\")' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':(cached?'Refresh AI review':'Analyze my training'))+"</button></div>"+
- "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='Ask about stalls, volume, or progression…'>"+aiSafe(_aiQuestion)+"</textarea>"+
- "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(\"question\")' "+(_aiBusy?'disabled':'')+">Ask LiftIQ</button></div>"+
- "<div class='ai-feedback'>LiftIQ sends a compact, priority-aware summary with dated best sets—not the entire Hevy export. Older or lower-priority records may be omitted; ask about a specific lift for a focused answer. Existing rule-based targets are suggestions, not facts. Training plans are never changed automatically.</div>"+
- "<div class='ai-feedback'>Coach review is cached until your workout history or readiness flags change. Approvals expire when underlying data changes. Data reflects saved Hevy sessions, not unfinished workouts.</div>"+
- "<div class='ai-feedback'>AI analysis sends summarized metrics, exercise names, selected goals, training preferences and up to six recent workout titles to Gemini. Your Google email and full raw Hevy sessions are not included. Google may use free-tier Gemini submissions to improve its products. AI can be mistaken.</div></div>";
+ "<div class='ux-coach-intro'>Ask about your completed Hevy training. Answers are suggestions and never automatically change your plan.</div>"+
+ "<textarea class='ai-input' id='aiQuestion' rows='3' maxlength='350' placeholder='What are my weaknesses?'>"+aiSafe(_aiQuestion)+"</textarea>"+
+ "<div class='ai-actions'><button class='ai-btn secondary' onclick='askAI(&quot;question&quot;)' "+(_aiBusy?'disabled':'')+">Ask Coach</button><button class='ai-btn ux-ai-review' onclick='askAI(&quot;review&quot;)' "+(_aiBusy?'disabled':'')+">"+(_aiBusy?'Analyzing…':(cached?'Refresh review':'Analyze my training'))+"</button></div>"+
+ "<details class='ux-coach-explain'><summary>How Coach uses your data &amp; privacy</summary>"+
+ "<p>LiftIQ sends a compact, priority-aware summary with dated best sets, not your entire Hevy export. Lower-priority records can be omitted. Rule-based targets are suggestions, not facts. No Hevy workout or plan is automatically changed.</p>"+
+ "<p>Reviews are cached until underlying training data or readiness changes. Approvals expire when the evidence changes. Unfinished Hevy workouts are excluded.</p>"+
+ "<p>Gemini receives summarized metrics, exercise names, selected goals, training preferences and up to six recent workout titles. Your email and full raw Hevy sessions are not sent. Google's free-tier policies may allow submitted content to improve products. AI can be mistaken.</p></details></div>";
  if(STATE.imported){html+=uiFold('coach-key-movements','Priority context','Your selected exercises included in coaching analysis',"<div class='v3-muted'>Review priorities under Targets before approving any programming changes.</div>"+smartPinned().slice(0,8).map(function(x){return "<div class='v3-row'>"+v3Safe(shortName(x.name))+" · "+x.dates+" recorded training dates</div>";}).join(''),false,smartPinned().length+' selected');}
  if(STATE.imported){html+=uiFold('coach-evidence','Workout evidence sent to Gemini','Inspect dated best-set observations by exercise',"<div class='v3-muted'>Up to 4 recent best sets per priority exercise over 84 days are sent in the standard compact AI request. This inspector shows the full local evidence.</div>"+smartActivePriorityNames().slice(0,12).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join(''),false,smartActivePriorityNames().length+' lifts');}
  if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
@@ -3807,6 +3927,8 @@ document.addEventListener("DOMContentLoaded",function(){
 
 
 
+// Preserve last visited primary destination within this browsing session only.
+try{uxUpdateNav('today');}catch(e){}
 </script>
 </body>
 </html>
