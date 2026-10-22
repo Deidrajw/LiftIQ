@@ -723,6 +723,43 @@ body[data-theme="light"]{
 .v131-bench-rest .v131-bench-items{padding:10px}
 @media(max-width:370px){.v131-bench-values{gap:8px}.v131-bench-values strong{font-size:13px}}
 
+
+/* V13.2 · glanceable, *live* visual benchmarks. The goal bar and trend bars
+   intentionally have different labels/scales: a trend is not an approved goal. */
+.v132-bench-card{padding:13px 14px 12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;min-width:0}
+.v132-bench-card .v131-bench-top{margin-bottom:7px}
+.v132-bench-summary{font-size:11px;line-height:1.6;color:var(--t2);margin-bottom:8px;overflow-wrap:anywhere}
+.v132-bench-summary strong{color:var(--tx);font-weight:800}
+.v132-bench-frame{background:var(--bg3);border-radius:10px;padding:10px 11px 9px}
+.v132-bar-row{display:grid;grid-template-columns:38px minmax(0,1fr) 51px;gap:9px;align-items:center;margin-bottom:6px}
+.v132-bar-row:last-child{margin-bottom:0}
+.v132-bar-label{font-size:10px;color:var(--t2);font-weight:750}
+.v132-bar-value{font-size:10px;color:var(--tx);font-weight:800;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.v132-track{height:8px;border-radius:9px;background:var(--bd2);overflow:hidden}
+.v132-fill{height:100%;border-radius:9px;display:block;background:#b6c2ce}
+.v132-fill--previous{background:#657483}
+.v132-fill--current{background:linear-gradient(90deg,#819cad,#bed0df)}
+.v132-fill--goal{background:linear-gradient(90deg,var(--v127-grow-edge),var(--v127-go))}
+.v132-track--empty{border:1px dashed var(--bd2);background:transparent}
+.v132-bar-topline{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:7px}
+.v132-bar-topline span{font-size:10px;color:var(--t2);font-weight:700}
+.v132-bar-topline strong{font-size:11px;color:var(--tx);font-weight:800}
+.v132-legend{display:flex;justify-content:space-between;gap:9px;margin-top:6px;font-size:10px;color:var(--t2);flex-wrap:wrap;line-height:1.5}
+.v132-legend strong{color:var(--tx)}
+.v132-glance-note{margin-top:7px;font-size:10px;color:var(--t2);line-height:1.55}
+.v132-actions{margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.v132-actions button,.v132-more>summary{color:var(--tx);font-size:11px;line-height:1.6;font-weight:750}
+.v132-actions button{background:transparent;border:0;padding:3px 0;cursor:pointer}
+.v132-actions button:hover,.v132-more>summary:hover{text-decoration:underline}
+.v132-more{border-top:1px solid var(--bd);margin-top:8px;padding-top:7px}
+.v132-more>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0}
+.v132-more>summary::-webkit-details-marker{display:none}
+.v132-more>summary::after{content:'⌄';color:var(--t2);font-size:14px}
+.v132-more[open]>summary::after{content:'⌃'}
+.v132-evidence{font-size:11px;color:var(--t2);line-height:1.7;margin:8px 0 3px;overflow-wrap:anywhere}
+.v132-bench-card button:focus-visible,.v132-more>summary:focus-visible{outline:2px solid var(--or);outline-offset:3px;border-radius:3px}
+@media(max-width:370px){.v132-bench-card{padding:11px}.v132-bar-row{gap:6px;grid-template-columns:34px minmax(0,1fr) 48px}}
+
 </style>
 </head>
 <body class="today-active">
@@ -1927,34 +1964,51 @@ function v131BenchmarkData(){
  });
 }
 function v131BenchmarkCard(b){
- var status=b.label,latest=b.last;
- var score=b.end?Math.round(b.end.e1rmLb):null;
- var lastSet=latest?(Math.round(latest.weightLb*10)/10)+' lb × '+latest.reps:'No qualifying weighted set';
- var recent=b.recent.length;
- var compare=recent>=2?'Recent estimated strength: '+Math.round(b.first.e1rmLb)+' → '+Math.round(b.end.e1rmLb)+' lb ('+(b.percentChange>=0?'+':'')+b.percentChange.toFixed(1)+'%). Compared '+uiLongDate(b.first.date)+' to '+uiLongDate(b.end.date)+'.':
-   recent===1?'Only one training date in the latest 84-day window. More dates are needed for a trend.':
-   latest?'No qualifying sets in the latest 84-day window. Earlier history is still available.':'Sync your completed workouts to establish a baseline.';
- var goalText='',g=b.goal;
+ // The compact at-a-glance chart uses exercise-specific, equivalent measurements.
+ // Without an approved goal we compare *two dated* e1RM observations (not a goal).
+ var latest=b.last,recent=b.recent.length,g=b.goal;
+ var fmt=function(v){return Number(v).toLocaleString('en-US',{maximumFractionDigits:1});};
+ var name=v3Safe(shortName(b.name));
+ var lastText=latest?fmt(latest.weightLb)+' lb × '+latest.reps:'No dated sets';
+ var lastDate=latest?uiLongDate(latest.date):'No recorded date';
+ var label=g?(g.metric==='reps'?'Reps at equivalent load':g.metric==='weightLb'?'Working weight':'Estimated strength'):'Estimated strength (e1RM)';
+ var visual='',summary='',evidence='';
  if(g){
-  var units=g.metric==='reps'?' reps':' lb',metric=g.metric==='reps'?'reps at comparable load':g.metric==='weightLb'?'working weight':'estimated strength';
-  goalText='<div class="v131-bench-goal"><div class="v131-bench-goal-title"><span>Approved '+v3Safe(metric)+' goal</span><strong>'+v3Safe(String(g.target)+units)+'</strong></div>'+
-   (g.pct!=null?'<div class="smart-goalbar" role="progressbar" aria-label="Progress toward approved goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+g.pct+'"><span style="width:'+g.pct+'%"></span></div><div class="v131-bench-note">'+g.pct+'% of planned improvement · Compared on '+v3Safe(uiLongDate(g.date))+'.</div>':
-   '<div class="v131-bench-note">'+v3Safe(g.reason||'No comparable observation available yet.')+'</div>')+'</div>';
+  var unit=g.metric==='reps'?' reps':' lb',now=g.current!=null?fmt(g.current)+unit:'Not comparable';
+  summary='Latest observed set: <strong>'+v3Safe(lastText)+'</strong> · '+v3Safe(lastDate);
+  evidence='Approved '+label.toLowerCase()+' goal: '+fmt(g.baseline)+unit+' → '+fmt(g.target)+unit+'. '+
+   (g.current!=null?'Comparable set on '+uiLongDate(g.date)+': '+now+'.':'Current comparison unavailable. '+(g.reason||''));
+  visual='<div class="v132-bench-frame"><div class="v132-bar-topline"><span>'+v3Safe(label)+' · approved goal</span><strong>'+(g.pct!=null?g.pct+'% of improvement':'Awaiting comparison')+'</strong></div>'+
+   '<div class="v132-track'+(g.pct==null?' v132-track--empty':'')+'"'+(g.pct==null?'':' role="progressbar" aria-label="Improvement toward approved goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+g.pct+'"')+'><span class="v132-fill v132-fill--goal" style="width:'+(g.pct!=null?g.pct:0)+'%"></span></div>'+
+   '<div class="v132-legend"><span>Start <strong>'+v3Safe(fmt(g.baseline)+unit)+'</strong></span><span>Now <strong>'+v3Safe(now)+'</strong></span><span>Goal <strong>'+v3Safe(fmt(g.target)+unit)+'</strong></span></div></div>';
+ }else if(recent>=2 && b.first && b.end && Number(b.first.e1rmLb)>0 && Number(b.end.e1rmLb)>0){
+  // Both horizontal bars use *one common zero-based scale*.  This is a dated trend,
+  // never a percentage of a goal the user has not approved.
+  var a=Number(b.first.e1rmLb),z=Number(b.end.e1rmLb),max=Math.max(a,z);
+  var aw=Math.min(100,Math.round(a/max*1000)/10),zw=Math.min(100,Math.round(z/max*1000)/10);
+  var chg=(z-a)/a*100,change=(chg>=0?'+':'')+chg.toFixed(1)+'%';
+  summary='Last recorded <strong>'+v3Safe(lastDate)+'</strong> · '+recent+' comparable training dates';
+  evidence='First best set on '+uiLongDate(b.first.date)+' ('+fmt(a)+' lb e1RM). Latest best set on '+uiLongDate(b.end.date)+' ('+fmt(z)+' lb e1RM). Latest recorded set: '+lastText+'.';
+  visual='<div class="v132-bench-frame"><div class="v132-bar-topline"><span>84-day trend · not a goal</span><strong>'+v3Safe(change)+'</strong></div>'+
+   '<div class="v132-bar-row"><span class="v132-bar-label">Then</span><div class="v132-track"><span class="v132-fill v132-fill--previous" style="width:'+aw+'%"></span></div><strong class="v132-bar-value">'+fmt(a)+' lb</strong></div>'+
+   '<div class="v132-bar-row"><span class="v132-bar-label">Now</span><div class="v132-track"><span class="v132-fill v132-fill--current" style="width:'+zw+'%"></span></div><strong class="v132-bar-value">'+fmt(z)+' lb</strong></div></div>';
  }else{
-  goalText='<div class="v131-bench-note">'+(b.mode==='pinned'?'Pinned for monitoring':'No approved numerical goal')+' · <button type="button" class="v131-inline-target" onclick="smartOpenTargets()">Manage in Targets →</button></div>';
+  summary='Last recorded <strong>'+v3Safe(lastDate)+'</strong> · '+v3Safe(lastText);
+  evidence=(recent===1?'Only one comparable date in the recent comparison period.':latest?'Earlier history exists, but insufficient recent comparable observations.':'No qualifying weighted sets found.')+' '+(b.mode==='pinned'?'Pinned for monitoring.':'No approved numerical target.');
+  visual='<div class="v132-bench-frame"><div class="v132-bar-topline"><span>84-day strength comparison</span><strong>Insufficient data</strong></div><div class="v132-track v132-track--empty"></div><div class="v132-glance-note">No progress percentage is shown without two comparable observations.</div></div>';
  }
- return '<article class="v131-bench-card"><div class="v131-bench-top"><strong class="v131-bench-name">'+v3Safe(shortName(b.name))+'</strong><span class="v131-bench-pill '+b.tone+'">'+v3Safe(status)+'</span></div>'+
-   '<div class="v131-bench-values"><div><span>Latest recorded set</span><strong>'+v3Safe(lastSet)+'</strong></div><div><span>Latest best-set e1RM (84d)</span><strong>'+(score!=null?score+' lb':'Not available')+'</strong></div></div>'+
-   '<div class="v131-bench-note">'+(latest?'Last recorded '+v3Safe(uiLongDate(latest.date))+' · ':'')+recent+' recent training date'+(recent===1?'':'s')+'</div>'+
-   '<div class="v131-bench-note">'+v3Safe(compare)+'</div>'+goalText+
-   '<div class="v131-bench-actions"><button type="button" data-history="'+v3Safe(b.name)+'" onclick="openExerciseHistory(this.dataset.history)">View progression →</button></div></article>';
+ var details='<details class="v132-more"><summary>Details & dates</summary><p class="v132-evidence">'+v3Safe(evidence)+'</p>'+
+  (!g?'<p class="v132-evidence">No numerical goal is assumed. <button type="button" class="v131-inline-target" onclick="smartOpenTargets()">Manage in Targets →</button></p>':'')+'</details>';
+ return '<article class="v132-bench-card" aria-label="Live benchmark for '+name+'"><div class="v131-bench-top"><strong class="v131-bench-name">'+name+'</strong><span class="v131-bench-pill '+b.tone+'">'+v3Safe(b.label)+'</span></div>'+
+  '<p class="v132-bench-summary">'+summary+'</p>'+visual+
+  '<div class="v132-actions"><button type="button" data-history="'+v3Safe(b.name)+'" onclick="openExerciseHistory(this.dataset.history)">View progression →</button></div>'+details+'</article>';
 }
 function renderLiveBenchmarks(){
  var rows=v131BenchmarkData(),keys=Object.keys(STATE.dailyLog||{}).sort();
  var anchor=keys.length?keys[keys.length-1]:(STATE.dateRange&&STATE.dateRange.end)||null;
  var approved=rows.filter(function(r){return r.goal;}).length;
  var title='Live performance benchmarks';
- var message='Updated from completed Hevy workouts. Recent performance compares the same exercise variation across dated best sets; estimated strength is not a prescribed load. Your numerical goals change only when you approve or edit them.';
+ var message='See progress at a glance. Two bars compare estimated strength from the same exercise; a single goal bar appears only for goals you approved. Tap Details for the evidence.';
  var content='<div class="v131-bench-header"><strong>Current training evidence</strong><span class="v131-bench-asof">'+(anchor?'Through '+v3Safe(uiLongDate(anchor)):'Awaiting workout data')+'</span></div>'+
   '<p class="v131-bench-lede">'+v3Safe(message)+'</p>'+
   (rows.length?'<div class="v131-bench-items">'+rows.slice(0,3).map(v131BenchmarkCard).join('')+'</div>':
