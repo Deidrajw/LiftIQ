@@ -689,6 +689,40 @@ body[data-theme="light"]{
 @media(max-width:430px){.guidance-dated{display:block}.guidance-dated>span{display:block}.nx-card.v13-guidance .nx-head{align-items:flex-start}.nx-card.v13-guidance .nx-stats{gap:10px}.nx-card.v13-guidance .nx-stats>div:last-child .nx-stat-v{font-size:18px}}
 @media(max-width:345px){.nx-card.v13-guidance .nx-head{flex-wrap:wrap}.nx-card.v13-guidance .nx-badge{max-width:100%}.nx-card.v13-guidance .nx-stats{grid-template-columns:1fr}}
 
+
+/* V13.1 · current evidence, not frozen M8 benchmarks */
+.v131-bench-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 11px}
+.v131-bench-header strong{font-size:13px;color:var(--tx)}
+.v131-bench-asof{font-size:10px;color:var(--t2);line-height:1.6}
+.v131-bench-lede{font-size:11px;line-height:1.7;color:var(--t2);margin:0 0 11px}
+.v131-bench-items{display:grid;gap:9px}
+.v131-bench-card{border:1px solid var(--bd2);border-radius:12px;background:var(--bg2);padding:13px 14px;min-width:0}
+.v131-bench-top{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.v131-bench-name{color:var(--tx);font-weight:800;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.v131-bench-pill{font-size:10px;border:1px solid var(--bd2);border-radius:99px;padding:4px 8px;color:var(--t2);background:var(--bg3);font-weight:750}
+.v131-bench-pill.improved{color:var(--v127-go);border-color:var(--v127-go-edge);background:var(--v127-go-bg)}
+.v131-bench-pill.review{color:var(--v127-warn);border-color:var(--v127-warn-edge);background:var(--v127-warn-bg)}
+.v131-bench-pill.steady{color:var(--v127-steady);border-color:var(--v127-steady-edge);background:var(--v127-steady-bg)}
+.v131-bench-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:8px}
+.v131-bench-values span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:750;color:var(--t2);display:block;margin-bottom:4px}
+.v131-bench-values strong{font-size:15px;line-height:1.4;color:var(--tx);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.v131-bench-note{font-size:11px;color:var(--t2);line-height:1.65;margin:5px 0}
+.v131-bench-goal{border-top:1px solid var(--bd);padding-top:9px;margin-top:9px}
+.v131-bench-goal-title{display:flex;justify-content:space-between;gap:9px;font-size:11px;line-height:1.55;color:var(--tx);flex-wrap:wrap}
+.v131-bench-goal-title strong{font-weight:800}
+.v131-bench-goal .smart-goalbar{margin:7px 0 5px}
+.v131-bench-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.v131-bench-actions button{color:var(--tx);background:var(--bg3);border:1px solid var(--bd2);padding:9px 11px;font-size:11px;font-weight:700;border-radius:9px;cursor:pointer}
+.v131-inline-target{background:none;border:none;color:var(--or);text-decoration:underline;cursor:pointer;font:inherit;font-weight:700}
+.v131-inline-target:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.v131-bench-actions button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.v131-bench-rest{margin-top:10px;border:1px solid var(--bd2);border-radius:10px;overflow:hidden}
+.v131-bench-rest>summary{list-style:none;cursor:pointer;font-size:11px;font-weight:750;display:flex;justify-content:space-between;gap:8px;padding:12px;color:var(--tx);background:var(--bg2)}
+.v131-bench-rest>summary::-webkit-details-marker{display:none}
+.v131-bench-rest[open]>summary{border-bottom:1px solid var(--bd)}
+.v131-bench-rest .v131-bench-items{padding:10px}
+@media(max-width:370px){.v131-bench-values{gap:8px}.v131-bench-values strong{font-size:13px}}
+
 </style>
 </head>
 <body class="today-active">
@@ -1872,6 +1906,63 @@ function renderNextWeek() {
 }
 
 // ── Training Map ──
+
+/* V13.1 — Adaptive performance *observations* always refresh on Hevy import.
+   Approved numeric goals are a separate local user decision, never rewritten by sync.
+   One movement/equipment name = one series; never average different machines. */
+function v131BenchmarkData(){
+ var ordered=smartActivePriorityNames();
+ var keys=Object.keys(STATE.dailyLog||{}).sort();
+ var anchor=keys.length?keys[keys.length-1]:(STATE.dateRange&&STATE.dateRange.end)||null;
+ return ordered.slice(0,24).map(function(name){
+  var recent=v10ComparableHistory(name,84),all=historyEntries(name),last=all[all.length-1]||null;
+  var first=recent[0]||null,end=recent[recent.length-1]||null;
+  var change=recent.length>1&&first.e1rmLb>0?(end.e1rmLb-first.e1rmLb)/first.e1rmLb*100:null;
+  var goal=smartGoalState(name);
+  var label=change===null?(recent.length===1?'One recent date':last?'Older records only':'No dated sets'):
+   change>2.5?'Estimate up':change< -2.5?'Estimate lower':'Stable / mixed';
+  var tone=change!==null&&(change>2.5?'improved':change< -2.5?'review':'steady')||'';
+  return {name:name,anchor:anchor,recent:recent,first:first,end:end,last:last,
+   percentChange:change,label:label,tone:tone,goal:goal,mode:smartPriorityStatus(name)};
+ });
+}
+function v131BenchmarkCard(b){
+ var status=b.label,latest=b.last;
+ var score=b.end?Math.round(b.end.e1rmLb):null;
+ var lastSet=latest?(Math.round(latest.weightLb*10)/10)+' lb × '+latest.reps:'No qualifying weighted set';
+ var recent=b.recent.length;
+ var compare=recent>=2?'Recent estimated strength: '+Math.round(b.first.e1rmLb)+' → '+Math.round(b.end.e1rmLb)+' lb ('+(b.percentChange>=0?'+':'')+b.percentChange.toFixed(1)+'%). Compared '+uiLongDate(b.first.date)+' to '+uiLongDate(b.end.date)+'.':
+   recent===1?'Only one training date in the latest 84-day window. More dates are needed for a trend.':
+   latest?'No qualifying sets in the latest 84-day window. Earlier history is still available.':'Sync your completed workouts to establish a baseline.';
+ var goalText='',g=b.goal;
+ if(g){
+  var units=g.metric==='reps'?' reps':' lb',metric=g.metric==='reps'?'reps at comparable load':g.metric==='weightLb'?'working weight':'estimated strength';
+  goalText='<div class="v131-bench-goal"><div class="v131-bench-goal-title"><span>Approved '+v3Safe(metric)+' goal</span><strong>'+v3Safe(String(g.target)+units)+'</strong></div>'+
+   (g.pct!=null?'<div class="smart-goalbar" role="progressbar" aria-label="Progress toward approved goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+g.pct+'"><span style="width:'+g.pct+'%"></span></div><div class="v131-bench-note">'+g.pct+'% of planned improvement · Compared on '+v3Safe(uiLongDate(g.date))+'.</div>':
+   '<div class="v131-bench-note">'+v3Safe(g.reason||'No comparable observation available yet.')+'</div>')+'</div>';
+ }else{
+  goalText='<div class="v131-bench-note">'+(b.mode==='pinned'?'Pinned for monitoring':'No approved numerical goal')+' · <button type="button" class="v131-inline-target" onclick="smartOpenTargets()">Manage in Targets →</button></div>';
+ }
+ return '<article class="v131-bench-card"><div class="v131-bench-top"><strong class="v131-bench-name">'+v3Safe(shortName(b.name))+'</strong><span class="v131-bench-pill '+b.tone+'">'+v3Safe(status)+'</span></div>'+
+   '<div class="v131-bench-values"><div><span>Latest recorded set</span><strong>'+v3Safe(lastSet)+'</strong></div><div><span>Latest best-set e1RM (84d)</span><strong>'+(score!=null?score+' lb':'Not available')+'</strong></div></div>'+
+   '<div class="v131-bench-note">'+(latest?'Last recorded '+v3Safe(uiLongDate(latest.date))+' · ':'')+recent+' recent training date'+(recent===1?'':'s')+'</div>'+
+   '<div class="v131-bench-note">'+v3Safe(compare)+'</div>'+goalText+
+   '<div class="v131-bench-actions"><button type="button" data-history="'+v3Safe(b.name)+'" onclick="openExerciseHistory(this.dataset.history)">View progression →</button></div></article>';
+}
+function renderLiveBenchmarks(){
+ var rows=v131BenchmarkData(),keys=Object.keys(STATE.dailyLog||{}).sort();
+ var anchor=keys.length?keys[keys.length-1]:(STATE.dateRange&&STATE.dateRange.end)||null;
+ var approved=rows.filter(function(r){return r.goal;}).length;
+ var title='Live performance benchmarks';
+ var message='Updated from completed Hevy workouts. Recent performance compares the same exercise variation across dated best sets; estimated strength is not a prescribed load. Your numerical goals change only when you approve or edit them.';
+ var content='<div class="v131-bench-header"><strong>Current training evidence</strong><span class="v131-bench-asof">'+(anchor?'Through '+v3Safe(uiLongDate(anchor)):'Awaiting workout data')+'</span></div>'+
+  '<p class="v131-bench-lede">'+v3Safe(message)+'</p>'+
+  (rows.length?'<div class="v131-bench-items">'+rows.slice(0,3).map(v131BenchmarkCard).join('')+'</div>':
+   '<p class="v131-bench-lede">No priority exercise history yet. Sync workouts and select priorities in Targets to populate this section.</p>')+
+  (rows.length>3?'<details class="v131-bench-rest"><summary>Show '+(rows.length-3)+' more movement'+(rows.length-3===1?'':'s')+' <span aria-hidden="true">⌄</span></summary><div class="v131-bench-items">'+rows.slice(3).map(v131BenchmarkCard).join('')+'</div></details>':'')+
+  '<div class="v131-bench-actions"><button type="button" onclick="smartOpenTargets()">Manage priorities & goals →</button></div>';
+ return uiFold('plan-live-benchmarks',title,'Automatically refreshed evidence · Approved goals stay yours',content,true,rows.length+' lifts · '+approved+' goals');
+}
 function renderMap() {
   var el = document.getElementById("t-map");
   if (!el) return;
@@ -1885,7 +1976,7 @@ function renderMap() {
      success:"Glute Drive toward 490 e1RM, RDL toward 210, Leg Curl toward 140."},
     {label:"M9",name:"Strength",   period:"Aug\u2013Sep '26",color:"#a4b1be",active:b.label==="M9",
      purpose:"Convert hypertrophy base into top-end strength at 4\u20138 reps.",
-     emphasis:"Load progression. Every session should feel like a new record attempt.",
+     emphasis:"Build strength with measured load or rep improvements while monitoring effort.",
      keyLifts:["Glute Drive","RDL","BSS","Rear Kick"],
      success:"Glute Drive toward 540 e1RM, RDL toward 225, BSS toward 155."},
     {label:"M10",name:"Deload",    period:"Oct '26",color:"var(--t3)",active:b.label==="M10",
@@ -1894,8 +1985,8 @@ function renderMap() {
      keyLifts:["All \u2014 reduced"],
      success:"No new pain. Ready to accumulate again."},
     {label:"M11",name:"Accum. 2.0",period:"Nov\u2013Dec '26",color:"var(--or)",active:b.label==="M11",
-     purpose:"Accumulation at heavier loads than M8, targeting Dec 2023 peak recapture.",
-     emphasis:"Start heavier than M8 week 1. The base is built. Use it.",
+     purpose:"Accumulation guided by current performance history, rep quality, and recovery.",
+     emphasis:"Progress from recent comparable workouts, within your chosen rep and RPE ranges.",
      keyLifts:["Glute Drive","RDL","Hip Thrust","BSS","Leg Curl"],
      success:"Recapture Dec 2023 peaks: RDL 205 lbs, BSS 140 lbs, Glute Drive 540+ e1RM."}
   ];
@@ -1927,22 +2018,6 @@ function renderMap() {
   // Week detail card
   var weekDetail = "<div id='weekDetail' style='display:none;margin-bottom:0'></div>";
 
-  // Lift progress
-  var liftRows = PROFILE.priorityLifts.slice(0,6).map(function(lk) {
-    var t=PROFILE.liftTargets[lk], d=STATE.lifts[lk];
-    var cur=d?d.lastE:null;
-    var pct=(cur&&t.M8e)?Math.min(Math.round(cur/t.M8e*100),100):0;
-    var n=shortName(lk);
-    return "<div class='map-lift'>" +
-      "<div class='map-lift-row'>" +
-        "<span class='map-lift-name'>"+n+"</span>" +
-        "<span class='map-lift-vals'>"+(cur||"\u2014")+" \u2192 <span class='g'>"+t.M8e+"</span> \u2192 <span style='color:var(--or)'>"+t.goale+"</span></span>" +
-      "</div>" +
-      "<div class='map-bar-bg'><div class='map-bar-fill' style='width:"+pct+"%'></div></div>" +
-      "<div class='map-bar-labels'><span>Now"+(cur?" ("+cur+")":"")+"</span><span>M8: "+t.M8e+"</span><span>Goal: "+t.goale+"</span></div>" +
-    "</div>";
-  }).join("");
-
   var activeCycle=v3ActiveCycle();
   var hero="<div class='v3-active'><div class='v3-state'>"+(activeCycle?(v3Paused(activeCycle)?'PAUSED CYCLE':'CURRENT CYCLE'):'NO ACTIVE CYCLE')+"</div><div class='v3-h1' style='margin-top:7px'>"+(activeCycle?v3Safe(activeCycle.label+' · '+activeCycle.name):'No cycle scheduled')+"</div><div class='v3-sub'>"+(activeCycle?v3Safe(v4Date(activeCycle.start)+' – '+v4Date(activeCycle.end)+' · Week '+b.week+' of '+b.totalWeeks):'Choose or edit a cycle below to get started.')+"</div>"+(activeCycle?"<div class='v3-actions'>"+(v3Paused(activeCycle)?"<button class='v3-action' onclick='v3ResumeCycle()'>"+v4Icon('play')+" Resume cycle</button>":"<button class='v3-action warn' onclick='v3PauseCycle()'>"+v4Icon('pause')+" Pause cycle</button>")+"<button class='v3-action alt' data-cycle='"+activeCycle.label+"' onclick='v3OpenEditor(this.dataset.cycle)'>"+v4Icon('edit')+" Edit cycle</button></div>":"")+"</div>";
   var editor="<div id='cycleEditorBox' class='collapse-box"+(_cycleEditorOpen?" open":"")+"'><div class='collapse-head' onclick='toggleCycleEditor()'><div><div id='v3-edit-head' style='font-size:13px;font-weight:800'>Edit training cycle</div><div class='v3-muted'>Open only when you want to adjust dates, RPE, or reps.</div></div><button class='v3-mini' type='button'>"+(_cycleEditorOpen?'Collapse':'Open editor')+"</button></div><div class='collapse-summary'>Current selection: "+v3Safe((activeCycle?activeCycle.label:'')+(activeCycle?' · ':'')+(activeCycle?activeCycle.name:'No cycle selected'))+"</div><div class='collapse-body' id='cycleEditorBody' style='display:"+(_cycleEditorOpen?'block':'none')+"'><div class='v3-titlebar' style='margin:0 0 8px'><h3>Cycle settings</h3><button class='v3-mini' onclick='v3ResetCycles()'>Reset schedule</button></div><div class='v3-muted'>Editing affects LiftIQ's local plan only. Pausing freezes the cycle week; resuming shifts the current and later cycles forward by the pause duration.</div><div class='v3-actions'>"+MESO_PLAN.map(function(m){return "<button class='v3-mini' data-cycle='"+m.label+"' onclick='v3SelectCycle(this.dataset.cycle);_cycleEditorOpen=true;toggleCycleEditor(true)'>"+m.label+"</button>";}).join('')+"</div><form id='v3-cycle-form' class='v3-form' onsubmit='event.preventDefault();v3SaveEdit()'><div class='v3-field full'><label>Cycle name</label><input name='cycleName' maxlength='80' required></div><div class='v3-field'><label>Start date</label><input name='cycleStart' type='date' required></div><div class='v3-field'><label>End date</label><input name='cycleEnd' type='date' required></div><div class='v3-field'><label>Target RPE</label><input name='cycleRpe' maxlength='20'></div><div class='v3-field'><label>Reps</label><input name='cycleReps' maxlength='20'></div><div class='v3-field full'><button class='v3-action' type='submit'>Save cycle changes</button></div></form></div></div>";
@@ -1955,13 +2030,14 @@ function renderMap() {
   var cycleReview="<div class='v4-cycle-ai'><div class='v4-eyebrow'>"+v4Icon('spark')+" Gemini · Cycle advisor</div><div style='font-weight:800;margin-top:8px'>Should this block change?</div><div class='v3-muted'>Review your actual performance trends and ask Gemini whether to extend, hold, deload, or adjust the cycle. Advice is not automatically applied.</div><button onclick='v4CycleReview()' "+(!activeCycle?'disabled':'')+">Review my current cycle</button><div class='v3-muted'>After reviewing advice, use Edit cycle to approve a date change. Hevy data is never overwritten.</div></div>";
   el.innerHTML =
     hero +
+    renderLiveBenchmarks() +
     uiFold('plan-cycle-review','Cycle review and goals','Training frequency, set evidence and optional cycle-extension proposal',v11CyclePanel(activeCycle),false,'Review') +
-    smartPlanSummary() + editor +
+    editor +
     uiFold('plan-roadmap','Training roadmap','Macrocycle, mesocycles and weekly progression',hierarchy + phaseRow + phaseDetail +
       "<div class='cc'><div class='cl'>Week in block</div>"+weekDots+
       "<div style='font-size:11px;color:var(--t2);margin-top:6px'>Week "+b.week+" of "+b.totalWeeks+" · "+b.phase+"</div>"+weekDetail+"</div>",false,MESO_PLAN.length+' blocks') +
     uiFold('plan-cycle-advisor','Ask Gemini about this cycle','Optional advice; no plan changes without your approval',cycleReview,false,'Optional') +
-    "<details class='smart-card smart-plan'><summary class='smart-discovery-head'><strong>Legacy M8 benchmarks · optional reference</strong><span class='smart-tag'>Expand</span></summary><p class='v3-muted'>These historical benchmarks are not current user-approved targets. Set active goals in Targets.</p>"+liftRows+"</details>" +
+
     "<div class='v3-muted' style='margin:12px 0'>The current plan is not automatically rewritten when priorities change. Your selected focus is reflected in the cycle review and in future coaching context.</div>";
 
   // Store PHASES for click handler access
@@ -1990,8 +2066,8 @@ function showPhaseDetail(label) {
       "<div style='font-size:11px;color:var(--t2);line-height:1.8'>" +
         "<strong style='color:var(--tx)'>Purpose:</strong> "+p.purpose+"<br>" +
         "<strong style='color:var(--tx)'>Emphasis:</strong> "+p.emphasis+"<br>" +
-        "<strong style='color:var(--tx)'>Key lifts:</strong> "+p.keyLifts.join(", ")+"<br>" +
-        "<strong style='color:var(--tx)'>Success:</strong> "+p.success +
+        "<strong style='color:var(--tx)'>Currently selected movements:</strong> "+v3Safe(smartActivePriorityNames().slice(0,6).map(shortName).join(', ')||'Choose priorities in Targets')+"<br>" +
+        "<strong style='color:var(--tx)'>Your approved cycle success criterion:</strong> "+v3Safe(V11_CYCLE_GOALS[p.label]||'Not set — define it in Cycle review and goals.') +
       "</div>" +
     "</div>";
   detail.style.display = "block";
