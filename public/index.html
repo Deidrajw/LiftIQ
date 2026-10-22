@@ -828,7 +828,16 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 @media(max-width:375px){.obs-wordmark{font-size:19px}.obs-subbrand{font-size:7px}.obs-edition{display:none}.ux-primary-nav{gap:0}.ux-dest{font-size:10px}.ux-utility-btn{padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-.li-panel,.li-searchbox{background:var(--bg2,#1a2129);color:var(--tx,#eaf1f7);border:1px solid #495666;border-radius:14px;padding:15px;margin:14px 0}.li-panel button,.li-searchbox button{min-height:44px;border-radius:9px;border:1px solid #566679;background:#283544;color:#eaf1f7;padding:10px;margin:4px}.li-panel input,.li-panel select,.li-panel textarea,.li-searchbox input{width:100%;padding:11px;box-sizing:border-box;min-height:44px;font-size:16px;background:#111923;border:1px solid #526273;border-radius:9px;color:#fff}.li-panel label{display:block;margin-top:10px;font-size:13px}.li-entry{border-top:1px solid #394957;padding:12px 0}.li-search{position:fixed;z-index:9900;inset:0;background:#05080cde;overflow:auto;padding:20px 12px;display:none}.li-search.open{display:block}.li-searchbox{max-width:600px;margin:0 auto}</style>
+.li-panel,.li-searchbox{background:var(--bg2,#1a2129);color:var(--tx,#eaf1f7);border:1px solid #495666;border-radius:14px;padding:15px;margin:14px 0}.li-panel button,.li-searchbox button{min-height:44px;border-radius:9px;border:1px solid #566679;background:#283544;color:#eaf1f7;padding:10px;margin:4px}.li-panel input,.li-panel select,.li-panel textarea,.li-searchbox input{width:100%;padding:11px;box-sizing:border-box;min-height:44px;font-size:16px;background:#111923;border:1px solid #526273;border-radius:9px;color:#fff}.li-panel label{display:block;margin-top:10px;font-size:13px}.li-entry{border-top:1px solid #394957;padding:12px 0}.li-search{position:fixed;z-index:9900;inset:0;background:#05080cde;overflow:auto;padding:20px 12px;display:none}.li-search.open{display:block}.li-searchbox{max-width:600px;margin:0 auto}
+/* LIFTIQ_V143_ASSISTANT: contextual guidance and user-approved flags */
+.li-advice{border:1px solid #587184;border-radius:12px;background:#1b2b36;padding:14px;margin:14px 0}
+.li-advice h4{margin:0 0 8px;color:#eaf1f7}.li-advice p{line-height:1.55}
+.li-advice .li-warn{color:#f0d5a1}.li-advice .li-flag{color:#b0e2cb}
+.li-advice label{display:block;margin:9px 0 4px;color:#c4d3df}
+.li-advice select{width:100%;background:#17212a;color:#edf4fa;border:1px solid #65798b;border-radius:8px;padding:10px;min-height:44px;font-size:16px}
+.li-advice button{margin:7px 5px 3px 0}
+.li-memory{font-size:13px;color:#c0cdd9;border-top:1px solid #465764;margin-top:12px;padding-top:10px}
+</style>
 </head>
 <body class="today-active">
 <input type="file" id="csvIn" accept=".csv" style="display:none" onchange="onFileSelect(event)">
@@ -3945,6 +3954,36 @@ function liCloseSearch(){document.getElementById('liSearch').classList.remove('o
 function liRenderSearch(){var words=document.getElementById('liQuery').value.toLowerCase().split(/\s+/).filter(Boolean),all=[...new Set([...Object.keys(STATE.exerciseHistory||{}),...Object.keys(STATE.lifts||{})])],names=all.filter(x=>words.every(w=>x.toLowerCase().includes(w))).slice(0,15),h=document.getElementById('liResults');if(!words.length){h.textContent='Search '+all.length+' exercises from your imported Hevy history.';return}if(!names.length){h.textContent='No matches. Try a broader exercise name.';return}h.innerHTML=names.map(function(n,i){var x=historyEntries(n),last=x.at(-1);return '<div class="li-entry"><strong>'+liEsc(n)+'</strong><p>'+(last?'Latest: '+Math.round(last.weightLb*10)/10+' lb × '+last.reps+' · '+liEsc(uiLongDate(last.date)):'No comparable weighted sets')+' · '+x.length+' dates</p><button data-chart="'+i+'">View progression</button><button data-ask="'+i+'">Ask about increasing weight</button></div>'}).join('');h.querySelectorAll('[data-chart]').forEach(b=>b.onclick=()=>{var n=names[+b.dataset.chart];liCloseSearch();openExerciseHistory(n)});h.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>liAskLoad(names[+b.dataset.ask]))}
 function liAskLoad(n){var e=historyEntries(n).slice(-4).map(x=>uiLongDate(x.date)+': '+Math.round(x.weightLb*10)/10+' lb × '+x.reps+(x.rpe!=null?' RPE '+x.rpe:'')).join('; ');_aiQuestion=('Should I increase weight for '+n+'? My completed Hevy sets: '+(e||'No recent comparable sets')+'. Consider technique, RPE, reps, readiness and current set performance.').slice(0,350);liCloseSearch();uiNavigate('coach');renderAICoach();var q=document.getElementById('aiQuestion');if(q){q.value=_aiQuestion;q.focus()}}
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('liSearch')?.classList.contains('open'))liCloseSearch()});
+
+
+/* LIFTIQ_V143_ASSISTANT · deterministic safety-first suggestions. Gemini opt-in only. */
+var LI143_KEY='liftiq_training_flags_v143',LI143={flags:[],dismissed:[],answers:{}};
+try{var _li143=JSON.parse(localStorage.getItem(LI143_KEY)||'null');if(_li143){LI143.flags=Array.isArray(_li143.flags)?_li143.flags:[];LI143.dismissed=Array.isArray(_li143.dismissed)?_li143.dismissed:[];LI143.answers=_li143.answers||{}}}catch(e){}
+function li143Save(){try{localStorage.setItem(LI143_KEY,JSON.stringify(LI143))}catch(e){alert('Could not save flags in this browser.')}}
+function li143Latest(){var a=LI.active;return a?.events?.length?a.events[a.events.length-1]:null}
+function li143Flag(id){var e=li143Latest();if(!e||e.id!==id)return;if(!LI143.flags.some(x=>x.eventId===id)){LI143.flags.unshift({eventId:id,exercise:e.ex||'Unspecified exercise',kind:e.type,note:e.note,created:new Date().toISOString(),resolved:false});LI143.flags=LI143.flags.slice(0,30)}li143Save();renderNextSessionCoach()}
+function li143Dismiss(id){if(!LI143.dismissed.includes(id))LI143.dismissed.push(id);li143Save();renderNextSessionCoach()}
+function li143Resolve(id){var f=LI143.flags.find(x=>x.eventId===id);if(f){f.resolved=!f.resolved;li143Save();renderNextSessionCoach()}}
+function li143Symptoms(id){var p=document.getElementById('li143Pain'),r=document.getElementById('li143Radiation');if(!p||!r)return;LI143.answers[id]={severity:p.value,neurology:r.value};li143Save();renderNextSessionCoach()}
+function li143RenderAdvice(){
+ var e=li143Latest(),h='';
+ if(e&&!LI143.dismissed.includes(e.id)){
+  var kind=(e.type||'other').toLowerCase(),txt=(e.note||'').toLowerCase();
+  var possiblePain=kind==='pain'||/\b(pain|hurt|injur|sharp|numb|tingl)\b/.test(txt);
+  var a=LI143.answers[e.id]||{},high=a.severity==='severe'||a.neurology==='bladder',rad=a.neurology==='leg';
+  var suggestion=possiblePain?'Stop the painful exercise and do not increase its load today. If symptoms continue, consider ending the workout and seeking medical assessment.':kind==='swap'?'Record which exercise replaced the original and why. After Hevy syncs, compare the completed session before making any future plan change.':kind==='load'?'Check technique, reps and effort before increasing weight. A completed Hevy set cannot establish how your current set feels.':kind==='fatigue'?'Consider reducing effort or finishing earlier based on how you feel. Avoid interpreting one low-energy session as a strength plateau.':kind==='equipment'?'Treat this as an equipment constraint, not a failure to progress. Record the substitution for later review.':'Record the context and compare it with your completed Hevy session before changing the plan.';
+  if(high)suggestion='Stop training and seek urgent medical assessment for severe pain with significant neurological symptoms, or new bladder/bowel changes. Do not rely on an AI substitution recommendation.';
+  else if(rad)suggestion='Stop the painful movement. Pain spreading into the leg deserves clinical assessment, especially if new or worsening. Do not test heavier loads.';
+  h+='<div class="li-advice" aria-live="polite"><h4>Suggested response to your note</h4><p>'+liEsc(suggestion)+'</p>';
+  if(possiblePain){h+='<p class="li-warn">Safety check · This is not a diagnosis.</p><label for="li143Pain">How does the pain feel?</label><select id="li143Pain"><option value="unknown">Choose</option><option value="mild" '+(a.severity==='mild'?'selected':'')+'>Mild discomfort</option><option value="sharp" '+(a.severity==='sharp'?'selected':'')+'>Sharp or worsening</option><option value="severe" '+(a.severity==='severe'?'selected':'')+'>Severe / limiting movement</option></select><label for="li143Radiation">Any symptoms beyond the painful area?</label><select id="li143Radiation"><option value="unknown">Choose</option><option value="local" '+(a.neurology==='local'?'selected':'')+'>Localized only</option><option value="leg" '+(a.neurology==='leg'?'selected':'')+'>Pain into leg, tingling, or numbness</option><option value="bladder" '+(a.neurology==='bladder'?'selected':'')+'>New weakness, saddle numbness, or bladder/bowel changes</option></select><button onclick="li143Symptoms(\''+e.id+'\')">Update guidance</button>';}
+  h+='<div class="tm-actions"><button onclick="li143Flag(\''+e.id+'\')">'+(LI143.flags.some(x=>x.eventId===e.id)?'Flag saved ✓':'Flag for next workout')+'</button><button onclick="liCoach(\''+LI.active.id+'\',false)">Ask Gemini with my notes</button><button onclick="li143Dismiss(\''+e.id+'\')">Dismiss suggestion</button></div><p class="li-memory">Gemini is never contacted by this panel. It only receives notes if you explicitly review and submit a Coach question. Your training plan is not changed automatically.</p></div>';
+ }
+ var active=LI143.flags.filter(x=>!x.resolved);
+ if(active.length){h+='<details class="li-advice"><summary>Training memory · '+active.length+' active flag'+(active.length===1?'':'s')+'</summary><p class="li-memory">These reminders stay local and do not automatically change the next-workout ranking or Gemini context.</p>';active.slice(0,10).forEach(x=>{h+='<div class="li-entry"><strong>'+liEsc(x.exercise)+'</strong><p>'+liEsc(x.note)+'</p><button onclick="li143Resolve(\''+x.eventId+'\')">Mark resolved</button></div>'});h+='</details>'}
+ return h;
+}
+var li143OriginalJournalHTML=liJournalHTML;
+liJournalHTML=function(){return li143OriginalJournalHTML()+li143RenderAdvice()};
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
