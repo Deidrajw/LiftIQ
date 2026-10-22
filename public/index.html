@@ -840,6 +840,25 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 
 /* V14.4 UX consolidation */
 .liq-thread-list{display:flex;gap:8px;overflow-x:auto;padding:8px 0 12px}.liq-thread-list button,.liq-journal-btn{padding:10px 12px;min-height:44px;border-radius:10px;border:1px solid var(--bd2,#4a5662);background:var(--bg2,#1c242d);color:var(--tx,#eef3f7);cursor:pointer}.liq-thread-list .active{border-color:#a0bbcf;background:#304251}.liq-message{border:1px solid var(--bd2,#44515e);border-radius:12px;padding:12px;margin:10px 0;overflow-wrap:anywhere}.liq-message.user{border-left:3px solid #87b7d4}.liq-message.assistant{border-left:3px solid #82b8a0}.liq-message strong{display:block;margin-bottom:6px}.liq-history-note{font-size:12px;color:var(--mu,#a7b5c2)}.liq-journal-overlay{display:none;position:fixed;z-index:9500;inset:0;overflow:auto;background:#05090fdf;padding:16px 12px max(30px,env(safe-area-inset-bottom))}.liq-journal-overlay.open{display:block}.liq-journal-content{max-width:660px;margin:auto}.liq-journal-top{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px;background:#1e2832;border-radius:12px}.liq-journal-top button{min-height:44px;padding:10px;border-radius:9px}.liq-mini-status{border:1px solid var(--bd2,#4a5662);padding:13px;border-radius:12px;display:flex;gap:10px;align-items:center;justify-content:space-between}.liq-mini-status p{margin:0}.liq-mini-status button{min-height:44px;padding:9px 12px;border-radius:8px;border:1px solid #647588;background:#28394a;color:#eff4f8}.liq-thread-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.liq-thread-actions button{min-height:44px;padding:10px;border-radius:9px;border:1px solid #657584;background:#263440;color:#eef5fa}#liqJournalOverlay button:focus-visible,.liq-thread-actions button:focus-visible{outline:3px solid #9fcbe9;outline-offset:2px}
+
+/* LiftIQ V14.5 responsive navigation */
+.obs-header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.obs-brand{min-width:0;flex:0 1 auto}
+.ux-utility-actions{position:static!important;top:auto!important;right:auto!important;display:flex!important;align-items:center;gap:7px!important;flex-shrink:0}
+.ux-more-menu{position:relative}
+.ux-more-menu summary{display:flex;align-items:center;list-style:none;cursor:pointer;min-height:44px;padding:10px 12px;border:1px solid var(--bd2);border-radius:12px;background:var(--bg2);color:var(--tx);font-size:14px}
+.ux-more-menu summary::-webkit-details-marker{display:none}
+.ux-more-list{position:absolute;right:0;top:calc(100% + 7px);z-index:300;min-width:180px;padding:7px;border-radius:12px;border:1px solid var(--bd2);background:var(--bg2);box-shadow:0 12px 32px #0009}
+.ux-more-list button{display:block;width:100%;min-height:46px;padding:10px;color:var(--tx);background:transparent;border:0;text-align:left;font-size:14px}
+.ux-more-list button:focus-visible,.ux-more-menu summary:focus-visible{outline:3px solid #95b9d6;outline-offset:2px}
+@media(max-width:620px){.obs-header{padding-left:12px!important;padding-right:12px!important}.obs-monogram{width:34px;height:40px}.obs-wordmark{font-size:20px}.obs-subbrand{font-size:9px;letter-spacing:.08em}.ux-utility-actions .ux-search-direct{padding:9px 12px}}
+@media(max-width:345px){.obs-subbrand{display:none}.ux-utility-actions .ux-search-direct{padding:8px}}
+.ux-primary-nav{padding-bottom:calc(5px + env(safe-area-inset-bottom))!important}
+.ux-dest{min-height:50px!important}
+.liq-coach-composer{border:1px solid var(--bd2);border-radius:14px;padding:14px;background:var(--bg2);margin-bottom:12px}
+.liq-coach-history>summary{cursor:pointer;list-style:none;min-height:44px;padding:12px;border:1px solid var(--bd2);border-radius:10px;font-size:14px;font-weight:650}
+.liq-coach-history>summary::-webkit-details-marker{display:none}
+.liq-coach-history>.cc{margin-top:10px}
 </style>
 </head>
 <body class="today-active">
@@ -848,9 +867,7 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 <header class="obs-header">
   <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
   <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 04</span></div>
-  <div class="ux-utility-actions"><button type="button" class="ux-utility-btn" onclick="liqJournalOpen()">Journal</button><button type="button" class="ux-utility-btn" onclick="liOpenSearch()">Search</button>
-  <button type="button" class="ux-utility-btn" onclick="uiNavigate('sync')" aria-label="Sync workouts" title="Sync workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v-4l-4 4h4a8 8 0 0 0-14 2M4 17v4l4-4H4a8 8 0 0 0 14-2"/></svg><span>Sync</span></button>
-  <button type="button" class="ux-utility-btn" onclick="uiNavigate('settings')" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></svg><span>Settings</span></button>
+  <div class="ux-utility-actions"><button type="button" class="ux-utility-btn ux-search-direct" onclick="liOpenSearch()">Search</button><details class="ux-more-menu" id="uxMoreMenu"><summary>More ▾</summary><div class="ux-more-list"><button onclick="liqJournalOpen();uxMoreMenu.open=false">Journal</button><button onclick="uiNavigate('sync');uxMoreMenu.open=false">Sync Hevy</button><button onclick="uiNavigate('settings');uxMoreMenu.open=false">Settings</button></div></details>
 </div>
 </header>
 
@@ -4020,6 +4037,26 @@ liJournalHTML=function(){return '<div class="liq-mini-status"><div><strong>'+(LI
 var liqOldRenderNext=renderNextSessionCoach;
 renderNextSessionCoach=function(){liqOldRenderNext();if(document.getElementById('liqJournalOverlay')?.classList.contains('open'))liqJournalRefresh()};
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('liqJournalOverlay')?.classList.contains('open'))liqJournalClose()});
+
+
+/* V14.5 improved Coach content order */
+var liq145OldRenderCoach=renderAICoach;
+renderAICoach=function(){
+ liq145OldRenderCoach();
+ var pane=document.getElementById('t-ai');if(!pane)return;
+ var composer=pane.querySelector('.cc:has(#aiQuestion)');
+ var history=pane.querySelector('.cc:has(.liq-thread-list)');
+ if(composer)composer.classList.add('liq-coach-composer');
+ if(composer&&history){
+  var wrapper=document.createElement('details');wrapper.className='liq-coach-history';
+  var label=document.createElement('summary');
+  label.textContent='Conversation history · '+LIQ_CHAT.threads.length+' saved';
+  history.parentNode.insertBefore(wrapper,history);
+  wrapper.append(label,history);
+  composer.parentNode.insertBefore(composer,wrapper);
+ }
+};
+document.addEventListener('click',function(e){var d=document.getElementById('uxMoreMenu');if(d&&d.open&&!d.contains(e.target))d.open=false});
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
