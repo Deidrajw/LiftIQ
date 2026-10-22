@@ -837,6 +837,9 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .li-advice select{width:100%;background:#17212a;color:#edf4fa;border:1px solid #65798b;border-radius:8px;padding:10px;min-height:44px;font-size:16px}
 .li-advice button{margin:7px 5px 3px 0}
 .li-memory{font-size:13px;color:#c0cdd9;border-top:1px solid #465764;margin-top:12px;padding-top:10px}
+
+/* V14.4 UX consolidation */
+.liq-thread-list{display:flex;gap:8px;overflow-x:auto;padding:8px 0 12px}.liq-thread-list button,.liq-journal-btn{padding:10px 12px;min-height:44px;border-radius:10px;border:1px solid var(--bd2,#4a5662);background:var(--bg2,#1c242d);color:var(--tx,#eef3f7);cursor:pointer}.liq-thread-list .active{border-color:#a0bbcf;background:#304251}.liq-message{border:1px solid var(--bd2,#44515e);border-radius:12px;padding:12px;margin:10px 0;overflow-wrap:anywhere}.liq-message.user{border-left:3px solid #87b7d4}.liq-message.assistant{border-left:3px solid #82b8a0}.liq-message strong{display:block;margin-bottom:6px}.liq-history-note{font-size:12px;color:var(--mu,#a7b5c2)}.liq-journal-overlay{display:none;position:fixed;z-index:9500;inset:0;overflow:auto;background:#05090fdf;padding:16px 12px max(30px,env(safe-area-inset-bottom))}.liq-journal-overlay.open{display:block}.liq-journal-content{max-width:660px;margin:auto}.liq-journal-top{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px;background:#1e2832;border-radius:12px}.liq-journal-top button{min-height:44px;padding:10px;border-radius:9px}.liq-mini-status{border:1px solid var(--bd2,#4a5662);padding:13px;border-radius:12px;display:flex;gap:10px;align-items:center;justify-content:space-between}.liq-mini-status p{margin:0}.liq-mini-status button{min-height:44px;padding:9px 12px;border-radius:8px;border:1px solid #647588;background:#28394a;color:#eff4f8}.liq-thread-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.liq-thread-actions button{min-height:44px;padding:10px;border-radius:9px;border:1px solid #657584;background:#263440;color:#eef5fa}#liqJournalOverlay button:focus-visible,.liq-thread-actions button:focus-visible{outline:3px solid #9fcbe9;outline-offset:2px}
 </style>
 </head>
 <body class="today-active">
@@ -845,7 +848,7 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 <header class="obs-header">
   <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
   <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 04</span></div>
-  <div class="ux-utility-actions"><button type="button" class="ux-utility-btn" onclick="liOpenSearch()">Search</button>
+  <div class="ux-utility-actions"><button type="button" class="ux-utility-btn" onclick="liqJournalOpen()">Journal</button><button type="button" class="ux-utility-btn" onclick="liOpenSearch()">Search</button>
   <button type="button" class="ux-utility-btn" onclick="uiNavigate('sync')" aria-label="Sync workouts" title="Sync workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v-4l-4 4h4a8 8 0 0 0-14 2M4 17v4l4-4H4a8 8 0 0 0 14-2"/></svg><span>Sync</span></button>
   <button type="button" class="ux-utility-btn" onclick="uiNavigate('settings')" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></svg><span>Settings</span></button>
 </div>
@@ -863,7 +866,7 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
     <div class="v3-titlebar"><h3>Dated best sets</h3><span class="v3-muted">Tap chart points for details</span></div><div id="historyRows" class="history-rows"></div>
   </div>
 </div>
-<div class="li-search" id="liSearch" role="dialog" aria-label="Exercise search"><div class="li-searchbox"><h3>Exercise search</h3><button onclick="liCloseSearch()">Close</button><input id="liQuery" type="search" aria-label="Exercise name" placeholder="Reverse lunge…" oninput="liRenderSearch()"><div id="liResults"></div></div></div><!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
+<div class="li-search" id="liSearch" role="dialog" aria-label="Exercise search"><div class="li-searchbox"><h3>Exercise search</h3><button onclick="liCloseSearch()">Close</button><input id="liQuery" type="search" aria-label="Exercise name" placeholder="Reverse lunge…" oninput="liRenderSearch()"><div id="liResults"></div></div></div><div id="liqJournalOverlay" class="liq-journal-overlay" role="dialog" aria-modal="true" aria-label="Training journal"><div class="liq-journal-content"><div class="liq-journal-top"><strong>Workout journal &amp; training memory</strong><button id="liqJournalClose" onclick="liqJournalClose()">Close</button></div><div id="liqJournalContents"></div></div></div><!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
 <div id="gym" class="today-mode">
   <div class="today-intro"><span class="obs-eyebrow">YOUR TRAINING COMPANION</span><h2>Today, in focus.</h2><p>Prepare here. Log your workout in Hevy. Come back for a data-backed review.</p></div>
   <div class="coach-card" id="coachCard"></div>
@@ -3984,6 +3987,39 @@ function li143RenderAdvice(){
 }
 var li143OriginalJournalHTML=liJournalHTML;
 liJournalHTML=function(){return li143OriginalJournalHTML()+li143RenderAdvice()};
+
+
+/* V14.4 Coach conversations and dedicated journal. Locally saved; no cloud sync. */
+var LIQ_CHAT_KEY='liftiq_coach_threads_v144',LIQ_CHAT={threads:[],active:null},LIQ_PENDING=null;
+try{var _ch=JSON.parse(localStorage.getItem(LIQ_CHAT_KEY)||'null');if(_ch&&Array.isArray(_ch.threads)){LIQ_CHAT.threads=_ch.threads.slice(0,25);LIQ_CHAT.active=_ch.active||null}}catch(e){}
+function liqChatSave(){try{localStorage.setItem(LIQ_CHAT_KEY,JSON.stringify(LIQ_CHAT))}catch(e){alert('Conversation could not be saved on this device.')}}
+function liqChatActive(){return LIQ_CHAT.threads.find(function(t){return t.id===LIQ_CHAT.active})||null}
+function liqChatNew(){var id='t'+Date.now();LIQ_CHAT.threads.unshift({id:id,title:'New conversation',created:new Date().toISOString(),messages:[]});LIQ_CHAT.threads=LIQ_CHAT.threads.slice(0,25);LIQ_CHAT.active=id;_aiQuestion='';_aiResult=null;liqChatSave();renderAICoach()}
+function liqChatOpen(id){if(_aiBusy)return;LIQ_CHAT.active=id;_aiResult=null;_aiQuestion='';liqChatSave();renderAICoach()}
+function liqChatDelete(id){if(!confirm('Delete this saved conversation?'))return;LIQ_CHAT.threads=LIQ_CHAT.threads.filter(function(t){return t.id!==id});if(LIQ_CHAT.active===id)LIQ_CHAT.active=LIQ_CHAT.threads[0]?.id||null;_aiResult=null;_aiQuestion='';liqChatSave();renderAICoach()}
+function liqChatContext(){var t=liqChatActive();return (t?.messages||[]).slice(-6).map(function(m){return {role:m.role,text:String(m.text).slice(0,600)}})}
+function liqChatHTML(){var t=liqChatActive(),h='<section class="cc"><div class="cl">Saved Coach conversations</div><p class="liq-history-note">Stored only in this browser. You can reopen, continue, or delete a conversation. The latest three exchanges are included when you ask a follow-up in the same conversation.</p><div class="liq-thread-actions"><button onclick="liqChatNew()">+ New conversation</button>'+(t?'<button onclick="liqChatDelete(\''+t.id+'\')">Delete current</button>':'')+'</div>';
+ h+='<div class="liq-thread-list">';LIQ_CHAT.threads.slice(0,15).forEach(function(x){h+='<button class="'+(x.id===LIQ_CHAT.active?'active':'')+'" onclick="liqChatOpen(\''+x.id+'\')">'+aiSafe(x.title)+'</button>'});h+='</div>';
+ if(t&&t.messages.length){h+='<details open><summary>Conversation · '+t.messages.length+' messages</summary>';t.messages.slice(-16).forEach(function(m){h+='<div class="liq-message '+(m.role==='user'?'user':'assistant')+'"><strong>'+(m.role==='user'?'You':'LiftIQ Coach')+'</strong><div>'+aiSafe(m.text)+'</div><p class="liq-history-note">'+new Date(m.at).toLocaleString('en-CA',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</p></div>'});h+='</details>'}
+ return h+'</section>'}
+var liqOldRenderAI=renderAICoach;
+renderAICoach=function(){liqOldRenderAI();var pane=document.getElementById('t-ai');if(!pane)return;var first=pane.firstElementChild; if(first)first.insertAdjacentHTML('beforebegin',liqChatHTML());};
+var liqOldAskAI=askAI;
+askAI=async function(mode){var q=document.getElementById('aiQuestion')?.value.trim()||_aiQuestion,thread=liqChatActive();if(mode==='question'&&q&&!thread){liqChatNew();thread=liqChatActive();var el=document.getElementById('aiQuestion');if(el)el.value=q;}
+ var prior=_aiResult;
+ await liqOldAskAI(mode);
+ if(mode==='question'&&q&&_aiResult&&_aiResult!==prior&&!_aiError){thread=liqChatActive();if(thread){var now=new Date().toISOString();thread.messages.push({role:'user',text:q.slice(0,350),at:now},{role:'assistant',text:String(_aiResult.answer||_aiResult.summary||'No answer text').slice(0,1800),at:now});thread.messages=thread.messages.slice(-50);if(thread.title==='New conversation')thread.title=q.slice(0,42);liqChatSave();renderAICoach();}}
+};
+var liqOldCoachRequest=coachRequestBody;
+coachRequestBody=function(mode,question,maxLength){var base=JSON.parse(liqOldCoachRequest(mode,question,maxLength));base.conversationContext=mode==='question'?liqChatContext():[];return JSON.stringify(base)};
+function liqJournalOpen(){document.getElementById('liqJournalOverlay').classList.add('open');liqJournalRefresh();document.getElementById('liqJournalClose').focus()}
+function liqJournalClose(){document.getElementById('liqJournalOverlay').classList.remove('open')}
+function liqJournalRefresh(){var host=document.getElementById('liqJournalContents');if(host)host.innerHTML=li143OriginalJournalHTML()+li143RenderAdvice()}
+var liqOldJournalHTML=liJournalHTML;
+liJournalHTML=function(){return '<div class="liq-mini-status"><div><strong>'+(LI.active?'Training journal active':'Training journal')+'</strong><p class="today-muted">'+(LI.active?'Capture an observation or finish your journal.':'Record decisions and changes without duplicating Hevy sets.')+'</p></div><button onclick="liqJournalOpen()">'+(LI.active?'Open journal':'Journal')+'</button></div>'};
+var liqOldRenderNext=renderNextSessionCoach;
+renderNextSessionCoach=function(){liqOldRenderNext();if(document.getElementById('liqJournalOverlay')?.classList.contains('open'))liqJournalRefresh()};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('liqJournalOverlay')?.classList.contains('open'))liqJournalClose()});
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
