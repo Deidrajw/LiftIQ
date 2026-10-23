@@ -999,6 +999,18 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 #t-ai .liq-v152-history-actions button{min-height:44px;padding:9px 12px;border-radius:9px;background:#2c3c4b;border:1px solid #5e7387;color:#f2f6fb}
 #t-ai .liq-ai-evidence:not([open]){padding:0!important}
 @media(max-width:370px){#t-ai .liq15-main .liq-chat-bubble{max-width:97%!important}#t-ai .liq15-main .liq-coach-composer{padding:12px!important}}
+
+/* V15.3 Coach priority: scannable replies, prompt chips and secondary action hierarchy */
+#t-ai .liq15-main .liq-chat-bubble.assistant .liq153-copy{display:grid;gap:10px}
+#t-ai .liq15-main .liq-chat-bubble.assistant .liq153-copy p{margin:0;line-height:1.55;white-space:pre-wrap}
+#t-ai .liq15-main .liq-chat-bubble.assistant .liq153-copy p+ p{padding-top:8px;border-top:1px solid #355367}
+#t-ai .liq153-suggestions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+#t-ai .liq153-suggestions button{min-height:38px;padding:7px 11px;border-radius:18px;border:1px solid #60798c;background:#253542;color:#dceaf6;font-size:12px;line-height:1.3}
+#t-ai .liq153-suggestions button:focus-visible{outline:3px solid #bbd5ec;outline-offset:2px}
+#t-ai .liq153-secondary{display:flex;justify-content:flex-start;align-items:center;margin-top:10px;gap:8px}
+#t-ai .liq153-secondary button{font-size:12px;min-height:40px}
+#t-ai .liq153-subtle{font-size:12px;color:#a7b9c7}
+@media(max-width:390px){#t-ai .liq153-suggestions{gap:6px}#t-ai .liq153-suggestions button{font-size:12px}}
 </style>
 </head>
 <body class="today-active">
@@ -4494,6 +4506,35 @@ renderAICoach=function(){
   backdrop.addEventListener('click',function(e){if(e.target===backdrop)liq152CloseHistory()});
   backdrop.addEventListener('keydown',function(e){if(e.key==='Escape')liq152CloseHistory();if(e.key==='Tab'){var els=[...backdrop.querySelectorAll('button,input')].filter(function(x){return !x.disabled&&!x.hidden&&x.getClientRects().length});if(!els.length)return;if(e.shiftKey&&document.activeElement===els[0]){e.preventDefault();els[els.length-1].focus()}else if(!e.shiftKey&&document.activeElement===els[els.length-1]){e.preventDefault();els[0].focus()}}});
  }
+};
+
+
+/* V15.3: preserve Gemini text verbatim; improve answer rhythm and question discoverability */
+var liq153RenderPrevious=renderAICoach;
+renderAICoach=function(){
+ liq153RenderPrevious();
+ var pane=document.getElementById('t-ai'),main=pane?.querySelector('.liq15-main');if(!main)return;
+ main.querySelectorAll('.liq-chat-bubble.assistant').forEach(function(bubble){
+  var original=[...bubble.children].find(function(el){return el.tagName==='DIV'&&!el.classList.contains('liq-chat-stamp')});
+  if(!original||original.classList.contains('liq153-copy'))return;
+  var raw=original.textContent||'',parts=raw.split(/\n\s*\n/).map(function(v){return v.trim()}).filter(Boolean);
+  if(parts.length<2)return;
+  original.textContent='';original.classList.add('liq153-copy');
+  parts.forEach(function(part){var p=document.createElement('p');p.textContent=part;original.appendChild(p)});
+ });
+ var composer=main.querySelector('.liq-coach-composer'),question=composer?.querySelector('#aiQuestion');if(!composer||!question)return;
+ var suggestions=document.createElement('div');suggestions.className='liq153-suggestions';suggestions.setAttribute('aria-label','Suggested coaching questions');
+ [['Next workout','Based on my completed workouts, what should I focus on next?'],
+ ['Adjust load','Based on my recent sets and recovery, should I adjust my working weights?'],
+ ['Exercise swap','What exercise substitution makes sense given my current training context?']].forEach(function(item){
+  var b=document.createElement('button');b.type='button';b.textContent=item[0];b.onclick=function(){question.value=item[1];_aiQuestion=question.value;liq149SaveDraft(question.value);question.focus()};suggestions.appendChild(b);
+ });
+ composer.appendChild(suggestions);
+ var buttons=[...composer.querySelectorAll('button')];
+ var secondary=buttons.find(function(b){return /analyz(e|ing)|review my training/i.test(b.textContent||'')});
+ if(secondary){secondary.title='Analyze completed Hevy workouts';secondary.style.fontWeight='500'}
+ var tools=main.querySelector('.liq-chat-toolrow');
+ if(tools){var idea=[...tools.querySelectorAll('button')].find(function(b){return /Question idea/i.test(b.textContent||'')});if(idea)idea.remove()}
 };
 
 // Preserve last visited primary destination within this browsing session only.
