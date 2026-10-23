@@ -1011,6 +1011,15 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 #t-ai .liq153-secondary button{font-size:12px;min-height:40px}
 #t-ai .liq153-subtle{font-size:12px;color:#a7b9c7}
 @media(max-width:390px){#t-ai .liq153-suggestions{gap:6px}#t-ai .liq153-suggestions button{font-size:12px}}
+
+/* V15.5 transparent mesocycle readiness review */
+.v155-review{border:1px solid var(--bd2,#46515c);border-radius:13px;padding:13px;margin:10px 0 16px;background:rgba(103,133,154,.07)}
+.v155-review h4{font-size:14px;margin:0 0 8px}
+.v155-review p{font-size:13px;line-height:1.5;margin:7px 0}
+.v155-review .v155-stats{display:flex;gap:10px;flex-wrap:wrap}
+.v155-review .v155-stats span{font-size:12px;border:1px solid var(--bd2,#46515c);padding:6px 9px;border-radius:8px}
+.v155-review .v155-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.v155-review .v155-actions button{min-height:44px}
 </style>
 </head>
 <body class="today-active">
@@ -4535,6 +4544,29 @@ renderAICoach=function(){
  if(secondary){secondary.title='Analyze completed Hevy workouts';secondary.style.fontWeight='500'}
  var tools=main.querySelector('.liq-chat-toolrow');
  if(tools){var idea=[...tools.querySelectorAll('button')].find(function(b){return /Question idea/i.test(b.textContent||'')});if(idea)idea.remove()}
+};
+
+
+/* V15.5 cycle review: observational only, no automatic rescheduling */
+var v155LegacyCyclePanel=v11CyclePanel;
+function v155CycleCheck(c){
+ if(!c)return '';
+ var today=v3Today(),end=today<c.end?today:c.end;
+ var start=c.start,elapsed=Math.max(1,Math.ceil((v3Date(end)-v3Date(start)+86400000)/604800000));
+ var target=Number(USER_SETTINGS.sessionsPerWeek)||4,st=v11CycleStats(c);
+ var recent=Object.keys(STATE.dailyLog||{}).filter(function(d){return d>=start&&d<=end});
+ var names=smartActivePriorityNames(),seen=names.filter(function(n){return historyEntries(n).some(function(x){return x.date>=start&&x.date<=end})}).length;
+ var state=v3Paused(c)?'Paused cycle':today>c.end?'Scheduled end passed':'Active or upcoming cycle';
+ var enough=recent.length>=4&&seen>0;
+ var guidance=!recent.length?'No completed sessions appear in the imported cycle window. Review your sync before evaluating the block.':!enough?'Limited evidence: review your recent sessions, priority-lift coverage and recovery before changing the calendar.':'Some completed training is available. Compare dated performance and reported recovery before choosing to keep, extend, or deload.';
+ return '<section class="v155-review" aria-label="Cycle decision support"><h4>Cycle decision check · '+v3Safe(state)+'</h4>'+
+ '<div class="v155-stats"><span>'+recent.length+' logged training dates so far</span><span>'+seen+' / '+names.length+' selected lifts seen</span><span>'+elapsed+' elapsed weeks · '+target+'/week planned</span></div>'+
+ '<p>'+v3Safe(guidance)+'</p><p><strong>Decision boundary:</strong> This is a descriptive snapshot, not a fatigue score or proof that an extension is needed. Missing Hevy history and unlogged recovery can change the interpretation.</p>'+
+ '<div class="v155-actions"><button class="v3-action alt" type="button" onclick="v4CycleReview()">Ask Coach for evidence-based review</button></div></section>';
+}
+v11CyclePanel=function(c){
+ var original=v155LegacyCyclePanel(c);if(!c)return original;
+ return original.replace('<div class=\'v11-buttons\'>',v155CycleCheck(c)+'<div class=\'v11-buttons\'>');
 };
 
 // Preserve last visited primary destination within this browsing session only.
