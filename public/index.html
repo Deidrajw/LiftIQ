@@ -937,6 +937,20 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 #t-ai .liq-chat-toolrow button{font-size:13px;min-height:44px}
 #t-ai .liq-coach-composer textarea:focus-visible{outline:2px solid #aac5df;outline-offset:2px}
 @media(max-width:390px){#t-ai .liq-chat-toolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}#t-ai .liq-chat-toolrow button{min-width:0;padding:8px;overflow-wrap:anywhere}#t-ai .liq-chat-toolrow button:last-child:nth-child(odd){grid-column:1/-1}}
+
+/* V15.0 Coach consolidation layout */
+#t-ai .liq15-main{padding:14px!important;margin:0 0 12px!important}
+#t-ai .liq15-main .liq-chat-header{display:flex;justify-content:space-between;gap:10px}
+#t-ai .liq15-main .liq-chat-header h3{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+#t-ai .liq15-main .liq-chat-transcript{max-height:min(38vh,360px);overflow-y:auto;min-height:125px}
+#t-ai .liq15-main .liq-coach-composer{border:0!important;padding:8px 0!important;background:transparent!important}
+#t-ai .liq15-main .liq-coach-composer textarea{min-height:72px}
+#t-ai .liq15-main .liq-chat-toolrow{margin-top:10px}
+#t-ai .liq15-main .liq-chat-toolrow button{font-size:12px}
+#t-ai .liq-ai-evidence[open]{padding:10px}
+#t-ai .liq-ai-evidence .cc{margin-top:8px}
+#t-ai .liq-thread-list button[hidden]{display:none!important}
+#t-ai .liq-coach-history[open] .liq-thread-list{max-height:230px;flex-wrap:wrap;overflow:auto}
 </style>
 </head>
 <body class="today-active">
@@ -4311,6 +4325,64 @@ renderAICoach=function(){
   input.insertAdjacentElement('afterend',info);
  }
 };
+
+
+/* V15.0 Coach consolidated renderer: single presentation path, existing state and API retained. */
+function liq15Escape(value){return aiSafe(String(value==null?'':value))}
+function liq15RenderCoach(){
+ var pane=document.getElementById('t-ai');if(!pane)return;
+ liqOldRenderAI(); // original evidence, proposals, settings-aware Gemini controls
+ var core=pane.querySelector('.cc:has(#aiQuestion)');
+ if(!core)return;
+ var thread=liqChatActive(),messages=thread&&Array.isArray(thread.messages)?thread.messages:[];
+ var shell=document.createElement('section');shell.className='cc liq-chat-main liq15-main';
+ var header=document.createElement('div');header.className='liq-chat-header';
+ var name=document.createElement('h3');name.textContent=thread?(thread.title||'Training conversation'):'Training conversation';name.title=name.textContent;
+ var newBtn=document.createElement('button');newBtn.className='ai-btn secondary';newBtn.textContent='+ New';newBtn.onclick=liqChatNew;
+ header.append(name,newBtn);shell.appendChild(header);
+ var transcript=document.createElement('div');transcript.className='liq-chat-transcript';transcript.setAttribute('role','log');transcript.setAttribute('aria-label','Training conversation');
+ if(!messages.length){var empty=document.createElement('p');empty.className='liq-chat-empty';empty.textContent='Ask about a completed lift, your next workout, or an adjustment you made during training.';transcript.appendChild(empty)}
+ messages.slice(-24).forEach(function(m){
+  var bubble=document.createElement('div');bubble.className='liq-chat-bubble '+(m.role==='user'?'user':'assistant');
+  var author=document.createElement('strong');author.textContent=m.role==='user'?'You':'Coach';
+  var answer=document.createElement('div');answer.textContent=String(m.text||'');
+  var when=document.createElement('div');when.className='liq-chat-stamp';var date=new Date(m.at);when.textContent=isNaN(date.getTime())?'Saved':date.toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  bubble.append(author,answer,when);transcript.appendChild(bubble);
+ });shell.appendChild(transcript);
+ core.classList.add('liq-coach-composer');core.querySelector('.cl')?.remove();core.querySelector('.ux-coach-intro')?.remove();
+ var textarea=core.querySelector('#aiQuestion');if(textarea){
+  textarea.value=_aiQuestion||LIQ149_DRAFTS[liq149DraftKey()]||'';
+  textarea.placeholder='Ask Coach a follow-up about your training…';textarea.setAttribute('aria-label','Message LiftIQ Coach');
+  textarea.oninput=function(){liq149SaveDraft(this.value)};
+ }
+ var explanation=core.querySelector('.ux-coach-explain');if(explanation)explanation.remove();
+ var actions=core.querySelector('.ai-actions');if(actions){
+  var review=actions.querySelector('.ux-ai-review');if(review)review.textContent='Analyze training';
+ }
+ shell.appendChild(core);
+ var tools=document.createElement('div');tools.className='liq-chat-toolrow';
+ [['History ('+LIQ_CHAT.threads.length+')',function(){var d=pane.querySelector('.liq-coach-history');if(d){d.open=!d.open;if(d.open)d.querySelector('input')?.focus()}}],
+  ['Export',liq149Export],
+  ['Question idea',liq146AskSuggestion]].forEach(function(pair){var button=document.createElement('button');button.type='button';button.textContent=pair[0];button.onclick=pair[1];tools.appendChild(button)});
+ shell.appendChild(tools);pane.prepend(shell);
+ var history=document.createElement('details');history.className='liq-coach-history';
+ var summary=document.createElement('summary');summary.textContent='Saved conversations · '+LIQ_CHAT.threads.length;history.appendChild(summary);
+ var search=document.createElement('input');search.className='liq-history-filter';search.type='search';search.placeholder='Search conversation history';search.setAttribute('aria-label','Search saved conversations');
+ var list=document.createElement('div');list.className='liq-thread-list';
+ function filter(){var q=search.value.toLowerCase().trim();[...list.children].forEach(function(button){var item=LIQ_CHAT.threads.find(x=>x.id===button.dataset.id);button.hidden=!!q&&!((item?.title||'')+' '+(item?.messages||[]).map(x=>x.text||'').join(' ')).toLowerCase().includes(q)})}
+ search.oninput=filter;history.append(search,list);
+ LIQ_CHAT.threads.slice(0,25).forEach(function(t){var button=document.createElement('button');button.type='button';button.dataset.id=t.id;button.textContent=t.title||'Conversation';if(t.id===LIQ_CHAT.active)button.classList.add('active');button.onclick=function(){liqChatOpen(t.id)};list.appendChild(button)});
+ var deleteButton=document.createElement('button');deleteButton.className='ai-btn secondary';deleteButton.textContent='Delete current conversation';deleteButton.onclick=function(){if(LIQ_CHAT.active)liqChatDelete(LIQ_CHAT.active)};history.appendChild(deleteButton);
+ pane.insertBefore(history,shell.nextSibling);
+ var extras=document.createElement('details');extras.className='liq-ai-evidence';var extrasSummary=document.createElement('summary');extrasSummary.textContent='Training evidence, targets & privacy';extras.appendChild(extrasSummary);
+ var candidates=[...pane.children].filter(function(el){return el!==shell&&el!==history});
+ candidates.forEach(function(el){extras.appendChild(el)});
+ pane.appendChild(extras);
+ /* Show only unsaved new answer when it is not already in the selected transcript. */
+ if(messages.length){var result=extras.querySelector('.ai-result');if(result&&_aiResult){var resultCard=result.closest('.cc');if(resultCard)resultCard.hidden=true}}
+ transcript.scrollTop=transcript.scrollHeight;
+}
+renderAICoach=liq15RenderCoach;
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
