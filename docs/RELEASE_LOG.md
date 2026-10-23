@@ -18,6 +18,10 @@
 - New device-local user confirmation mapping: `liftiq_journal_hevy_links_v157`.
 - No renamed/deleted pre-existing localStorage keys or data migrations. No new backend secrets/endpoints.
 
+### QA progress
+- 17/17 expanded source-level logic assertions passed, including duplicate prevention, XSS escaping and storage quota behavior.
+- Separate fictional standalone HTML demo passed Chromium Playwright interaction checks and width checks (320/375/390/960px). Real GitHub-branch UI remains unverified in a browser.
+
 ### Not implemented
 - Automatic program changes, workout logging to Hevy, exercise substitutions as actual planned-vs-performed deltas, cross-device sync.
 - No authenticated end-to-end or published branch preview verification yet.
