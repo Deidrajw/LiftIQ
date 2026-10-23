@@ -963,6 +963,42 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 #t-ai .liq15-main .liq-chat-loading{font-size:13px;color:#c6d5e2;padding:9px}
 #t-ai .liq15-main .liq-chat-toolrow{margin-top:14px!important}
 @media(max-width:600px){#t-ai .liq15-main .liq-chat-bubble{font-size:15px!important}#t-ai .liq15-main .liq-coach-composer .ai-actions{gap:8px}}
+
+/* LiftIQ V15.2 · approved conversational Coach design */
+#t-ai .liq15-main{border:0!important;background:transparent!important;padding:0!important;box-shadow:none!important}
+#t-ai .liq15-main .liq-chat-header{padding:12px 2px 15px;display:flex!important;align-items:center;gap:10px}
+#t-ai .liq15-main .liq-chat-header h3{font-size:16px!important;font-weight:750;flex:1;min-width:0}
+#t-ai .liq15-main .liq-chat-header button{min-height:44px}
+#t-ai .liq15-main .liq-chat-transcript{height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;display:flex;flex-direction:column;gap:15px;padding:12px 0!important}
+#t-ai .liq15-main .liq-chat-bubble{display:block;box-sizing:border-box;width:fit-content;max-width:88%!important;border-radius:17px!important;margin:0!important;padding:13px 15px!important;font-size:15px!important;line-height:1.6!important;box-shadow:none!important}
+#t-ai .liq15-main .liq-chat-bubble.user{align-self:flex-end!important;margin-left:auto!important;margin-right:0!important;background:#292e37!important;border:1px solid #555e6b!important;border-radius:17px 17px 5px 17px!important;color:#f3f5f8!important}
+#t-ai .liq15-main .liq-chat-bubble.assistant{align-self:flex-start!important;margin-right:auto!important;margin-left:0!important;max-width:94%!important;background:#1b303f!important;border:1px solid #456a82!important;border-left:3px solid #92bdd9!important;border-radius:17px 17px 17px 5px!important;color:#e7f0f8!important}
+#t-ai .liq15-main .liq-chat-bubble strong{display:flex;align-items:center;gap:7px;font-size:12px!important;letter-spacing:.02em;margin-bottom:8px}
+#t-ai .liq15-main .liq-chat-bubble.assistant strong{color:#badcf2!important}
+#t-ai .liq15-main .liq-chat-bubble.user strong{color:#d2d9e2!important}
+#t-ai .liq15-main .liq-chat-bubble .liq-role-icon{display:inline-flex;justify-content:center;align-items:center;width:22px;height:22px;border-radius:50%;background:#49657a;color:#eef6fb;font-size:12px}
+#t-ai .liq15-main .liq-chat-bubble.user .liq-role-icon{background:#4a535e}
+#t-ai .liq15-main .liq-chat-bubble>div:not(.liq-chat-stamp){white-space:pre-wrap;overflow-wrap:anywhere}
+#t-ai .liq15-main .liq-chat-stamp{font-size:11px!important;color:#9caebd!important;opacity:.85}
+#t-ai .liq15-main .liq-coach-composer{margin:18px 0 4px!important;padding:16px!important;background:#1b232d!important;border:1px solid #667e93!important;border-radius:16px!important}
+#t-ai .liq15-main .liq-coach-composer .liq-chat-composer-title{color:#dceaf5;font-size:14px}
+#t-ai .liq15-main .liq-coach-composer textarea{background:#101820!important;border-color:#647b8d!important;border-radius:11px!important;font-size:16px!important;line-height:1.5}
+#t-ai .liq15-main .liq-coach-composer .ai-actions button:first-child{background:#bfd5e4!important;color:#14212d!important;font-weight:750!important}
+#t-ai .liq15-main .liq-coach-composer .ai-actions button{min-height:44px}
+#t-ai .liq15-main .liq-chat-toolrow{display:flex!important;gap:8px!important;flex-wrap:wrap;margin-top:12px!important}
+#t-ai .liq15-main .liq-chat-toolrow button{font-size:12px;min-height:44px}
+#t-ai .liq-coach-history{display:none!important}
+#t-ai .liq-v152-history-backdrop{position:fixed;inset:0;z-index:9000;background:#04070bdd;display:none;align-items:flex-end;justify-content:center}
+#t-ai .liq-v152-history-backdrop.open{display:flex!important}
+#t-ai .liq-v152-history-sheet{width:100%;max-width:640px;max-height:min(80dvh,750px);overflow:auto;padding:18px 16px calc(22px + env(safe-area-inset-bottom));background:#19222c;border:1px solid #465b6e;border-radius:18px 18px 0 0}
+#t-ai .liq-v152-history-sheet .liq-thread-list{display:flex;flex-direction:column;max-height:50vh;overflow-y:auto;gap:6px}
+#t-ai .liq-v152-history-sheet .liq-thread-list button{min-height:44px;text-align:left;white-space:normal;overflow-wrap:anywhere}
+#t-ai .liq-v152-history-sheet .liq-thread-list button[hidden]{display:none!important}
+#t-ai .liq-v152-history-sheet .liq-history-filter{font-size:16px}
+#t-ai .liq-v152-history-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+#t-ai .liq-v152-history-actions button{min-height:44px;padding:9px 12px;border-radius:9px;background:#2c3c4b;border:1px solid #5e7387;color:#f2f6fb}
+#t-ai .liq-ai-evidence:not([open]){padding:0!important}
+@media(max-width:370px){#t-ai .liq15-main .liq-chat-bubble{max-width:97%!important}#t-ai .liq15-main .liq-coach-composer{padding:12px!important}}
 </style>
 </head>
 <body class="today-active">
@@ -4425,6 +4461,38 @@ askAI=async function(mode){
  }else if(mode==='question'&&_aiError){
   _aiQuestion=draft.slice(0,350);renderAICoach();
   var failed=document.getElementById('aiQuestion');if(failed)failed.value=draft;
+ }
+};
+
+
+/* LiftIQ V15.2 role differentiation and history sheet; no data migration */
+var liq152PriorRender=renderAICoach;
+function liq152CloseHistory(){var dialog=document.getElementById('liq152History');if(!dialog)return;dialog.classList.remove('open');dialog.setAttribute('aria-hidden','true');var trigger=document.getElementById('liq152HistoryTrigger');if(trigger)trigger.focus()}
+function liq152OpenHistory(){var dialog=document.getElementById('liq152History');if(!dialog)return;dialog.classList.add('open');dialog.setAttribute('aria-hidden','false');var input=dialog.querySelector('input');if(input)input.focus()}
+renderAICoach=function(){
+ liq152PriorRender();
+ var pane=document.getElementById('t-ai');if(!pane)return;
+ var main=pane.querySelector('.liq15-main'),history=pane.querySelector('.liq-coach-history');if(!main)return;
+ main.querySelectorAll('.liq-chat-bubble').forEach(function(bubble){
+  var author=bubble.querySelector('strong');if(!author)return;
+  var dot=document.createElement('span');dot.className='liq-role-icon';dot.setAttribute('aria-hidden','true');dot.textContent=bubble.classList.contains('user')?'●':'✦';author.prepend(dot);
+ });
+ var tools=main.querySelector('.liq-chat-toolrow');
+ if(tools){var old=[...tools.querySelectorAll('button')].find(function(b){return b.textContent.startsWith('History')});if(old){old.id='liq152HistoryTrigger';old.textContent='History · '+LIQ_CHAT.threads.length;old.onclick=liq152OpenHistory}}
+ if(history){
+  var backdrop=document.createElement('div');backdrop.id='liq152History';backdrop.className='liq-v152-history-backdrop';backdrop.setAttribute('role','dialog');backdrop.setAttribute('aria-modal','true');backdrop.setAttribute('aria-label','Saved Coach conversations');backdrop.setAttribute('aria-hidden','true');
+  var sheet=document.createElement('div');sheet.className='liq-v152-history-sheet';
+  var bar=document.createElement('div');bar.className='liq-v152-history-actions';
+  var title=document.createElement('strong');title.textContent='Saved conversations';
+  var close=document.createElement('button');close.type='button';close.textContent='Close';close.onclick=liq152CloseHistory;bar.append(title,close);
+  sheet.append(bar);
+  var list=history.querySelector('.liq-thread-list'),input=history.querySelector('.liq-history-filter');
+  if(input){input.oninput=function(){var q=this.value.toLowerCase().trim();list.querySelectorAll('button').forEach(function(b){var t=LIQ_CHAT.threads.find(function(x){return x.id===b.dataset.id});b.hidden=!!q&&!((t?.title||'')+' '+(t?.messages||[]).map(function(m){return m.text||''}).join(' ')).toLowerCase().includes(q)})};sheet.append(input)}
+  if(list)sheet.append(list);
+  var del=history.querySelector('button.ai-btn');if(del)sheet.append(del);
+  backdrop.append(sheet);pane.append(backdrop);
+  backdrop.addEventListener('click',function(e){if(e.target===backdrop)liq152CloseHistory()});
+  backdrop.addEventListener('keydown',function(e){if(e.key==='Escape')liq152CloseHistory();if(e.key==='Tab'){var els=[...backdrop.querySelectorAll('button,input')].filter(function(x){return !x.disabled&&!x.hidden&&x.getClientRects().length});if(!els.length)return;if(e.shiftKey&&document.activeElement===els[0]){e.preventDefault();els[els.length-1].focus()}else if(!e.shiftKey&&document.activeElement===els[els.length-1]){e.preventDefault();els[0].focus()}}});
  }
 };
 
