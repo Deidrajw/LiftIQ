@@ -48,12 +48,13 @@ async function main(){
    liSave();
    localStorage.setItem(LI157_CACHE_KEY,JSON.stringify(LI157_SESSIONS));
    localStorage.setItem(LI157_LINKS_KEY,'{}');
-   window.renderNextSessionCoach=function(){document.querySelector('#qaArea').innerHTML=liJournalHTML()};
-   document.body.innerHTML='<main id="qaArea" style="max-width:480px;margin:0 auto;padding:16px">'+liJournalHTML()+'</main>';
+   renderNextSessionCoach();
   });
   // No journal ever becomes a completed Hevy workout merely by matching.
-  assert.equal(await page.locator('#qaArea summary').count(),1);
-  await page.locator('#qaArea summary').click();
+  assert.equal(await page.locator('.liq-mini-status button').count(),1);
+  await page.locator('.liq-mini-status button').click();
+  assert.equal(await page.locator('#liqJournalOverlay.open').count(),1);
+  await page.locator('#liqJournalContents details > summary').first().click();
   await page.locator('[data-li157-action="toggle"]').first().click();
   assert.equal(await page.locator('[data-li157-action="confirm"]').count(),2);
   const options=await page.locator('[data-li157-journal="j1"] .li157-candidate').allTextContents();
@@ -61,7 +62,7 @@ async function main(){
   assert(options.some(x=>x.includes('Upper Body')));
   assert(options.every(x=>x.includes('Same local calendar day')));
   await page.locator('[data-li157-journal="j1"] [data-li157-workout="w1"]').click();
-  assert.match(await page.locator('#qaArea').innerText(),/User-confirmed match/);
+  assert.match(await page.locator('#liqJournalContents').innerText(),/User-confirmed match/);
   const persisted=await page.evaluate(()=>({
    workoutId:LI157_LINKS.j1?.workoutId,
    journals:LI.history.length,
@@ -73,7 +74,7 @@ async function main(){
   assert.equal(persisted.stored,'w1');
   assert.equal(persisted.sessionCount,2);
   // Check genuine UI output for name-level evidence, not skipped-movement claims.
-  assert.match(await page.locator('#qaArea').innerText(),/exercise names/i);
+  assert.match(await page.locator('#liqJournalContents').innerText(),/exercise names/i);
   for(const width of [320,375,390,960]){
    await page.setViewportSize({width,height:780});
    const metrics=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth}));
@@ -81,19 +82,16 @@ async function main(){
   }
   // Reload app from local-only journal + Hevy cache and verify link survives.
   await page.reload({waitUntil:'domcontentloaded'});
-  await page.evaluate(()=>{
-   window.renderNextSessionCoach=function(){document.querySelector('#qaArea').innerHTML=liJournalHTML()};
-   document.body.innerHTML='<main id="qaArea" style="max-width:480px;margin:0 auto;padding:16px">'+liJournalHTML()+'</main>';
-  });
-  await page.locator('#qaArea summary').click();
-  assert.match(await page.locator('#qaArea').innerText(),/User-confirmed match/);
+  await page.locator('.liq-mini-status button').click();
+  await page.locator('#liqJournalContents details > summary').first().click();
+  assert.match(await page.locator('#liqJournalContents').innerText(),/User-confirmed match/);
   await page.locator('[data-li157-journal="j1"] [data-li157-action="unlink"]').click();
   assert.equal(await page.evaluate(()=>LI157_LINKS.j1),undefined);
   // No Hevy evidence: clear matching UI, no invented workout.
   await page.evaluate(()=>{
    LI157_SESSIONS=[];LI157_OPEN='j1';renderNextSessionCoach();
   });
-  assert.match(await page.locator('#qaArea').innerText(),/No workout-level Hevy evidence is stored yet/);
+  assert.match(await page.locator('#liqJournalContents').innerText(),/No workout-level Hevy evidence is stored yet/);
   assert.deepEqual(errors,[],'Unexpected application JavaScript errors: '+errors.join(', '));
   console.log('PASS: Real LiftIQ HTML with fictional data; two same-day candidates, user-confirmed linking, persistence, unlink, no-data UI and 320/375/390/960px widths');
   await context.close();
