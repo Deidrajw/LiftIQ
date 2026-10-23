@@ -951,6 +951,18 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 #t-ai .liq-ai-evidence .cc{margin-top:8px}
 #t-ai .liq-thread-list button[hidden]{display:none!important}
 #t-ai .liq-coach-history[open] .liq-thread-list{max-height:230px;flex-wrap:wrap;overflow:auto}
+
+/* V15.1 critical Coach usability repairs */
+#t-ai .liq15-main .liq-chat-transcript{max-height:none!important;min-height:0!important;overflow:visible!important;scrollbar-width:none!important}
+#t-ai .liq15-main .liq-chat-bubble{max-width:96%;padding:12px 14px;margin:10px 0;line-height:1.55}
+#t-ai .liq15-main .liq-coach-composer{margin-top:16px!important;padding:14px!important;border:2px solid #829bb2!important;border-radius:14px!important;background:#202832!important}
+#t-ai .liq15-main .liq-coach-composer textarea{background:#10161c!important;border:1px solid #5a6876!important;border-radius:10px!important;min-height:74px!important;max-height:none!important;resize:vertical}
+#t-ai .liq15-main .liq-chat-header h3{font-size:15px!important}
+#t-ai .liq15-main .liq-chat-composer-title{font-size:13px;font-weight:750;margin-bottom:9px;color:#dbe6f0}
+#t-ai .liq15-main .liq-chat-error{border:1px solid #c48f6a;padding:10px;border-radius:9px;color:#f3c3a7;margin-top:9px;font-size:13px}
+#t-ai .liq15-main .liq-chat-loading{font-size:13px;color:#c6d5e2;padding:9px}
+#t-ai .liq15-main .liq-chat-toolrow{margin-top:14px!important}
+@media(max-width:600px){#t-ai .liq15-main .liq-chat-bubble{font-size:15px!important}#t-ai .liq15-main .liq-coach-composer .ai-actions{gap:8px}}
 </style>
 </head>
 <body class="today-active">
@@ -4383,6 +4395,38 @@ function liq15RenderCoach(){
  transcript.scrollTop=transcript.scrollHeight;
 }
 renderAICoach=liq15RenderCoach;
+
+
+/* V15.1: keep errors visible, enable actual follow-up, and remove inner chat scrolling */
+var liq151OldRender=renderAICoach;
+renderAICoach=function(){
+ liq151OldRender();
+ var p=document.getElementById('t-ai');if(!p)return;
+ var shell=p.querySelector('.liq15-main'),composer=shell?.querySelector('.liq-coach-composer');
+ if(!shell||!composer)return;
+ var heading=document.createElement('div');heading.className='liq-chat-composer-title';heading.textContent='Ask a follow-up';composer.prepend(heading);
+ var text=composer.querySelector('#aiQuestion');
+ if(text){text.setAttribute('aria-label','Write your next message to Coach');text.placeholder='What would you like to ask next?';text.oninput=function(){_aiQuestion=this.value.slice(0,350);liq149SaveDraft(this.value)}}
+ var sourceError=p.querySelector('.cc[style*="var(--re)"]');
+ if(_aiError){var err=document.createElement('div');err.className='liq-chat-error';err.setAttribute('role','alert');err.textContent=_aiError;composer.appendChild(err);if(sourceError)sourceError.hidden=true}
+ if(_aiBusy){var loading=document.createElement('div');loading.className='liq-chat-loading';loading.setAttribute('role','status');loading.textContent='Coach is analyzing your question…';composer.appendChild(loading)}
+};
+var liq151OldAsk=askAI;
+askAI=async function(mode){
+ var draft=document.getElementById('aiQuestion')?.value||'';
+ var before=liqChatActive()?.messages?.length||0;
+ await liq151OldAsk(mode);
+ var after=liqChatActive()?.messages?.length||0;
+ if(mode==='question'&&after>before&&!_aiError){
+  _aiQuestion='';LIQ149_DRAFTS[liq149DraftKey()]='';
+  try{localStorage.setItem(LIQ149_DRAFT_KEY,JSON.stringify(LIQ149_DRAFTS))}catch(e){}
+  renderAICoach();
+  var next=document.getElementById('aiQuestion');if(next){next.value='';next.focus()}
+ }else if(mode==='question'&&_aiError){
+  _aiQuestion=draft.slice(0,350);renderAICoach();
+  var failed=document.getElementById('aiQuestion');if(failed)failed.value=draft;
+ }
+};
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
