@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LiftIQ · V15.6.1</title>
+<title>LiftIQ · V15.7 preview</title>
 <meta name="theme-color" content="#0a0b0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1038,6 +1038,28 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .liq156-context strong{display:block;margin-bottom:5px}
 .liq156-context p{margin:5px 0;color:inherit;opacity:.9}
 .liq156-context .liq156-chip{display:inline-block;border:1px solid #647a89;border-radius:20px;font-size:11px;padding:2px 9px;margin:3px 6px 5px 0}
+
+/* V15.7: reconciliation stays inside the existing journal, no competing navigation or nested scrolling. */
+.li157-review{border:1px solid var(--bd2);border-radius:12px;padding:11px;margin:11px 0;background:var(--bg3);font-size:12px;line-height:1.5}
+.li157-head{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.li157-ok{font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;color:var(--gr)}
+.li157-action{border:1px solid var(--bd2);background:var(--or);color:var(--bg);border-radius:8px;min-height:38px;padding:7px 11px;font-weight:700;font-size:12px;cursor:pointer}
+.li157-action:focus-visible{outline:2px solid var(--bl);outline-offset:3px}
+.li157-review .li157-secondary{background:var(--bg2);color:var(--tx)}
+.li157-candidates{padding-top:10px}
+.li157-candidates p,.li157-review p{color:var(--t2);line-height:1.55;margin:7px 0}
+.li157-review .li157-caution{color:var(--t2);font-size:11px}
+.li157-candidate{display:flex;justify-content:space-between;align-items:center;gap:9px;padding:11px 0;border-top:1px solid var(--bd)}
+.li157-candidate>div{min-width:0;display:grid;gap:2px}
+.li157-candidate strong{color:var(--tx);overflow-wrap:anywhere}
+.li157-candidate span{font-size:11px;color:var(--t2)}
+.li157-evidence{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.li157-evidence span{border:1px solid var(--bd2);border-radius:20px;padding:5px 8px;background:var(--bg2);font-size:10px;color:var(--tx)}
+.li157-observation{padding:10px 0;border-bottom:1px solid var(--bd)}
+.li157-observation span{font-size:10px;color:var(--t2)}
+.li157-details{padding:9px 0}.li157-details summary{cursor:pointer;color:var(--tx);font-weight:700}
+@media(max-width:350px){.li157-candidate{align-items:flex-start;flex-direction:column}.li157-candidate button{align-self:flex-start}}
+
 </style>
 </head>
 <body class="today-active">
@@ -3927,6 +3949,7 @@ async function syncHevy(weeks,options){
         .sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,250);
       saveState();
     }
+    li157CaptureHevy(fetched);
     renderNextSessionCoach();
     // parseHevy converts back to the app's existing intelligence pipeline.
     // It also keeps previous STATE intact on any empty/invalid analysis.
@@ -4195,9 +4218,145 @@ function liFinish(){if(!confirm('Finish the journal? Save your workout in Hevy s
 function liAdd(){var note=document.getElementById('liNote').value.trim();if(!note)return;LI.active.events.push({id:'e'+Date.now(),type:document.getElementById('liType').value,ex:document.getElementById('liEx').value.trim().slice(0,100),note:note.slice(0,1000),at:new Date().toISOString()});liSave();renderNextSessionCoach()}
 function liEdit(id){var x=LI.active?.events.find(e=>e.id===id);if(!x)return;var v=prompt('Edit note',x.note);if(v&&v.trim()){x.note=v.trim().slice(0,1000);liSave();renderNextSessionCoach()}}
 function liDelete(id){if(!confirm('Delete this note?'))return;LI.active.events=LI.active.events.filter(x=>x.id!==id);liSave();renderNextSessionCoach()}
-function liDeleteSession(id){if(!confirm('Delete this finished journal?'))return;LI.history=LI.history.filter(x=>x.id!==id);liSave();renderNextSessionCoach()}
+function liDeleteSession(id){if(!confirm('Delete this finished journal?'))return;LI.history=LI.history.filter(x=>x.id!==id);li157ForgetJournal(id);liSave();renderNextSessionCoach()}
 function liCoach(id,old){var a=old?LI.history.find(x=>x.id===id):LI.active;if(!a?.events?.length)return;if(!confirm('Prepare a Gemini question containing these notes? You will review it before submission.'))return;_aiQuestion=('During '+a.name+' I observed: '+a.events.slice(-3).map(x=>(x.ex?x.ex+': ':'')+x.note).join(' | ')+'. Using my completed training history, what cautious adjustments might be appropriate? Do not diagnose pain.').slice(0,350);uiNavigate('coach');renderAICoach();var e=document.getElementById('aiQuestion');if(e){e.value=_aiQuestion;e.focus()}}
-function liJournalHTML(){var a=LI.active,h='<section class="li-panel"><h3>Training Mode</h3>';if(!a)h+='<p>Keep tracking sets in Hevy. Log why you change, swap, or stop an exercise.</p><button onclick="liStart()">▶ I’m currently training</button><p>Saved only in this browser · Never shared with Gemini automatically.</p>';else{h+='<strong>'+liEsc(a.name)+'</strong><p>Active journal · '+new Date(a.at).toLocaleString()+'</p><label>What happened?</label><select id="liType"><option value="pain">Pain or discomfort</option><option value="swap">Exercise substitution</option><option value="load">Weight adjustment</option><option value="fatigue">Fatigue</option><option value="equipment">Equipment unavailable</option><option value="other">Other</option></select><label>Exercise</label><input id="liEx" maxlength="100" placeholder="RDL"><label>Reason or observation</label><textarea id="liNote" rows="3" maxlength="1000"></textarea><button onclick="liAdd()">Save note</button><button onclick="liFinish()">Finish journal</button><p>Stop and assess painful exercises. This is not medical advice or a diagnosis.</p>';a.events.slice().reverse().forEach(function(e){h+='<div class="li-entry"><strong>'+liEsc(e.ex||e.type)+'</strong><p>'+liEsc(e.type)+' · '+new Date(e.at).toLocaleString()+'</p><p>'+liEsc(e.note)+'</p><button onclick="liEdit(\''+e.id+'\')">Edit</button><button onclick="liDelete(\''+e.id+'\')">Delete</button></div>'});if(a.events.length)h+='<button onclick="liCoach(\''+a.id+'\',false)">Ask Gemini about these notes</button>'}h+='</section>';if(LI.history.length){h+='<details class="li-panel"><summary>Finished journals ('+LI.history.length+')</summary>';LI.history.slice(0,12).forEach(function(a){h+='<div class="li-entry"><strong>'+liEsc(a.name)+'</strong>';a.events.forEach(e=>h+='<p>'+liEsc(e.ex)+' · '+liEsc(e.note)+'</p>');h+='<button onclick="liCoach(\''+a.id+'\',true)">Ask Gemini with notes</button><button onclick="liDeleteSession(\''+a.id+'\')">Delete journal</button></div>'});h+='</details>'}return h}
+
+/* V15.7 · User-confirmed journal↔Hevy reconciliation.
+ * Source separation: completed Hevy API workout snapshots vs locally reported journal observations.
+ * Never infer skipped exercises from day-aggregated training, or turn journal notes into Hevy completions.
+ */
+var LI157_LINKS_KEY='liftiq_journal_hevy_links_v157';
+var LI157_CACHE_KEY='liftiq_hevy_session_evidence_v157';
+var LI157_LINKS={}; var LI157_SESSIONS=[]; var LI157_OPEN='';
+try{
+ var _li157Saved=JSON.parse(localStorage.getItem(LI157_LINKS_KEY)||'{}');
+ if(_li157Saved&&typeof _li157Saved==='object'&&!Array.isArray(_li157Saved))LI157_LINKS=_li157Saved;
+}catch(e){console.warn('Reconciliation link restore skipped',e)}
+try{
+ var _li157Records=JSON.parse(localStorage.getItem(LI157_CACHE_KEY)||'[]');
+ if(Array.isArray(_li157Records))LI157_SESSIONS=_li157Records.filter(function(w){return w&&typeof w.id==='string'&&typeof w.name==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(w.date)}).slice(0,250);
+}catch(e){console.warn('Hevy evidence cache restore skipped',e)}
+function li157CaptureHevy(workouts){
+ if(!Array.isArray(workouts)||!workouts.length)return false;
+ var seen=new Set(),sessions=[];
+ workouts.forEach(function(w){
+  var id=String(w&&w.id||'').trim(),dateInfo=parseHevyDate(w&&w.start_time||'');
+  if(!id||id.length>130||!dateInfo||seen.has(id))return;
+  var name=String(w.title||'').trim().slice(0,140);
+  if(!name)return;
+  seen.add(id);
+  var exSeen=new Set(),exercises=[];
+  (Array.isArray(w.exercises)?w.exercises:[]).forEach(function(ex){
+   var title=String(ex&&ex.title||'').trim().slice(0,140);
+   var k=title.toLowerCase();
+   if(title&&!exSeen.has(k)&&exercises.length<80){exSeen.add(k);exercises.push(title)}
+  });
+  sessions.push({id:id,name:name,date:dateInfo.dateKey,exercises:exercises});
+ });
+ sessions.sort(function(a,b){return b.date.localeCompare(a.date)});
+ sessions=sessions.slice(0,250);
+ if(!sessions.length)return false;
+ try{localStorage.setItem(LI157_CACHE_KEY,JSON.stringify(sessions));LI157_SESSIONS=sessions;return true;}
+ catch(e){console.warn('Hevy reconciliation snapshot not saved; existing evidence retained',e);return false}
+}
+function li157LocalDay(timestamp){
+ var d=new Date(timestamp||'');if(!Number.isFinite(d.getTime()))return '';
+ return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
+function li157DayDistance(a,b){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(a)||!/^\d{4}-\d{2}-\d{2}$/.test(b))return 999;
+ return Math.abs((Date.parse(a+'T12:00:00Z')-Date.parse(b+'T12:00:00Z'))/86400000);
+}
+function li157Norm(s){return normalizeExerciseName(String(s||'').trim()).toLowerCase().replace(/\s+/g,' ')}
+function li157Candidates(journal){
+ if(!journal)return [];
+ var date=li157LocalDay(journal.at),name=li157Norm(journal.name);
+ return LI157_SESSIONS.filter(function(w){return li157DayDistance(date,w.date)<=1}).map(function(w){
+  var delta=li157DayDistance(date,w.date),sameTitle=!!name&&li157Norm(w.name)===name;
+  return {workout:w,delta:delta,sameTitle:sameTitle,rank:(delta===0?4:0)+(sameTitle?3:0)};
+ }).sort(function(a,b){return b.rank-a.rank||a.workout.date.localeCompare(b.workout.date)||a.workout.name.localeCompare(b.workout.name)}).slice(0,8);
+}
+function li157Persist(){
+ try{localStorage.setItem(LI157_LINKS_KEY,JSON.stringify(LI157_LINKS));return true}
+ catch(e){alert('Could not save the journal match on this device. Check available browser storage.');return false}
+}
+function li157JournalById(id){return (LI.history||[]).find(function(j){return j&&j.id===id})||null}
+function li157Confirm(journalId,workoutId){
+ var journal=li157JournalById(journalId),match=journal&&li157Candidates(journal).find(function(c){return c.workout.id===workoutId});
+ if(!match)return false;
+ var claimed=Object.keys(LI157_LINKS).some(function(id){return id!==journalId&&LI157_LINKS[id]&&LI157_LINKS[id].workoutId===workoutId});
+ if(claimed){alert('This Hevy workout is already matched to another journal. Unlink it there before continuing.');return false}
+ if(!confirm('Link this journal to "'+match.workout.name+'" on '+match.workout.date+'? Confirm using your own workout history. This does not edit Hevy or your plan.'))return false;
+ var former=LI157_LINKS[journalId];
+ LI157_LINKS[journalId]={workoutId:workoutId,workoutName:match.workout.name,workoutDate:match.workout.date,confirmedAt:new Date().toISOString()};
+ if(!li157Persist()){if(former)LI157_LINKS[journalId]=former;else delete LI157_LINKS[journalId];return false}
+ LI157_OPEN=journalId;renderNextSessionCoach();return true;
+}
+function li157Unlink(journalId){
+ if(!LI157_LINKS[journalId]||!confirm('Remove this confirmed journal-to-Hevy match? The journal and Hevy workout will remain unchanged.'))return false;
+ var former=LI157_LINKS[journalId];delete LI157_LINKS[journalId];
+ if(!li157Persist()){LI157_LINKS[journalId]=former;return false}
+ LI157_OPEN=journalId;renderNextSessionCoach();return true;
+}
+function li157ForgetJournal(id){
+ if(LI157_LINKS[id]){delete LI157_LINKS[id];li157Persist()}
+ if(LI157_OPEN===id)LI157_OPEN='';
+}
+function li157Comparison(journal,workout){
+ if(!workout||!Array.isArray(workout.exercises))return '<p class="li157-caution">This workout is not in the latest Hevy evidence cache. Re-sync before comparing exercises. The confirmed link remains yours.</p>';
+ var events=Array.isArray(journal.events)?journal.events:[],recorded=new Set(workout.exercises.map(li157Norm).filter(Boolean));
+ var checked=events.filter(function(e){return e&&e.ex&&String(e.ex).trim()});
+ var found=checked.filter(function(e){return recorded.has(li157Norm(e.ex))});
+ var h='<div class="li157-evidence"><span>'+workout.exercises.length+' distinct Hevy exercise titles</span><span>'+events.length+' journal observations</span>';
+ if(checked.length)h+='<span>'+found.length+' / '+checked.length+' mentioned exercises matched by name</span>';
+ h+='</div>';
+ if(!events.length)h+='<p>No observations in this journal. A confirmed match only connects the journal date and workout.</p>';
+ events.slice(0,12).forEach(function(e){
+  var label=e.ex?liEsc(e.ex):'General observation';
+  var result=!e.ex?'Observation only — no named exercise to compare':recorded.has(li157Norm(e.ex))?'Exercise name found in this Hevy workout':'Exercise name not found in this workout’s saved list; may be a variation or substitution';
+  h+='<div class="li157-observation"><strong>'+label+'</strong> <span>'+liEsc(e.type||'other')+'</span><p>'+liEsc(result)+'</p></div>';
+ });
+ h+='<details class="li157-details"><summary>View completed Hevy exercise titles</summary><p>'+workout.exercises.map(liEsc).join(' · ')+'</p></details>';
+ h+='<p class="li157-caution">These are completed exercise names, not a planned exercise checklist. Missing names do not prove a movement was skipped. Journal notes remain user-reported and are not sent to Gemini automatically.</p>';
+ return h;
+}
+function li157ReviewHTML(journal){
+ if(!journal||!journal.id)return '';
+ var id=String(journal.id),record=LI157_LINKS[id],opened=LI157_OPEN===id;
+ var h='<div class="li157-review" data-li157-journal="'+liEsc(id)+'">';
+ if(record){
+  var workout=LI157_SESSIONS.find(function(w){return w.id===record.workoutId});
+  h+='<div class="li157-head"><span class="li157-ok">User-confirmed match</span><strong>'+liEsc(record.workoutName)+' · '+liEsc(record.workoutDate)+'</strong></div>';
+  h+=li157Comparison(journal,workout);
+  h+='<button type="button" class="li157-action li157-secondary" data-li157-action="unlink" data-li157-id="'+liEsc(id)+'">Remove match</button>';
+ }else{
+  h+='<button type="button" class="li157-action li157-secondary" aria-expanded="'+String(opened)+'" data-li157-action="toggle" data-li157-id="'+liEsc(id)+'">'+(opened?'Hide matches':'Match to completed Hevy workout')+'</button>';
+  if(opened){
+   var matches=li157Candidates(journal);
+   h+='<div class="li157-candidates"><p><strong>Review before linking.</strong> Candidates use workout date and title. A close match is never confirmed automatically.</p>';
+   if(!LI157_SESSIONS.length)h+='<p class="li157-caution">No workout-level Hevy evidence is stored yet. Sync Hevy again while signed in to enable matching. Existing journals remain unchanged.</p>';
+   else if(!matches.length)h+='<p class="li157-caution">No Hevy workouts within one calendar day of this journal start. Confirm your journal date and sync range; LiftIQ will not guess a distant workout.</p>';
+   else {
+    if(matches.length>1)h+='<p class="li157-caution">Multiple possible workouts found. Check the correct session carefully.</p>';
+    matches.forEach(function(c){
+     h+='<div class="li157-candidate"><div><strong>'+liEsc(c.workout.name)+'</strong><span>'+liEsc(c.workout.date)+' · '+(c.sameTitle?'Name matches journal':'Different routine title')+(c.delta?' · Adjacent day':' · Same calendar day')+'</span></div><button type="button" class="li157-action" data-li157-action="confirm" data-li157-id="'+liEsc(id)+'" data-li157-workout="'+liEsc(c.workout.id)+'">Confirm</button></div>';
+    });
+   }
+   h+='</div>';
+  }
+ }
+ return h+'</div>';
+}
+document.addEventListener('click',function(event){
+ var button=event.target.closest('[data-li157-action]');if(!button)return;
+ event.preventDefault();
+ var action=button.getAttribute('data-li157-action'),id=button.getAttribute('data-li157-id');
+ if(action==='toggle'){LI157_OPEN=LI157_OPEN===id?'':id;renderNextSessionCoach()}
+ if(action==='confirm')li157Confirm(id,button.getAttribute('data-li157-workout'));
+ if(action==='unlink')li157Unlink(id);
+});
+
+function liJournalHTML(){var a=LI.active,h='<section class="li-panel"><h3>Training Mode</h3>';if(!a)h+='<p>Keep tracking sets in Hevy. Log why you change, swap, or stop an exercise.</p><button onclick="liStart()">▶ I’m currently training</button><p>Saved only in this browser · Never shared with Gemini automatically.</p>';else{h+='<strong>'+liEsc(a.name)+'</strong><p>Active journal · '+new Date(a.at).toLocaleString()+'</p><label>What happened?</label><select id="liType"><option value="pain">Pain or discomfort</option><option value="swap">Exercise substitution</option><option value="load">Weight adjustment</option><option value="fatigue">Fatigue</option><option value="equipment">Equipment unavailable</option><option value="other">Other</option></select><label>Exercise</label><input id="liEx" maxlength="100" placeholder="RDL"><label>Reason or observation</label><textarea id="liNote" rows="3" maxlength="1000"></textarea><button onclick="liAdd()">Save note</button><button onclick="liFinish()">Finish journal</button><p>Stop and assess painful exercises. This is not medical advice or a diagnosis.</p>';a.events.slice().reverse().forEach(function(e){h+='<div class="li-entry"><strong>'+liEsc(e.ex||e.type)+'</strong><p>'+liEsc(e.type)+' · '+new Date(e.at).toLocaleString()+'</p><p>'+liEsc(e.note)+'</p><button onclick="liEdit(\''+e.id+'\')">Edit</button><button onclick="liDelete(\''+e.id+'\')">Delete</button></div>'});if(a.events.length)h+='<button onclick="liCoach(\''+a.id+'\',false)">Ask Gemini about these notes</button>'}h+='</section>';if(LI.history.length){h+='<details class="li-panel"'+(LI157_OPEN?' open':'')+'><summary>Finished journals ('+LI.history.length+')</summary>';LI.history.slice(0,12).forEach(function(a){h+='<div class="li-entry"><strong>'+liEsc(a.name)+'</strong>';a.events.forEach(e=>h+='<p>'+liEsc(e.ex)+' · '+liEsc(e.note)+'</p>');h+=li157ReviewHTML(a);h+='<button onclick="liCoach(\''+a.id+'\',true)">Ask Gemini with notes</button><button onclick="liDeleteSession(\''+a.id+'\')">Delete journal</button></div>'});h+='</details>'}return h}
 function liOpenSearch(){document.getElementById('liSearch').classList.add('open');document.getElementById('liQuery').focus();liRenderSearch()}
 function liCloseSearch(){document.getElementById('liSearch').classList.remove('open')}
 function liRenderSearch(){var words=document.getElementById('liQuery').value.toLowerCase().split(/\s+/).filter(Boolean),all=[...new Set([...Object.keys(STATE.exerciseHistory||{}),...Object.keys(STATE.lifts||{})])],names=all.filter(x=>words.every(w=>x.toLowerCase().includes(w))).slice(0,15),h=document.getElementById('liResults');if(!words.length){h.textContent='Search '+all.length+' exercises from your imported Hevy history.';return}if(!names.length){h.textContent='No matches. Try a broader exercise name.';return}h.innerHTML=names.map(function(n,i){var x=historyEntries(n),last=x.at(-1);return '<div class="li-entry"><strong>'+liEsc(n)+'</strong><p>'+(last?'Latest: '+Math.round(last.weightLb*10)/10+' lb × '+last.reps+' · '+liEsc(uiLongDate(last.date)):'No comparable weighted sets')+' · '+x.length+' dates</p><button data-chart="'+i+'">View progression</button><button data-ask="'+i+'">Ask about increasing weight</button></div>'}).join('');h.querySelectorAll('[data-chart]').forEach(b=>b.onclick=()=>{var n=names[+b.dataset.chart];liCloseSearch();openExerciseHistory(n)});h.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>liAskLoad(names[+b.dataset.ask]))}
@@ -4650,7 +4809,7 @@ function liq156Context(){
  }else parts.push('<p><strong>No weekly schedule saved.</strong> Set training days in Settings to make the recommendation day-aware.</p>');
  if(cycle)parts.push('<p><strong>Training block:</strong> '+v3Safe(cycle.label)+' · '+v3Safe(cycle.name)+(v3Paused(cycle)?' (paused; no changes applied)':'')+'.</p>');
  if(journal)parts.push('<p><strong>Unreconciled journal:</strong> Your current notes are not a completed Hevy workout. Review relevant limitations or discomfort before training.</p>');
- if(sync){var age=Math.max(0,Math.round((Date.now()-sync)/86400000));if(age>3)parts.push('<p>Last Hevy sync was '+age+' days ago. Recent workouts may be missing.</p>')}
+ if(sync){var age=Math.max(0,Math.round((Date.now()-sync)/86400000));if(Date.now()-sync>72*60*60*1000)parts.push('<p>Last Hevy sync was '+age+' days ago (over 72 hours). Recent workouts may be missing.</p>')}
  parts.push('<p>No program, schedule, cycle, or Hevy data is modified by this recommendation or its manual override.</p>');
  return '<div class="liq156-context">'+parts.join('')+'</div>';
 }
