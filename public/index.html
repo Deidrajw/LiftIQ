@@ -4597,7 +4597,7 @@ function liq156Context(){
 var liq156OldCard=nextWorkoutCard;
 nextWorkoutCard=function(){
  var html=liq156OldCard();
- return html.replace('</div>',liq156Context()+'</div>');
+ return html.replace(/<\/div>\s*$/,liq156Context()+'</div>');
 };
 var liq156OldSession=renderNextSessionCoach;
 renderNextSessionCoach=function(){
