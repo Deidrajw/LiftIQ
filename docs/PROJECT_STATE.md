@@ -1,5 +1,13 @@
 # LiftIQ — Project State (Living Handoff)
 
+## Current deployed fix — 2026-10-23
+
+- PR #4 merged into `main` at `94c9f77f69441934acada54d93d841ceb5e65c53` and Netlify deploy `6adbd6d6278f88401625e4fa` verified **ready** with matching commit. Five functions present: `ai-coach`, `auth-config`, `auth-lib`, `auth-session`, `hevy-sync`.
+- Next Workout manual selection now lists all distinct titles from the **currently imported completed Hevy history**, including multiple routines sharing a training category, titles outside the latest 28 recognized strength sessions, and unrecognized titles. The category-based automatic recommendation remains intact. This is **not** the saved Hevy routine library; titles absent from the current sync range cannot be listed.
+- Seven isolated source-derived scenario checks and full frontend JavaScript syntax passed before merge. **Not run:** authenticated production selection, iOS Safari manual QA, real Hevy sync after merge. No existing storage keys changed.
+- Next exact step: with signed-in Hevy history, verify previously missing workout titles appear after an all-history sync and that manual selection works on iOS Safari; then address any remaining Hevy routine-library expectations and UI clarity.
+
+
 ## Latest release — V15.8 (2026-10-23)
 
 - User explicitly approved deployment. V15.7.1 QA hardening merged via PR #2 commit `5314226780b6b9b8e70b9ac4843a71eb9dec62f2`; V15.8 Training Memory merged via PR #3 commit `36062c1e11c6cbcb0c468ec66c01d600fb05cd12`.
