@@ -30,3 +30,7 @@ Purpose: preserve **why** a behavior was chosen, so future chats do not undo app
 ## How to update this log
 
 For each meaningful decision record: date, affected screen/function, approved behavior, evidence/rationale, alternatives rejected, data implications, and any user approval required. If the source disagrees with a prior choice, mark the conflict and resolve it explicitly before changing behavior.
+
+
+### D-013 — V15.8 context-sensitive training memory (2026-10-23, preview awaiting acceptance)
+Only explicitly saved, unresolved user flags are eligible for compact Today guidance. Show flags relevant to the suggested workout group; keep details collapsed and hide when no relevant flags exist. Provide a reversible/explicit resolution operation; preserve original journal observations. Do not automatically change workout ranking, training plan, targets, completed history or Gemini context. Keep a clear user-reported versus Hevy-evidence distinction.
