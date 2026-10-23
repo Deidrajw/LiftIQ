@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LiftIQ · V15.7.1 QA preview</title>
+<title>LiftIQ · V15.8 preview</title>
 <meta name="theme-color" content="#0a0b0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1059,6 +1059,21 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .li157-observation span{font-size:10px;color:var(--t2)}
 .li157-details{padding:9px 0}.li157-details summary{cursor:pointer;color:var(--tx);font-weight:700}
 @media(max-width:350px){.li157-candidate{align-items:flex-start;flex-direction:column}.li157-candidate button{align-self:flex-start}}
+
+
+/* V15.8 memory stays collapsed until requested and shares Today card hierarchy. */
+.li158-memory{border-top:1px solid var(--bd2);padding:11px 0 0;margin-top:13px}
+.li158-memory summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;font-size:12px;font-weight:700;color:var(--tx);min-height:40px}
+.li158-memory summary:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
+.li158-counter{font-size:10px;color:var(--t2);font-weight:600;text-align:right}
+.li158-intro,.li158-foot{color:var(--t2);font-size:11px;line-height:1.6;margin:10px 0}
+.li158-entry{padding:11px 0;border-top:1px solid var(--bd)}
+.li158-entry>div{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:5px}
+.li158-entry strong{font-size:12px;color:var(--tx)}
+.li158-entry span{font-size:10px;color:var(--t2)}
+.li158-entry p{font-size:11px;color:var(--t2);margin:6px 0}
+.li158-entry button{font-size:11px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2);border-radius:8px;min-height:38px;padding:6px 11px}
+.li158-entry button:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
 
 </style>
 </head>
@@ -4861,6 +4876,64 @@ renderNextSessionCoach=function(){
  if(!card)return;
  var block=document.createElement('div');block.innerHTML=liq156Context();if(block.firstElementChild)card.appendChild(block.firstElementChild);
 };
+
+
+/* V15.8 preview: saved user-approved flags inform Today without affecting Hevy facts,
+   workout ranking, permanent cycles, targets or Gemini. */
+function li158RelevantFlags(group){
+ var flags=Array.isArray(LI143.flags)?LI143.flags:[];
+ return flags.filter(function(f){
+  if(!f||f.resolved||!f.eventId)return false;
+  // Only explicitly saved flags, never raw/unfinished journal observations.
+  if(!group)return false;
+  var ex=String(f.exercise||'').trim();
+  if(!ex||ex==='Unspecified exercise')return false;
+  return todayPriorityMatches(ex,group);
+ }).slice(0,5);
+}
+function li158MemoryHTML(group){
+ var flags=li158RelevantFlags(group);
+ if(!flags.length)return '';
+ var rows=flags.map(function(f){
+  var when=String(f.created||'').slice(0,10);
+  var label=when&&/^\d{4}-\d{2}-\d{2}$/.test(when)?uiLongDate(when):'Date not recorded';
+  var guidance=(f.kind==='pain'?'Check your current comfort before repeating this exercise; stop if it causes pain.':
+    f.kind==='equipment'||f.kind==='swap'?'Check equipment and any intended substitution before starting.':
+    f.kind==='fatigue'?'Check your current recovery; a prior fatigue note is not proof of today’s readiness.':
+    f.kind==='load'?'Review current technique and effort before changing load.':
+    'Review your previous observation before this focus.');
+  return '<div class="li158-entry"><div><strong>'+liEsc(f.exercise)+'</strong><span>'+liEsc(label)+' · '+liEsc(f.kind||'observation')+'</span></div><p>'+liEsc(guidance)+'</p><button type="button" data-li158-resolve="'+liEsc(f.eventId)+'">Mark resolved</button></div>';
+ }).join('');
+ return '<details class="li158-memory"><summary><span>Training memory</span><span class="li158-counter">'+flags.length+' relevant saved flag'+(flags.length===1?'':'s')+'</span></summary>'+
+ '<p class="li158-intro">Saved observations for movements related to this suggested focus. These are your reported notes, not completed Hevy evidence. Review relevance before acting.</p>'+
+ rows+'<p class="li158-foot">Nothing here changes the suggested workout, Hevy, your plan, or Gemini context. Resolve flags when they no longer apply.</p></details>';
+}
+function li158RenderToday(){
+ var root=document.getElementById('nextSessionCoach');
+ if(!root)return;
+ root.querySelectorAll('.li158-memory').forEach(function(node){node.remove()});
+ if(!STATE.imported)return;
+ var card=root.querySelector('.today-next');
+ if(!card)return;
+ var pick=nextWorkoutSelection();
+ var html=li158MemoryHTML(pick.group);
+ if(html)card.insertAdjacentHTML('beforeend',html);
+}
+var li158PreviousNextRender=renderNextSessionCoach;
+renderNextSessionCoach=function(){
+ li158PreviousNextRender();
+ li158RenderToday();
+};
+document.addEventListener('click',function(event){
+ var button=event.target.closest('[data-li158-resolve]');
+ if(!button)return;
+ event.preventDefault();
+ var id=button.getAttribute('data-li158-resolve');
+ var flag=(LI143.flags||[]).find(function(f){return f.eventId===id});
+ if(!flag||flag.resolved)return;
+ if(!confirm('Mark this training-memory flag resolved? Its original journal note is not deleted.'))return;
+ li143Resolve(id);
+});
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
