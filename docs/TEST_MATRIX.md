@@ -58,3 +58,17 @@
 ## How to update
 
 Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fictional vs real, no private data copied to docs), steps, expected vs actual, **PASS/FAIL/NOT RUN**, screenshot/log reference if available, and follow-up issue. Do not convert NOT RUN to PASS based on source inspection alone.
+
+
+## V15.8 preview (2026-10-23)
+| Scope | Status | Details |
+|---|---|---|
+| Frontend JavaScript syntax | PASS (isolated compilation) | Tested full `public/index.html` after V15.8 source edit |
+| Matching active saved flags by suggested group | PASS | Fictional Glutes/Hamstrings vs Upper Body scenarios |
+| Resolved/unscoped/unknown flags suppressed | PASS | Source-derived scenarios |
+| Memory panel collapsed and hidden when empty | PASS | HTML helper assertions, **not rendered mobile QA** |
+| Verbatim private observation not copied to panel | PASS | Exact sentinel test |
+| No network/Gemini send or recommendation mutation in memory helper | PASS (static source check) | No network routine or ranking changes introduced |
+| Actual app rendered Today + Journal regression | NOT RUN | Needs Chromium browser UI acceptance |
+| Mobile Safari / VoiceOver | NOT RUN | Device-specific testing |
+| Real authenticated Hevy & Gemini regression | NOT RUN | Requires signed-in environment |
