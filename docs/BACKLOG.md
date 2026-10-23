@@ -40,3 +40,8 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 ### V15.8 development update — 2026-10-23
 - **In development only** on `feature/v15-8-training-memory-preview`: collapsed saved-flag context on Today. Uses previously approved active flags, never scans unsolicited private journal notes. Matching is exercise-focus heuristic, not verified medical or workout evidence. Resolution retains original journal notes.
 - **Blocking**: signed-in V15.7.1 acceptance and iOS Safari checks; then V15.8 browser acceptance; user approval to deploy.
+
+
+### Active QA — October 23, 2026
+- **P0 In progress**: Progress confidence gate on `fix/progress-confidence-and-mobile-clearance` (draft PR #5). Verify realistic exercise histories against labels and iPhone bottom-nav clearance before merging.
+- **P1 Next**: Consolidate repeated Next Workout explanation into one collapsed evidence disclosure; make plan/cycle context actionable, then unify priority trend rows. Avoid unnecessary redesign.
