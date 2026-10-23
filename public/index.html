@@ -886,6 +886,29 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .liq-review button{min-height:44px;padding:9px 12px;background:var(--bg3);color:var(--tx);border:1px solid var(--bd2);border-radius:9px}
 .liq-session-indicator{font-size:13px;color:var(--ux-subtle);margin:5px 0}
 @media(max-width:380px){.liq-chat-header{align-items:flex-start;flex-wrap:wrap}.liq-chat-header h3{font-size:15px;overflow-wrap:anywhere}}
+
+/* V14.8 conversation-first UX: eliminate oversized stacked panels */
+#t-ai .liq-chat-shell{gap:8px}
+#t-ai .liq-chat-header{align-items:center;min-width:0}
+#t-ai .liq-chat-header h3{font-size:15px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#t-ai .liq-chat-header button{flex:none;white-space:nowrap;font-size:12px;padding:8px 10px}
+#t-ai .liq-chat-transcript{max-height:min(39vh,320px);min-height:130px;overflow-y:auto;scrollbar-width:thin;padding:2px 4px}
+#t-ai .liq-chat-bubble{max-width:96%;font-size:14px;line-height:1.48;padding:10px 12px;margin:8px 0}
+#t-ai .liq-chat-bubble strong{font-size:12px}
+#t-ai .liq-chat-stamp{margin-top:5px;font-size:10px}
+#t-ai .liq-chat-toolrow{order:3}
+#t-ai .liq-chat-toolrow button{font-size:12px;padding:8px}
+#t-ai .liq-coach-composer{padding:10px 12px;margin:0;background:transparent}
+#t-ai .liq-coach-composer .cl{display:none}
+#t-ai .liq-coach-composer .ux-coach-intro{display:none}
+#t-ai .liq-coach-composer textarea{min-height:68px;max-height:140px;resize:vertical;font-size:16px}
+#t-ai .liq-coach-composer .ai-actions{display:flex;gap:7px;flex-wrap:wrap}
+#t-ai .liq-coach-composer .ai-actions button{font-size:13px;padding:9px 12px}
+#t-ai .liq-chat-main{padding:12px!important;margin-bottom:12px!important}
+#t-ai .liq-chat-main>.liq-coach-composer{border:none!important;padding:5px 0!important}
+#t-ai .liq-coach-history{margin:8px 0}
+#t-ai .liq-chat-main .liq-chat-composer-label{font-size:12px;color:var(--ux-subtle);padding:7px 0 4px}
+@media(max-width:420px){#t-ai .liq-chat-header h3{font-size:14px}#t-ai .liq-chat-main{padding:10px!important}#t-ai .liq-chat-transcript{max-height:34vh}}
 </style>
 </head>
 <body class="today-active">
@@ -4150,6 +4173,31 @@ document.addEventListener('keydown',function(e){
  if(e.shiftKey&&document.activeElement===xs[0]){e.preventDefault();xs[xs.length-1].focus()}
  else if(!e.shiftKey&&document.activeElement===xs[xs.length-1]){e.preventDefault();xs[0].focus()}
 });
+
+
+/* V14.8: display conversation + composer together, without changing stored messages */
+var liq148Render=renderAICoach;
+renderAICoach=function(){
+ liq148Render();
+ var p=document.getElementById('t-ai');if(!p)return;
+ var conversation=p.querySelector('.liq-chat-shell');
+ var composer=p.querySelector('.liq-coach-composer');
+ if(!conversation||!composer)return;
+ var shell=conversation.closest('.cc');
+ if(!shell)return;
+ shell.classList.add('liq-chat-main');
+ composer.remove();
+ var inputLabel=document.createElement('div');inputLabel.className='liq-chat-composer-label';inputLabel.textContent='Your message';
+ var tools=conversation.querySelector('.liq-chat-toolrow');
+ if(tools)tools.before(inputLabel,composer);
+ else conversation.append(inputLabel,composer);
+ var transcript=conversation.querySelector('.liq-chat-transcript');
+ if(transcript)transcript.scrollTop=transcript.scrollHeight;
+ var header=conversation.querySelector('.liq-chat-header h3');
+ if(header){header.title=header.textContent;if(header.textContent.length>38)header.textContent=header.textContent.slice(0,35)+'…'}
+ var explanation=composer.querySelector('.ux-coach-explain');
+ if(explanation){var evidence=p.querySelector('.liq-coach-history');if(evidence)evidence.after(explanation)}
+};
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
