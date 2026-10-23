@@ -1,5 +1,15 @@
 # LiftIQ — Project State (Living Handoff)
 
+## Latest release — V15.8 (2026-10-23)
+
+- User explicitly approved deployment. V15.7.1 QA hardening merged via PR #2 commit `5314226780b6b9b8e70b9ac4843a71eb9dec62f2`; V15.8 Training Memory merged via PR #3 commit `36062c1e11c6cbcb0c468ec66c01d600fb05cd12`.
+- Published page title corrected with source commit `5cde58e87f609827d416060e634d30b6b13d9b3b`.
+- V15.8 adds relevant, explicitly saved unresolved training-memory flags in a collapsed section inside Today / Next Workout, with user-confirmed resolution. No automatic Hevy writes, Gemini sharing, cycle or target changes; no storage-key migrations.
+- V15.7.1 GitHub Actions Node and actual-HTML Chromium test jobs passed, using fictional records. V15.8 source syntax and focused memory-matching/privacy checks passed. Signed-in Hevy/Gemini and iOS Safari regression are **not verified**.
+- Netlify deployment commit and ready state must be verified separately after this documentation update; avoid assuming a queued build is published.
+- Next exact step: verify this docs commit is published with matching SHA and five backend functions; run signed-in and iOS Safari regression, then prioritize V15.8 usability and training-memory contextual relevance.
+
+
 > **Read this first in every new LiftIQ chat.** This is a verified checkpoint, not a substitute for checking GitHub `main` and the currently published Netlify commit. Code/deployment status outranks outdated notes. Do not rebuild completed features.
 
 **Last source inspection:** 2026-10-23 (Toronto).  
