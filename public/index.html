@@ -859,6 +859,25 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .liq-coach-history>summary{cursor:pointer;list-style:none;min-height:44px;padding:12px;border:1px solid var(--bd2);border-radius:10px;font-size:14px;font-weight:650}
 .liq-coach-history>summary::-webkit-details-marker{display:none}
 .liq-coach-history>.cc{margin-top:10px}
+
+/* V14.6 CHAT-FIRST */
+.liq-chat-shell{display:flex;flex-direction:column;gap:10px}
+.liq-chat-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.liq-chat-header h3{font-size:17px;margin:0}
+.liq-chat-transcript{max-height:42vh;overflow:auto;overscroll-behavior:contain;padding:8px 0}
+.liq-chat-bubble{max-width:91%;padding:12px 14px;margin:9px 0;border-radius:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;border:1px solid var(--bd2)}
+.liq-chat-bubble.user{margin-left:auto;background:var(--bg3);border-bottom-right-radius:4px}
+.liq-chat-bubble.assistant{margin-right:auto;background:var(--bg2);border-bottom-left-radius:4px}
+.liq-chat-stamp{font-size:11px;color:var(--ux-subtle);margin-top:7px}
+.liq-chat-empty{font-size:13px;color:var(--ux-subtle);padding:12px}
+.liq-chat-toolrow{display:flex;gap:8px;flex-wrap:wrap}
+.liq-chat-toolrow button{min-height:44px;padding:9px 12px;border-radius:10px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2)}
+.liq-chat-composer{position:relative}
+.liq-chat-composer textarea{width:100%;min-height:90px}
+.liq-history-filter,.liq-journal-search{width:100%;min-height:44px;padding:10px;font-size:16px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);margin:8px 0}
+.liq-journal-row{border-bottom:1px solid var(--bd2);padding:10px 0}
+.liq-history-result{font-size:12px;color:var(--ux-subtle);margin:5px 0}
+@media(max-width:400px){.liq-chat-bubble{max-width:98%}.liq-chat-transcript{max-height:36vh}}
 </style>
 </head>
 <body class="today-active">
@@ -4057,6 +4076,40 @@ renderAICoach=function(){
  }
 };
 document.addEventListener('click',function(e){var d=document.getElementById('uxMoreMenu');if(d&&d.open&&!d.contains(e.target))d.open=false});
+
+
+/* V14.6 CHAT-FIRST: existing saved conversation records are untouched */
+function liq146Transcript(){
+ var t=liqChatActive(),h='<div class="liq-chat-shell"><div class="liq-chat-header"><h3>'+ (t?aiSafe(t.title):'Your training conversation') +'</h3><button class="ai-btn secondary" onclick="liqChatNew()">+ New chat</button></div>';
+ h+='<div class="liq-chat-transcript" role="log" aria-label="Conversation messages" aria-live="polite">';
+ if(!t||!t.messages.length)h+='<div class="liq-chat-empty">Ask about your training, progress or next set. Completed Hevy workouts inform the answer; tell Coach how your current set feels.</div>';
+ else t.messages.slice(-24).forEach(function(m){var a=new Date(m.at);h+='<div class="liq-chat-bubble '+(m.role==='user'?'user':'assistant')+'"><strong>'+(m.role==='user'?'You':'Coach')+'</strong><div>'+aiSafe(m.text)+'</div><div class="liq-chat-stamp">'+(isNaN(a.getTime())?'Saved conversation':a.toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))+'</div></div>'});
+ h+='</div><div class="liq-chat-toolrow"><button type="button" onclick="liq146ToggleHistory()">Browse past chats ('+LIQ_CHAT.threads.length+')</button><button type="button" onclick="liq146AskSuggestion()">Suggest a training question</button></div></div>';return h;
+}
+function liq146AskSuggestion(){var q=document.getElementById('aiQuestion');if(q){q.value='Based on my recent completed workouts and current training phase, what should I focus on next?';q.focus()}}
+function liq146ToggleHistory(){var h=document.querySelector('.liq-coach-history');if(h){h.open=!h.open;if(h.open){var q=h.querySelector('.liq-history-filter');if(q)q.focus()}}}
+function liq146FilterChats(value){var q=(value||'').toLowerCase().trim();document.querySelectorAll('.liq-thread-list button').forEach(function(b){var t=LIQ_CHAT.threads.find(x=>x.id===b.dataset.thread);b.hidden=!!q && !(t&&(t.title+' '+t.messages.map(m=>m.text).join(' ')).toLowerCase().includes(q))})}
+var liq146RenderCoach=renderAICoach;
+renderAICoach=function(){
+ liq146RenderCoach();
+ var pane=document.getElementById('t-ai');if(!pane)return;
+ var composer=pane.querySelector('.liq-coach-composer'),history=pane.querySelector('.liq-coach-history');
+ if(!composer)return;
+ var chat=document.createElement('section');chat.className='cc';chat.innerHTML=liq146Transcript();
+ composer.parentNode.insertBefore(chat,composer);
+ var details=history;
+ if(details){
+  var inp=document.createElement('input');inp.className='liq-history-filter';inp.type='search';inp.placeholder='Search saved conversations';inp.setAttribute('aria-label','Search saved conversations');inp.oninput=function(){liq146FilterChats(this.value)};
+  var list=details.querySelector('.liq-thread-list');if(list){list.parentNode.insertBefore(inp,list);list.querySelectorAll('button').forEach(function(b){var t=LIQ_CHAT.threads.find(x=>b.textContent===x.title);if(t)b.dataset.thread=t.id})}
+ }
+ /* Current thread lives in the chat above, so remove duplicate transcript from history */
+ if(details){var old=details.querySelector('details[open]');if(old)old.remove()}
+ /* Historical AI result remains available for details; avoid duplicate answer for saved thread */
+ var t=liqChatActive();if(t?.messages?.length){var result=pane.querySelector('.ai-result');if(result){var card=result.closest('.cc');if(card)card.style.display='none'}}
+};
+function liq146JournalFilter(v){var q=(v||'').trim().toLowerCase();document.querySelectorAll('#liqJournalContents .li-entry').forEach(function(row){row.hidden=!!q&&!row.textContent.toLowerCase().includes(q)})}
+var liq146JournalRefresh=liqJournalRefresh;
+liqJournalRefresh=function(){liq146JournalRefresh();var root=document.getElementById('liqJournalContents');if(!root)return;var input=document.createElement('input');input.type='search';input.className='liq-journal-search';input.placeholder='Search exercises or journal notes';input.setAttribute('aria-label','Search journal');input.oninput=function(){liq146JournalFilter(this.value)};root.insertBefore(input,root.firstChild)};
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
