@@ -21,7 +21,8 @@ V15.7: *Post-Workout Reconciliation* links a finished browser-stored training jo
 
 ## Tests
 - JS syntax validated on updated full frontend source.
-- Ten isolated source-derived automated logic tests passed (candidate ambiguity, confirmation, unlink, cache, no history, no mutation, 72 hours). See `docs/TEST_MATRIX.md`.
+- Ten initial source-derived automated checks passed, followed by a second expanded 17/17 exact-source test run (ambiguous candidates, explicit confirmation, duplicate-match prevention, unlink, cache, XSS escaping, quota handling and 72h). See `docs/TEST_MATRIX.md`.
+- Independent fictional HTML demo passed Chromium Playwright interaction tests and responsive widths 320/375/390/960px with zero browser JavaScript exceptions or horizontal overflow. **This does not test the GitHub-branch application UI.**
 - Signed-in Google authentication, real Hevy API sync, Gemini, iOS Safari, accessibility and real-user storage migration NOT yet run against V15.7.
 - Netlify preview / production deployment NOT performed.
 
@@ -33,4 +34,4 @@ V15.7: *Post-Workout Reconciliation* links a finished browser-stored training jo
 - No automatic program, mesocycle, goal, target, or Hevy write. No sharing journal notes with Gemini without explicit user action.
 
 ## Exact next step
-QA the actual V15.7 browser UI with fictional records on mobile and desktop, then verify authenticated Hevy sync and journal matching in a branch Deploy Preview (or approved safe test environment). Prepare complete versioned ZIP, release notes, demo and checklist. Seek explicit approval before merging/publishing to `main` / production.
+QA the actual V15.7 GitHub-branch application UI (distinct from the standalone fictional demo), then verify authenticated Hevy sync and journal matching in a branch Deploy Preview (or approved safe test environment). Prepare complete versioned ZIP, release notes, demo and checklist. Seek explicit approval before merging/publishing to `main` / production.
