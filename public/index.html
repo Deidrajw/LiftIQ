@@ -878,6 +878,14 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .liq-journal-row{border-bottom:1px solid var(--bd2);padding:10px 0}
 .liq-history-result{font-size:12px;color:var(--ux-subtle);margin:5px 0}
 @media(max-width:400px){.liq-chat-bubble{max-width:98%}.liq-chat-transcript{max-height:36vh}}
+
+/* V14.7 — session follow-through and accessible overlays */
+.liq-review{border:1px solid var(--bd2);background:var(--bg2);border-radius:12px;padding:14px;margin:12px 0}
+.liq-review h4{margin-bottom:8px}.liq-review p{font-size:13px;line-height:1.5;color:var(--ux-subtle)}
+.liq-review .liq-review-row{padding:8px 0;border-bottom:1px solid var(--bd2)}
+.liq-review button{min-height:44px;padding:9px 12px;background:var(--bg3);color:var(--tx);border:1px solid var(--bd2);border-radius:9px}
+.liq-session-indicator{font-size:13px;color:var(--ux-subtle);margin:5px 0}
+@media(max-width:380px){.liq-chat-header{align-items:flex-start;flex-wrap:wrap}.liq-chat-header h3{font-size:15px;overflow-wrap:anywhere}}
 </style>
 </head>
 <body class="today-active">
@@ -4110,6 +4118,38 @@ renderAICoach=function(){
 function liq146JournalFilter(v){var q=(v||'').trim().toLowerCase();document.querySelectorAll('#liqJournalContents .li-entry').forEach(function(row){row.hidden=!!q&&!row.textContent.toLowerCase().includes(q)})}
 var liq146JournalRefresh=liqJournalRefresh;
 liqJournalRefresh=function(){liq146JournalRefresh();var root=document.getElementById('liqJournalContents');if(!root)return;var input=document.createElement('input');input.type='search';input.className='liq-journal-search';input.placeholder='Search exercises or journal notes';input.setAttribute('aria-label','Search journal');input.oninput=function(){liq146JournalFilter(this.value)};root.insertBefore(input,root.firstChild)};
+
+
+/* V14.7: show dated Hevy activity next to journals without assuming a match */
+function liq147RecentHevy(){
+ var dates=Object.keys(STATE.dailyLog||{}).sort().reverse();
+ if(!dates.length)return '<p>No completed Hevy sessions in local history. Sync after finishing your workout.</p>';
+ var out='<div class="liq-review"><h4>Recent completed Hevy workouts</h4><p>For comparison only. LiftIQ has not automatically matched these workouts to a journal.</p>';
+ dates.slice(0,4).forEach(function(date){var items=STATE.dailyLog[date]||[];var count=Array.isArray(items)?items.length:0;out+='<div class="liq-review-row"><strong>'+liEsc(uiLongDate(date))+'</strong><p>'+count+' recorded entries · Check Hevy for the precise performed exercise list.</p></div>'});
+ return out+'</div>';
+}
+function liq147JournalNotes(){
+ var a=LI.active,history=LI.history||[],out='<div class="liq-review"><h4>Journal & workout review</h4>';
+ if(a)out+='<p class="liq-session-indicator">Journal in progress: '+liEsc(a.name)+'. Your sets remain in Hevy.</p>';
+ else if(history.length){var j=history[0];out+='<p>Most recent journal: '+liEsc(j.name)+' · '+new Date(j.at).toLocaleDateString()+'</p><p>'+j.events.length+' observations saved. Review the corresponding workout in Hevy before applying coaching changes.</p>'}
+ else out+='<p>No saved journal yet. Start one when training to record why an exercise was swapped, stopped, or changed.</p>';
+ return out+'</div>'+liq147RecentHevy();
+}
+var liq147RefreshJournal=liqJournalRefresh;
+liqJournalRefresh=function(){liq147RefreshJournal();var root=document.getElementById('liqJournalContents');if(root){var panel=document.createElement('div');panel.innerHTML=liq147JournalNotes();root.appendChild(panel)}};
+var liq147ReturnFocus=null;
+var liq147OpenJournal=liqJournalOpen;
+liqJournalOpen=function(){liq147ReturnFocus=document.activeElement;liq147OpenJournal()};
+var liq147CloseJournal=liqJournalClose;
+liqJournalClose=function(){liq147CloseJournal();if(liq147ReturnFocus&&liq147ReturnFocus.isConnected)liq147ReturnFocus.focus()};
+document.addEventListener('keydown',function(e){
+ var overlay=document.getElementById('liqJournalOverlay');
+ if(!overlay?.classList.contains('open')||e.key!=='Tab')return;
+ var xs=[...overlay.querySelectorAll('button,input,textarea,select,summary,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled&&x.getClientRects().length);
+ if(!xs.length)return;
+ if(e.shiftKey&&document.activeElement===xs[0]){e.preventDefault();xs[xs.length-1].focus()}
+ else if(!e.shiftKey&&document.activeElement===xs[xs.length-1]){e.preventDefault();xs[0].focus()}
+});
 
 // Preserve last visited primary destination within this browsing session only.
 try{uxUpdateNav('today');}catch(e){}
