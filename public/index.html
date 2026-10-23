@@ -924,6 +924,19 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 #t-ai .liq-evidence-description{font-size:12px;color:var(--ux-subtle);margin:6px 0 12px}
 #t-ai .liq-chat-transcript{scrollbar-color:#526377 transparent}
 #t-ai .liq-chat-bubble{font-size:15px}
+
+/* V14.10 mobile usability hardening */
+#t-ai .liq-chat-main{min-width:0}
+#t-ai .liq-chat-header h3{min-width:0}
+#t-ai .liq-thread-list button[hidden]{display:none!important}
+#t-ai .liq-coach-history[open]{margin-bottom:12px}
+#t-ai .liq-coach-history .liq-thread-list{display:flex;max-height:180px;overflow:auto;flex-wrap:wrap}
+#t-ai .liq-coach-history .liq-thread-list button{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left}
+#t-ai .liq-chat-transcript{overflow-x:hidden}
+#t-ai .liq-chat-bubble div{overflow-wrap:anywhere}
+#t-ai .liq-chat-toolrow button{font-size:13px;min-height:44px}
+#t-ai .liq-coach-composer textarea:focus-visible{outline:2px solid #aac5df;outline-offset:2px}
+@media(max-width:390px){#t-ai .liq-chat-toolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}#t-ai .liq-chat-toolrow button{min-width:0;padding:8px;overflow-wrap:anywhere}#t-ai .liq-chat-toolrow button:last-child:nth-child(odd){grid-column:1/-1}}
 </style>
 </head>
 <body class="today-active">
@@ -4251,6 +4264,51 @@ renderAICoach=function(){
   var summary=document.createElement('summary');summary.textContent='Training evidence & approved targets';disclosure.appendChild(summary);
   var helper=document.createElement('p');helper.className='liq-evidence-description';helper.textContent='Open to inspect the evidence behind coaching suggestions. These details do not change your plan.';disclosure.appendChild(helper);
   cards[0].before(disclosure);cards.forEach(el=>disclosure.appendChild(el));
+ }
+};
+
+
+/* V14.10: stable chat filtering, correct draft handoff, predictable focus */
+var liq1410Open=liqChatOpen;
+liqChatOpen=function(id){
+ var box=document.getElementById('aiQuestion');
+ if(box)liq149SaveDraft(box.value);
+ liq1410Open(id);
+ _aiQuestion=LIQ149_DRAFTS[id]||'';
+ var target=document.getElementById('aiQuestion');
+ if(target){target.value=_aiQuestion;target.focus()}
+};
+var liq1410New=liqChatNew;
+liqChatNew=function(){
+ var box=document.getElementById('aiQuestion');
+ if(box)liq149SaveDraft(box.value);
+ liq1410New();
+ _aiQuestion='';
+ var target=document.getElementById('aiQuestion');
+ if(target){target.value='';target.focus()}
+};
+liq146FilterChats=function(value){
+ var q=String(value||'').toLowerCase().trim();
+ var index=LIQ_CHAT.threads||[];
+ document.querySelectorAll('#t-ai .liq-thread-list button').forEach(function(button,i){
+  var item=index[i];
+  button.hidden=!!q&&!(item&&((item.title||'')+' '+(item.messages||[]).map(function(m){return m.text||''}).join(' ')).toLowerCase().includes(q));
+ });
+};
+var liq1410Render=renderAICoach;
+renderAICoach=function(){
+ liq1410Render();
+ var root=document.getElementById('t-ai');if(!root)return;
+ var history=root.querySelector('.liq-coach-history');
+ if(history){
+  var summary=history.querySelector('summary');
+  if(summary)summary.setAttribute('aria-label','Browse and search previous Coach conversations');
+ }
+ var input=root.querySelector('#aiQuestion');
+ if(input){
+  input.setAttribute('aria-describedby','liq1410Help');
+  var info=document.createElement('span');info.id='liq1410Help';info.className='liq-history-note';info.textContent='Your messages are stored in this browser. Coach uses completed Hevy history, not live sets.';
+  input.insertAdjacentElement('afterend',info);
  }
 };
 
