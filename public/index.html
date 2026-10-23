@@ -230,7 +230,7 @@ body[data-theme="light"] .phase-card.phase-active{background:#edf1f5}
   --or:#cbd2da;--bl:#a8c0d6;--gr:#78bf9d;--re:#ee877e;--am:#e9bf79;
 }
 html{scroll-behavior:smooth}
-body{max-width:620px;min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse 85% 24% at 50% -4%,rgba(173,188,209,.09),transparent 72%),var(--bg);color:var(--tx);padding-bottom:108px;font-family:'DM Sans',sans-serif;font-size:14px}
+body{max-width:620px;min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse 85% 24% at 50% -4%,rgba(173,188,209,.09),transparent 72%),var(--bg);color:var(--tx);padding-bottom:calc(168px + env(safe-area-inset-bottom, 0px));font-family:'DM Sans',sans-serif;font-size:14px}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.10;background-image:radial-gradient(#a2aab5 .42px,transparent .45px);background-size:8px 8px;z-index:-1}
 button,input,textarea{font-family:'DM Sans',sans-serif}
 button{touch-action:manipulation}
@@ -1974,15 +1974,24 @@ function v10ComparableHistory(name,days){
 function v10TrendAssessment(name,days){
  var rows=v10ComparableHistory(name,days);
  if(!rows.length)return {status:'No comparable records',rows:rows,evidence:'No qualifying dated weighted sets for this movement in this '+days+'-day window.'};
- if(rows.length===1)return {status:'One training date',rows:rows,evidence:'Only one qualifying training date in the '+days+'-day window.'};
- var first=rows[0],last=rows[rows.length-1],delta=last.e1rmLb-first.e1rmLb;
- var sameLoad=Math.abs(first.weightLb-last.weightLb)<.25;
- var improved=delta>Math.max(2,first.e1rmLb*.025),declined=delta<-Math.max(2,first.e1rmLb*.025);
- var status=improved?'Progressing':declined?'Needs context':'Stable / mixed';
- var evidence=uiLongDate(first.date)+': '+first.weightLb+' lb × '+first.reps+' → '+uiLongDate(last.date)+': '+last.weightLb+' lb × '+last.reps+' · '+rows.length+' dated performances.';
- if(sameLoad&&last.reps>first.reps){status='Rep progression';}
- // This is a comparison signal, not a diagnosis of a plateau or fatigue.
- return {status:status,rows:rows,delta:Math.round(delta),evidence:evidence};
+ var first=rows[0],last=rows[rows.length-1];
+ var endpoints=uiLongDate(first.date)+': '+first.weightLb+' lb × '+first.reps+' → '+uiLongDate(last.date)+': '+last.weightLb+' lb × '+last.reps;
+ if(rows.length<3)return {status:'Limited evidence',rows:rows,evidence:endpoints+' · '+rows.length+' training dates. At least 3 comparable dates needed to assess a trend.'};
+ // Compare the first and last halves of dated estimated-strength readings;
+ // avoid labeling a single anomalous last session a confirmed progression.
+ var count=Math.max(1,Math.floor(rows.length/2));
+ function median(values){
+  var sorted=values.slice().sort(function(a,b){return a-b});
+  var mid=Math.floor(sorted.length/2);
+  return sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
+ }
+ var early=median(rows.slice(0,count).map(function(x){return x.e1rmLb}));
+ var late=median(rows.slice(-count).map(function(x){return x.e1rmLb}));
+ var pct=early>0?100*(late-early)/early:0;
+ var status=pct>=5?'Est. strength up':pct<=-5?'Est. strength down':'Stable / mixed';
+ var estimate=' · '+rows.length+' comparable training dates · estimated-strength trend '+(pct>0?'+':'')+pct.toFixed(1)+'% (early vs recent median).';
+ var caution=' Estimate from daily best comparable sets; not a confirmed strength gain, and not a full set-volume analysis.';
+ return {status:status,rows:rows,delta:Math.round(late-early),evidence:endpoints+estimate+caution};
 }
 
 
@@ -2167,7 +2176,7 @@ function v127Label(action,label){
  if(label){var cleaned=String(label).replace('HOLD — ','Hold · ').replace('INJURY — ','Injury · ');return cleaned==='STALLED'?'Stalled':cleaned==='BUILDING'?'Building':cleaned==='INCREASE'?'Increase':cleaned;}
  return ({stall:'Stalled',increase:'Increase',hold:'Hold',building:'Building',injury:'Review injury',reduce:'Reduce',tracked:'Tracked',pinned:'Pinned'})[action]||'Review';
 }
-function v127TrendTone(label){var value=String(label||'').toLowerCase();return value.includes('rep progression')?'building':value.includes('progressing')?'increase':value.includes('mixed')||value.includes('stable')?'hold':'baseline';}
+function v127TrendTone(label){var value=String(label||'').toLowerCase();return value.includes('rep progression')?'building':value.includes('est. strength up')||value.includes('progressing')?'increase':value.includes('est. strength down')?'reduce':value.includes('mixed')||value.includes('stable')?'hold':'baseline';}
 function v127StatusChip(action,label){
  var tone=v127Tone(action);
  return '<span class="state-chip state-tone--'+tone+'">'+v3Safe(v127Label(tone,label))+'</span>';
