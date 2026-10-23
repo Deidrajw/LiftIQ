@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LiftIQ · Obsidian V14</title>
+<title>LiftIQ · V15.6.1</title>
 <meta name="theme-color" content="#0a0b0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1021,6 +1021,18 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .v155-review .v155-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .v155-review .v155-actions button{min-height:44px}
 
+
+/* V15.6.1: compact, optional weekly schedule; prevent nested scrolling. */
+.liq156-schedule{border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;background:var(--bg3)}
+.liq156-schedule summary{cursor:pointer;font-size:13px;font-weight:700;line-height:1.5;color:var(--tx);padding:3px 0}
+.liq156-count{float:right;color:var(--t2);font-size:11px;font-weight:600;margin-right:7px}
+.liq156-schedule .settings-note{padding:8px 0;line-height:1.5}
+.liq156-day-list{display:grid;gap:5px}
+.liq156-day-row{display:grid;grid-template-columns:82px minmax(0,1fr);align-items:center;gap:8px;padding:4px 0}
+.settings-form .liq156-daycheck{display:flex;flex-direction:row;align-items:center;gap:8px;color:var(--tx);font-size:12px}
+.settings-form .liq156-daycheck input{width:17px;height:17px;flex:none;accent-color:var(--bl)}
+.liq156-day-row select{width:100%;min-width:0;min-height:36px;padding:7px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:12px}
+@media(max-width:350px){.liq156-day-row{grid-template-columns:65px minmax(0,1fr)}.liq156-count{float:none;display:block}}
 /* V15.6 source-of-truth indicators for Next Workout */
 .liq156-context{margin:12px 0 0;padding:12px;border:1px solid #5a7080;border-radius:11px;background:rgba(91,129,157,.10);font-size:13px;line-height:1.5}
 .liq156-context strong{display:block;margin-bottom:5px}
@@ -1305,11 +1317,26 @@ function v5CycleTrainingDays(){
 }
 function v4CycleReview(){var m=v3ActiveCycle();if(!m){alert('Select an active cycle before requesting a cycle review.');return;}var question='Review my current mesocycle '+m.label+' ('+m.name+'), scheduled '+uiLongDate(m.start)+' to '+uiLongDate(m.end)+', RPE '+m.rpe+', reps '+m.reps+'. Based ONLY on available 7/28/84 day training trends, should I extend, shorten, deload or keep it? Identify data limitations and suggest a specific adjustment for my approval. Do not claim to edit the plan.';_aiQuestion=question.slice(0,350);var coach=document.querySelector('.it[onclick*="ai"]');if(coach){iTab('ai',coach);}else{document.querySelectorAll('.it').forEach(function(b){if(b.textContent.toLowerCase().includes('coach'))iTab('ai',b);});}renderAICoach();var textarea=document.getElementById('aiQuestion');if(textarea){textarea.value=_aiQuestion;textarea.focus();}}
 var _cycleEditorOpen=false;
-var USER_SETTINGS={name:'Athlete',goal:'Glute growth and posterior chain strength',units:'lb',theme:'dark',notes:'',experience:'Intermediate',sessionsPerWeek:4,sessionMinutes:75,equipment:'Gym machines, free weights and Smith machine',limitations:'',routinePreference:''};
-function loadUserSettings(){try{var j=JSON.parse(localStorage.getItem('liftiq_user_settings_v1')||'null');if(j&&typeof j==='object')Object.assign(USER_SETTINGS,j);}catch(e){}applyTheme(USER_SETTINGS.theme||'dark');}
-function saveUserSettings(ev){if(ev)ev.preventDefault();var f=document.getElementById('settingsForm');if(!f)return;var v=function(k){var input=f.elements.namedItem(k);return input?String(input.value||''):'';};USER_SETTINGS.name=v('name').trim()||'Athlete';USER_SETTINGS.goal=v('goal').trim();USER_SETTINGS.units=v('units')||'lb';USER_SETTINGS.theme=v('theme')||'dark';USER_SETTINGS.notes=v('notes').trim();USER_SETTINGS.experience=v('experience')||'Intermediate';USER_SETTINGS.sessionsPerWeek=Math.max(1,Math.min(7,Number(v('sessionsPerWeek'))||4));USER_SETTINGS.sessionMinutes=Math.max(20,Math.min(240,Number(v('sessionMinutes'))||75));USER_SETTINGS.equipment=v('equipment').trim();USER_SETTINGS.limitations=v('limitations').trim();USER_SETTINGS.routinePreference=v('routinePreference').trim();localStorage.setItem('liftiq_user_settings_v1',JSON.stringify(USER_SETTINGS));applyTheme(USER_SETTINGS.theme);renderSettings();smartRerender();alert('Settings saved locally on this device.');}
+var USER_SETTINGS={name:'Athlete',goal:'Glute growth and posterior chain strength',units:'lb',theme:'dark',notes:'',experience:'Intermediate',sessionsPerWeek:4,sessionMinutes:75,equipment:'Gym machines, free weights and Smith machine',limitations:'',routinePreference:'',trainingDays:[],dayFocus:{}};
+function loadUserSettings(){try{var j=JSON.parse(localStorage.getItem('liftiq_user_settings_v1')||'null');if(j&&typeof j==='object')Object.assign(USER_SETTINGS,j);}catch(e){}USER_SETTINGS.trainingDays=Array.isArray(USER_SETTINGS.trainingDays)?Array.from(new Set(USER_SETTINGS.trainingDays.map(String).filter(function(d){return /^[0-6]$/.test(d)}))):[];if(!USER_SETTINGS.dayFocus||typeof USER_SETTINGS.dayFocus!=='object')USER_SETTINGS.dayFocus={};applyTheme(USER_SETTINGS.theme||'dark');}
+function saveUserSettings(ev){if(ev)ev.preventDefault();var f=document.getElementById('settingsForm');if(!f)return;var v=function(k){var input=f.elements.namedItem(k);return input?String(input.value||''):'';};USER_SETTINGS.name=v('name').trim()||'Athlete';USER_SETTINGS.goal=v('goal').trim();USER_SETTINGS.units=v('units')||'lb';USER_SETTINGS.theme=v('theme')||'dark';USER_SETTINGS.notes=v('notes').trim();USER_SETTINGS.experience=v('experience')||'Intermediate';USER_SETTINGS.sessionsPerWeek=Math.max(1,Math.min(7,Number(v('sessionsPerWeek'))||4));USER_SETTINGS.sessionMinutes=Math.max(20,Math.min(240,Number(v('sessionMinutes'))||75));USER_SETTINGS.equipment=v('equipment').trim();USER_SETTINGS.limitations=v('limitations').trim();USER_SETTINGS.routinePreference=v('routinePreference').trim();USER_SETTINGS.trainingDays=Array.from(f.querySelectorAll('input[name="trainingDays"]:checked')).map(function(el){return String(el.value)});USER_SETTINGS.dayFocus={};USER_SETTINGS.trainingDays.forEach(function(day){USER_SETTINGS.dayFocus[day]=v('focus_'+day)});localStorage.setItem('liftiq_user_settings_v1',JSON.stringify(USER_SETTINGS));applyTheme(USER_SETTINGS.theme);renderSettings();smartRerender();alert('Settings saved locally on this device.');}
 function applyTheme(theme){document.body.setAttribute('data-theme',theme==='light'?'light':'dark');var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='light'?'#f4f5f7':'#0a0b0d');}
-function renderSettings(){var el=document.getElementById('t-settings');if(!el)return;el.innerHTML="<div class='settings-grid'><div class='settings-card'><div class='settings-head'>Preferences</div><div class='settings-title'>Your LiftIQ profile</div><div class='settings-sub'>Store personal training preferences locally and switch between light and dark mode. These settings do not change Hevy history.</div><form id='settingsForm' class='settings-form' onsubmit='saveUserSettings(event)'><div class='settings-row'><label>Name<input name='name' maxlength='60' value='"+v3Safe(USER_SETTINGS.name||'')+"'></label><label>Experience<select name='experience'><option"+(USER_SETTINGS.experience==='Beginner'?' selected':'')+">Beginner</option><option"+(USER_SETTINGS.experience==='Intermediate'?' selected':'')+">Intermediate</option><option"+(USER_SETTINGS.experience==='Advanced'?' selected':'')+">Advanced</option></select></label></div><label>Primary goal<textarea name='goal' rows='3'>"+v3Safe(USER_SETTINGS.goal||'')+"</textarea></label><div class='settings-row'><label>Units<select name='units'><option value='lb'"+(USER_SETTINGS.units==='lb'?' selected':'')+">Pounds (lb)</option><option value='kg'"+(USER_SETTINGS.units==='kg'?' selected':'')+">Kilograms (kg)</option></select></label><label>Theme<select name='theme' onchange='applyTheme(this.value)'><option value='dark'"+(USER_SETTINGS.theme!=='light'?' selected':'')+">Dark</option><option value='light'"+(USER_SETTINGS.theme==='light'?' selected':'')+">Light</option></select></label></div><label>Notes<textarea name='notes' rows='4' placeholder='Anything you want LiftIQ to remember locally...'>"+v3Safe(USER_SETTINGS.notes||'')+"</textarea></label><div class='settings-row'><label>Training days per week<input name='sessionsPerWeek' type='number' min='1' max='7' value='"+v3Safe(USER_SETTINGS.sessionsPerWeek||4)+"'></label><label>Session duration (min)<input name='sessionMinutes' type='number' min='20' max='240' value='"+v3Safe(USER_SETTINGS.sessionMinutes||75)+"'></label></div><label>Equipment<input name='equipment' maxlength='250' value='"+v3Safe(USER_SETTINGS.equipment||'')+"'></label><label>Training limitations<textarea name='limitations' rows='2'>"+v3Safe(USER_SETTINGS.limitations||'')+"</textarea></label><label>Preferred training split<textarea name='routinePreference' rows='2' placeholder='Optional: e.g. Glutes / upper / hamstrings'>"+v3Safe(USER_SETTINGS.routinePreference||'')+"</textarea></label><div class='settings-actions'><button class='v3-action' type='submit'>Save settings</button><button class='v3-action alt' type='button' onclick='loadUserSettings();renderSettings()'>Revert</button></div></form></div><div class='settings-card'><div class='settings-head'>Theme & account</div><div class='settings-sub'><span class='settings-chip'>Theme: "+v3Safe((USER_SETTINGS.theme||'dark').charAt(0).toUpperCase()+(USER_SETTINGS.theme||'dark').slice(1))+"</span> <span class='settings-chip'>Units: "+v3Safe((USER_SETTINGS.units||'lb').toUpperCase())+"</span></div><div class='settings-note' style='margin-top:12px'>Google sign-in, Hevy sync, and Gemini settings stay connected through your deployed Netlify app. This screen is for your local app preferences only.</div></div></div>";}
+function liq156ScheduleSettingsHtml(){
+ var names=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+ var labels=['Automatic · use completed history','Glutes & hamstrings','Glutes & quads','Unilateral glutes','Lower body','Upper body','Conditioning / recovery'];
+ var values=['','Glutes & hamstrings','Glutes & quads','Unilateral glutes','Lower body','Upper body','Conditioning / recovery'];
+ var days=Array.isArray(USER_SETTINGS.trainingDays)?USER_SETTINGS.trainingDays.map(String):[];
+ var count=days.length;
+ var h='<details class="liq156-schedule"><summary>Weekly training schedule <span class="liq156-count">'+(count?count+' planned day'+(count===1?'':'s'):'Optional')+'</span></summary><p class="settings-note">Select your usual days. A focus is optional. This is a local preference, not a connected calendar or a change to Hevy.</p><div class="liq156-day-list">';
+ names.forEach(function(day,i){
+  var key=String(i),checked=days.indexOf(key)>=0,focus=String((USER_SETTINGS.dayFocus||{})[key]||'');
+  h+='<div class="liq156-day-row"><label class="liq156-daycheck"><input type="checkbox" name="trainingDays" value="'+key+'"'+(checked?' checked':'')+'><span>'+day+'</span></label><select name="focus_'+key+'" aria-label="'+day+' routine focus">';
+  values.forEach(function(val,k){h+='<option value="'+v3Safe(val)+'"'+(val===focus?' selected':'')+'>'+v3Safe(labels[k])+'</option>'});
+  h+='</select></div>';
+ });
+ return h+'</div><p class="settings-note">The next planned day is skipped when Hevy already shows a completed workout today. Unknown or unsynced workouts may change that result.</p></details>';
+}
+function renderSettings(){var el=document.getElementById('t-settings');if(!el)return;el.innerHTML="<div class='settings-grid'><div class='settings-card'><div class='settings-head'>Preferences</div><div class='settings-title'>Your LiftIQ profile</div><div class='settings-sub'>Store personal training preferences locally and switch between light and dark mode. These settings do not change Hevy history.</div><form id='settingsForm' class='settings-form' onsubmit='saveUserSettings(event)'><div class='settings-row'><label>Name<input name='name' maxlength='60' value='"+v3Safe(USER_SETTINGS.name||'')+"'></label><label>Experience<select name='experience'><option"+(USER_SETTINGS.experience==='Beginner'?' selected':'')+">Beginner</option><option"+(USER_SETTINGS.experience==='Intermediate'?' selected':'')+">Intermediate</option><option"+(USER_SETTINGS.experience==='Advanced'?' selected':'')+">Advanced</option></select></label></div><label>Primary goal<textarea name='goal' rows='3'>"+v3Safe(USER_SETTINGS.goal||'')+"</textarea></label><div class='settings-row'><label>Units<select name='units'><option value='lb'"+(USER_SETTINGS.units==='lb'?' selected':'')+">Pounds (lb)</option><option value='kg'"+(USER_SETTINGS.units==='kg'?' selected':'')+">Kilograms (kg)</option></select></label><label>Theme<select name='theme' onchange='applyTheme(this.value)'><option value='dark'"+(USER_SETTINGS.theme!=='light'?' selected':'')+">Dark</option><option value='light'"+(USER_SETTINGS.theme==='light'?' selected':'')+">Light</option></select></label></div><label>Notes<textarea name='notes' rows='4' placeholder='Anything you want LiftIQ to remember locally...'>"+v3Safe(USER_SETTINGS.notes||'')+"</textarea></label><div class='settings-row'><label>Training days per week<input name='sessionsPerWeek' type='number' min='1' max='7' value='"+v3Safe(USER_SETTINGS.sessionsPerWeek||4)+"'></label><label>Session duration (min)<input name='sessionMinutes' type='number' min='20' max='240' value='"+v3Safe(USER_SETTINGS.sessionMinutes||75)+"'></label></div><label>Equipment<input name='equipment' maxlength='250' value='"+v3Safe(USER_SETTINGS.equipment||'')+"'></label><label>Training limitations<textarea name='limitations' rows='2'>"+v3Safe(USER_SETTINGS.limitations||'')+"</textarea></label><label>Preferred training split<textarea name='routinePreference' rows='2' placeholder='Optional: e.g. Glutes / upper / hamstrings'>"+v3Safe(USER_SETTINGS.routinePreference||'')+"</textarea></label>"+liq156ScheduleSettingsHtml()+"<div class='settings-actions'><button class='v3-action' type='submit'>Save settings</button><button class='v3-action alt' type='button' onclick='loadUserSettings();renderSettings()'>Revert</button></div></form></div><div class='settings-card'><div class='settings-head'>Theme & account</div><div class='settings-sub'><span class='settings-chip'>Theme: "+v3Safe((USER_SETTINGS.theme||'dark').charAt(0).toUpperCase()+(USER_SETTINGS.theme||'dark').slice(1))+"</span> <span class='settings-chip'>Units: "+v3Safe((USER_SETTINGS.units||'lb').toUpperCase())+"</span></div><div class='settings-note' style='margin-top:12px'>Google sign-in, Hevy sync, and Gemini settings stay connected through your deployed Netlify app. This screen is for your local app preferences only.</div></div></div>";}
 function toggleCycleEditor(force){_cycleEditorOpen=(typeof force==='boolean')?force:!_cycleEditorOpen;var box=document.getElementById('cycleEditorBox');if(box)box.classList.toggle('open',_cycleEditorOpen);var body=document.getElementById('cycleEditorBody');if(body)body.style.display=_cycleEditorOpen?'block':'none';}
 function v3OpenEditor(label){if(label)v3SelectCycle(label);_cycleEditorOpen=true;setTimeout(function(){toggleCycleEditor(true);var box=document.getElementById('cycleEditorBox');if(box)box.scrollIntoView({behavior:'smooth',block:'start'});},0);}
 function humanizeSignalName(s){s=String(s||'Review');if(s.indexOf('_')>-1)s=s.replace(/_/g,' ');return s.replace(/\b\w/g,function(m){return m.toUpperCase();});}
@@ -1632,56 +1659,91 @@ function nextWorkoutCategory(name){
  if(/upper|push|pull|chest|back|shoulder|arms|arm/.test(t))return 'Upper body';
  return '';
 }
-function nextWorkoutAnalysis(){
- var titles=(STATE.workoutTitles||[]).filter(function(x){return x&&x.date&&x.name&&/^\d{4}-\d{2}-\d{2}$/.test(x.date);}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+function liq156PlanSlot(today,titles){
+ var days=Array.isArray(USER_SETTINGS.trainingDays)?USER_SETTINGS.trainingDays.map(String).filter(function(d){return /^[0-6]$/.test(d)}):[];
+ if(!days.length)return null;
+ var base=new Date(today+'T12:00:00');
+ if(isNaN(base.getTime()))return null;
+ var usedToday=(titles||[]).some(function(w){return w.date===today;});
+ var focus=USER_SETTINGS.dayFocus&&typeof USER_SETTINGS.dayFocus==='object'?USER_SETTINGS.dayFocus:{};
+ var dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+ for(var offset=0;offset<=7;offset++){
+  var d=new Date(base.getTime());d.setDate(d.getDate()+offset);
+  var dow=String(d.getDay());
+  if(days.indexOf(dow)<0||(offset===0&&usedToday))continue;
+  var iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return {date:iso,day:dayNames[Number(dow)],focus:String(focus[dow]||''),isToday:offset===0,skippedToday:usedToday};
+ }
+ return null;
+}
+function nextWorkoutAnalysis(todayOverride){
+ var today=/^\d{4}-\d{2}-\d{2}$/.test(String(todayOverride||''))?todayOverride:v3Today();
+ var titles=(STATE.workoutTitles||[]).filter(function(x){return x&&x.date&&x.name&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&x.date<=today;}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
  var typed=titles.map(function(x){return {name:x.name,date:x.date,group:nextWorkoutCategory(x.name)};}).filter(function(x){return x.group;});
  var strength=typed.filter(function(x){return x.group!=='Conditioning / recovery';});
- // Sample only recent history. Prefer distinct recent rotations, and do not treat two sessions on one date as multiple day gaps.
- var recent=strength.slice(0,28),latest=recent[0];
- if(!latest)return {name:'No routine detected',group:'',reason:'No recognizable workout titles are available yet. Sync all history after updating LiftIQ; if it persists, check that your Hevy workouts have titles like Glutes & Hams or Upper Body.',options:[],latest:null,confidence:'No history'};
+ var recent=strength.slice(0,28),latest=recent[0],slot=liq156PlanSlot(today,titles);
+ if(!latest)return {name:'No routine detected',group:'',reason:'No recognizable completed strength workout titles are available. Sync Hevy history before LiftIQ suggests a routine.',options:[],latest:null,confidence:'No history',slot:slot,evidenceCount:0};
  var groups={};recent.forEach(function(x){groups[x.group]=(groups[x.group]||0)+1;});
  var unique=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a];});
- var transitions={};for(var i=recent.length-1;i>0;i--){var from=recent[i].group,to=recent[i-1].group;if(from===to)continue;if(!transitions[from])transitions[from]={};transitions[from][to]=(transitions[from][to]||0)+1;}
- var available=unique.filter(function(g){return g!==latest.group;});
- // Fall back to known latest group when user consistently trains one routine.
- if(!available.length)available=unique.slice();
- var scores={};available.forEach(function(g){
-   var lastIndex=recent.findIndex(function(r){return r.group===g;});
-   var transition=(transitions[latest.group]||{})[g]||0;
-   var patternTotal=Object.values(transitions[latest.group]||{}).reduce(function(a,b){return a+b;},0);
-   var minutesBetween=(lastIndex>=0)?Math.max(0,(v3Date(latest.date)-v3Date(recent[lastIndex].date))/86400000):7;
-   var frequency=groups[g]||0;
-   scores[g]=((patternTotal?transition/patternTotal:0)*5)+(Math.min(minutesBetween,10)/10)*2+Math.min(frequency,8)/8;
+ var transitions={};
+ for(var i=recent.length-1;i>0;i--){
+  var from=recent[i].group,to=recent[i-1].group;
+  if(from===to)continue;
+  if(!transitions[from])transitions[from]={};
+  transitions[from][to]=(transitions[from][to]||0)+1;
+ }
+ var pattern=transitions[latest.group]||{};
+ var total=Object.keys(pattern).reduce(function(a,k){return a+pattern[k]},0);
+ var evidenceByDay={};
+ Object.keys(STATE.dailyLog||{}).forEach(function(d){
+  evidenceByDay[d]=new Set(Object.keys((STATE.dailyLog[d]||{}).ex||{}).map(normalizeExerciseName));
  });
- var active=smartCustomPriorities()?smartActivePriorityNames():[];
- var evidenceByDay={};Object.keys(STATE.dailyLog||{}).forEach(function(d){
-  var names=Object.keys((STATE.dailyLog[d]||{}).ex||{}).map(normalizeExerciseName);
-  evidenceByDay[d]=new Set(names);
+ var active=(typeof smartCustomPriorities==='function'&&smartCustomPriorities())?smartActivePriorityNames():[];
+ var scores={},notes={};
+ unique.forEach(function(g){
+  var ix=recent.findIndex(function(w){return w.group===g;});
+  var daysApart=Math.max(0,(v3Date(today)-v3Date(recent[ix].date))/86400000);
+  var transitionsWeight=total?(pattern[g]||0)/total*4:0;
+  var score=transitionsWeight+Math.min(daysApart,10)/10*2+Math.min(groups[g],8)/8;
+  if(g===latest.group)score-=1.75;
+  var onDates=Array.from(new Set(recent.filter(function(w){return w.group===g}).map(function(w){return w.date})));
+  var matches=active.filter(function(n){return onDates.some(function(d){return evidenceByDay[d]&&evidenceByDay[d].has(normalizeExerciseName(n))})});
+  if(matches.length){score+=Math.min(2.5,matches.length*.85);notes[g]=matches.slice(0,2);}
+  if(slot&&slot.focus){score+=g===slot.focus?7:-2;}
+  scores[g]=score;
  });
- var matchNotes={};
- available.forEach(function(group){
-  var dates=Array.from(new Set(recent.filter(function(x){return x.group===group;}).map(function(x){return x.date;})));
-  var matches=active.filter(function(name){return dates.some(function(d){return evidenceByDay[d]&&evidenceByDay[d].has(normalizeExerciseName(name));});});
-  if(matches.length){scores[group]+=Math.min(2.5,matches.length*.85);matchNotes[group]=matches.slice(0,2);}
- });
- var ranked=available.slice().sort(function(a,b){return scores[b]-scores[a]||a.localeCompare(b);});
+ var ranked=unique.slice().sort(function(a,b){return scores[b]-scores[a]||a.localeCompare(b)});
  var selected=ranked[0]||latest.group;
- var candidates=recent.filter(function(x){return x.group===selected;});
- var name=candidates[0]?candidates[0].name:selected;
- var matches=transitions[latest.group]&&transitions[latest.group][selected]||0;
- var total=Object.values(transitions[latest.group]||{}).reduce(function(a,b){return a+b;},0);
- var reason='Your latest recorded strength workout was '+latest.name+' ('+uiLongDate(latest.date)+'). ';
- if(matches>0)reason+='In your recent rotation, '+selected+' followed '+latest.group+' '+matches+' time'+(matches===1?'':'s')+' out of '+total+' observed transitions. ';
- else reason+='This routine appears in your recent history and provides a change from the last recorded focus. ';
- var m=v3ActiveCycle();if(m)reason+='Current block: '+m.label+' · '+m.name+'. Follow the block’s effort and volume targets. ';
- var wanted=Math.min(7,Math.max(1,Number(USER_SETTINGS.sessionsPerWeek)||4));
- reason+='Preference: '+wanted+' training days/week.';
- if(USER_SETTINGS.limitations)reason+=' Review your saved training limitations before starting.';
- if(matchNotes[selected])reason+=' This routine focus coincided on recorded training dates with '+matchNotes[selected].map(shortName).join(' and ')+', which you marked as priorities. Same-day activity is not proof the exercises were in the same session.';
- var opts=unique.map(function(g){var x=recent.find(function(w){return w.group===g;});return {group:g,name:x?x.name:g};});
- return {name:name,group:selected,reason:reason,latest:latest,options:opts,confidence:matches&&total>=2?'Rotation-informed':'History-based',scores:scores};
+ var candidate=recent.find(function(w){return w.group===selected});
+ var name=candidate?candidate.name:selected;
+ var matches=pattern[selected]||0;
+ var reason='Latest completed strength workout: '+latest.name+' ('+uiLongDate(latest.date)+'). ';
+ if(slot){
+  reason+='Your saved schedule indicates '+slot.day+' ('+uiLongDate(slot.date)+') as the next planned training day. ';
+  if(slot.focus){
+   if(unique.indexOf(slot.focus)>=0)reason+='You assigned '+slot.focus+' to that day. ';
+   else reason+='Your planned focus is '+slot.focus+', but no matching completed routine was recognized; review the suggestion manually. ';
+  }else reason+='No specific routine focus is assigned to that day. ';
+ }else reason+='No training days are configured, so this is a history-based suggestion rather than a calendar recommendation. ';
+ if(matches&&total>=1)reason+='Among '+total+' observed changes after '+latest.group+', '+selected+' followed '+matches+' time'+(matches===1?'':'s')+'. ';
+ else reason+='The suggestion uses the observed routine mix, days since recorded training, and selected priorities when available. ';
+ if(notes[selected])reason+='This focus also coincided on completed training dates with priorities '+notes[selected].map(shortName).join(' and ')+'. Same-day records do not establish same-session exercise participation. ';
+ var cycle=v3ActiveCycle();
+ if(cycle)reason+='Block: '+cycle.label+' · '+cycle.name+(v3Paused(cycle)?' (paused; no cycle adjustment implied)':' (review effort targets)').replace(/\.$/,'')+'. ';
+ if(USER_SETTINGS.limitations)reason+='Review your saved training limitations before starting. ';
+ var opts=unique.map(function(g){var w=recent.find(function(x){return x.group===g});return {group:g,name:w?w.name:g};});
+ var confidence=slot&&slot.focus&&selected===slot.focus?'Scheduled preference':matches&&total>=2?'Rotation-informed':'History-based';
+ return {name:name,group:selected,reason:reason.trim(),latest:latest,options:opts,confidence:confidence,scores:scores,slot:slot,evidenceCount:recent.length};
 }
-function nextWorkoutSelection(){var o=nextWorkoutAnalysis();if(NEXT_WORKOUT_OVERRIDE){var match=o.options.find(function(x){return x.name===NEXT_WORKOUT_OVERRIDE;});if(match)return {name:match.name,group:match.group,reason:'Manual override for this browser session. '+o.reason,manual:true,analysis:o};NEXT_WORKOUT_OVERRIDE='';}return {name:o.name,group:o.group,reason:o.reason,manual:false,analysis:o};}
+function nextWorkoutSelection(){
+ var o=nextWorkoutAnalysis();
+ if(NEXT_WORKOUT_OVERRIDE){
+  var match=o.options.find(function(x){return x.name===NEXT_WORKOUT_OVERRIDE});
+  if(match)return {name:match.name,group:match.group,reason:'You selected this routine manually. LiftIQ would otherwise suggest '+o.name+'. Your choice does not change your Hevy history, weekly schedule, or mesocycle.',manual:true,analysis:o};
+  NEXT_WORKOUT_OVERRIDE='';
+ }
+ return {name:o.name,group:o.group,reason:o.reason,manual:false,analysis:o};
+}
 function suggestedSession(){return nextWorkoutSelection().name;}
 function nextWorkoutOverride(value){NEXT_WORKOUT_OVERRIDE=value||'';renderNextSessionCoach();renderDashboard();}
 function nextWorkoutCard(){
@@ -4578,20 +4640,18 @@ v11CyclePanel=function(c){
 
 /* V15.6 explains recommendation inputs without rewriting history or committing schedule edits */
 function liq156Context(){
- var analysis=nextWorkoutAnalysis(),cycle=v3ActiveCycle(),sync=Number(localStorage.getItem('ti_hevy_synced_at')||0);
+ var a=nextWorkoutAnalysis(),cycle=v3ActiveCycle(),sync=Number(localStorage.getItem('ti_hevy_synced_at')||0);
  var journal=(typeof LI!=='undefined'&&LI&&LI.active)?LI.active:null;
- var parts=[];
- parts.push('<strong>Why this session is suggested</strong>');
- parts.push('<span class="liq156-chip">Source: completed Hevy history</span>');
- parts.push('<span class="liq156-chip">'+v3Safe(analysis.confidence||'History-based')+'</span>');
- if(analysis.latest)parts.push('<p>Latest recognizable completed routine: '+v3Safe(analysis.latest.name)+' · '+v3Safe(analysis.latest.date)+'. The proposed session follows observed workout rotation patterns; it is not a calendar booking.</p>');
- else parts.push('<p>No recognizable completed Hevy workout titles yet. Sync history to personalize this recommendation.</p>');
- if(cycle){
-  parts.push('<p>Training block: '+v3Safe(cycle.label)+' · '+v3Safe(cycle.name)+(v3Paused(cycle)?' (paused)':'')+'. '+(v3Paused(cycle)?'Cycle is paused; this suggestion does not resume it.':'Check your cycle effort and rep targets before training.')+'</p>');
- }else parts.push('<p>No currently active training block is detected. This recommendation comes from workout history rather than a mesocycle calendar.</p>');
- if(journal)parts.push('<p><strong>Journal in progress:</strong> Your current notes are not counted as a finished Hevy workout. Confirm any changes or discomfort before training.</p>');
- if(sync){var age=Math.round((Date.now()-sync)/86400000);if(age>3)parts.push('<p>Hevy was last synced '+age+' days ago. More recent completed sessions may change the recommendation.</p>')}
- parts.push('<p>Manual choices take priority on this screen only; they do not edit Hevy or your mesocycle.</p>');
+ var parts=['<strong>Why this session is suggested</strong>','<span class="liq156-chip">Completed Hevy workouts</span>','<span class="liq156-chip">'+v3Safe(a.confidence||'History-based')+'</span>'];
+ if(a.latest)parts.push('<p>Latest recognized strength session: '+v3Safe(a.latest.name)+' · '+v3Safe(a.latest.date)+'. Based on '+a.evidenceCount+' recent recognizable strength records.</p>');
+ else parts.push('<p>No recognizable completed strength sessions yet. Sync Hevy before following a recommendation.</p>');
+ if(a.slot){
+  parts.push('<p><strong>Saved schedule:</strong> '+v3Safe(a.slot.day)+' · '+v3Safe(uiLongDate(a.slot.date))+(a.slot.focus?' · '+v3Safe(a.slot.focus):' · focus from history')+'. This is a preference, not a calendar appointment.</p>');
+ }else parts.push('<p><strong>No weekly schedule saved.</strong> Set training days in Settings to make the recommendation day-aware.</p>');
+ if(cycle)parts.push('<p><strong>Training block:</strong> '+v3Safe(cycle.label)+' · '+v3Safe(cycle.name)+(v3Paused(cycle)?' (paused; no changes applied)':'')+'.</p>');
+ if(journal)parts.push('<p><strong>Unreconciled journal:</strong> Your current notes are not a completed Hevy workout. Review relevant limitations or discomfort before training.</p>');
+ if(sync){var age=Math.max(0,Math.round((Date.now()-sync)/86400000));if(age>3)parts.push('<p>Last Hevy sync was '+age+' days ago. Recent workouts may be missing.</p>')}
+ parts.push('<p>No program, schedule, cycle, or Hevy data is modified by this recommendation or its manual override.</p>');
  return '<div class="liq156-context">'+parts.join('')+'</div>';
 }
 var liq156OldCard=nextWorkoutCard;
