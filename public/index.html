@@ -1020,6 +1020,12 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .v155-review .v155-stats span{font-size:12px;border:1px solid var(--bd2,#46515c);padding:6px 9px;border-radius:8px}
 .v155-review .v155-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .v155-review .v155-actions button{min-height:44px}
+
+/* V15.6 source-of-truth indicators for Next Workout */
+.liq156-context{margin:12px 0 0;padding:12px;border:1px solid #5a7080;border-radius:11px;background:rgba(91,129,157,.10);font-size:13px;line-height:1.5}
+.liq156-context strong{display:block;margin-bottom:5px}
+.liq156-context p{margin:5px 0;color:inherit;opacity:.9}
+.liq156-context .liq156-chip{display:inline-block;border:1px solid #647a89;border-radius:20px;font-size:11px;padding:2px 9px;margin:3px 6px 5px 0}
 </style>
 </head>
 <body class="today-active">
@@ -4567,6 +4573,39 @@ function v155CycleCheck(c){
 v11CyclePanel=function(c){
  var original=v155LegacyCyclePanel(c);if(!c)return original;
  return original.replace('<div class=\'v11-buttons\'>',v155CycleCheck(c)+'<div class=\'v11-buttons\'>');
+};
+
+
+/* V15.6 explains recommendation inputs without rewriting history or committing schedule edits */
+function liq156Context(){
+ var analysis=nextWorkoutAnalysis(),cycle=v3ActiveCycle(),sync=Number(localStorage.getItem('ti_hevy_synced_at')||0);
+ var journal=(typeof LI!=='undefined'&&LI&&LI.active)?LI.active:null;
+ var parts=[];
+ parts.push('<strong>Why this session is suggested</strong>');
+ parts.push('<span class="liq156-chip">Source: completed Hevy history</span>');
+ parts.push('<span class="liq156-chip">'+v3Safe(analysis.confidence||'History-based')+'</span>');
+ if(analysis.latest)parts.push('<p>Latest recognizable completed routine: '+v3Safe(analysis.latest.name)+' · '+v3Safe(analysis.latest.date)+'. The proposed session follows observed workout rotation patterns; it is not a calendar booking.</p>');
+ else parts.push('<p>No recognizable completed Hevy workout titles yet. Sync history to personalize this recommendation.</p>');
+ if(cycle){
+  parts.push('<p>Training block: '+v3Safe(cycle.label)+' · '+v3Safe(cycle.name)+(v3Paused(cycle)?' (paused)':'')+'. '+(v3Paused(cycle)?'Cycle is paused; this suggestion does not resume it.':'Check your cycle effort and rep targets before training.')+'</p>');
+ }else parts.push('<p>No currently active training block is detected. This recommendation comes from workout history rather than a mesocycle calendar.</p>');
+ if(journal)parts.push('<p><strong>Journal in progress:</strong> Your current notes are not counted as a finished Hevy workout. Confirm any changes or discomfort before training.</p>');
+ if(sync){var age=Math.round((Date.now()-sync)/86400000);if(age>3)parts.push('<p>Hevy was last synced '+age+' days ago. More recent completed sessions may change the recommendation.</p>')}
+ parts.push('<p>Manual choices take priority on this screen only; they do not edit Hevy or your mesocycle.</p>');
+ return '<div class="liq156-context">'+parts.join('')+'</div>';
+}
+var liq156OldCard=nextWorkoutCard;
+nextWorkoutCard=function(){
+ var html=liq156OldCard();
+ return html.replace('</div>',liq156Context()+'</div>');
+};
+var liq156OldSession=renderNextSessionCoach;
+renderNextSessionCoach=function(){
+ liq156OldSession();
+ if(!STATE.imported)return;
+ var root=document.getElementById('nextSessionCoach'),card=root?.querySelector('.today-next');
+ if(!card)return;
+ var block=document.createElement('div');block.innerHTML=liq156Context();if(block.firstElementChild)card.appendChild(block.firstElementChild);
 };
 
 // Preserve last visited primary destination within this browsing session only.
