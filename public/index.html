@@ -1719,7 +1719,15 @@ function nextWorkoutAnalysis(todayOverride){
  var typed=titles.map(function(x){return {name:x.name,date:x.date,group:nextWorkoutCategory(x.name)};}).filter(function(x){return x.group;});
  var strength=typed.filter(function(x){return x.group!=='Conditioning / recovery';});
  var recent=strength.slice(0,28),latest=recent[0],slot=liq156PlanSlot(today,titles);
- if(!latest)return {name:'No routine detected',group:'',reason:'No recognizable completed strength workout titles are available. Sync Hevy history before LiftIQ suggests a routine.',options:[],latest:null,confidence:'No history',slot:slot,evidenceCount:0};
+ if(!latest){
+  var seenNoHistory=new Set();
+  var available=titles.reduce(function(list,w){
+   var name=String(w.name||'').trim(),key=name.toLocaleLowerCase();
+   if(name&&!seenNoHistory.has(key)){seenNoHistory.add(key);list.push({name:name,group:nextWorkoutCategory(name)||'Uncategorized routine',lastDate:w.date})}
+   return list;
+  },[]);
+  return {name:'No routine detected',group:'',reason:'No recognizable completed strength workout titles are available for an automatic recommendation. You may still choose any completed Hevy workout title below.',options:available,latest:null,confidence:'No recognized rotation',slot:slot,evidenceCount:0};
+ }
  var groups={};recent.forEach(function(x){groups[x.group]=(groups[x.group]||0)+1;});
  var unique=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a];});
  var transitions={};
@@ -1768,7 +1776,18 @@ function nextWorkoutAnalysis(todayOverride){
  var cycle=v3ActiveCycle();
  if(cycle)reason+='Block: '+cycle.label+' · '+cycle.name+(v3Paused(cycle)?' (paused; no cycle adjustment implied)':' (review effort targets)').replace(/\.$/,'')+'. ';
  if(USER_SETTINGS.limitations)reason+='Review your saved training limitations before starting. ';
- var opts=unique.map(function(g){var w=recent.find(function(x){return x.group===g});return {group:g,name:w?w.name:g};});
+ // The recommendation uses broad training groups, but the chooser must offer
+ // ALL distinct completed Hevy titles in the imported window (not one per group).
+ // Unrecognized titles remain selectable, with an explicit unknown category.
+ var seenNames=new Set();
+ var opts=titles.reduce(function(list,w){
+  var name=String(w.name||'').trim();
+  var key=name.toLocaleLowerCase();
+  if(!name||seenNames.has(key))return list;
+  seenNames.add(key);
+  list.push({group:nextWorkoutCategory(name)||'Uncategorized routine',name:name,lastDate:w.date});
+  return list;
+ },[]);
  var confidence=slot&&slot.focus&&selected===slot.focus?'Scheduled preference':matches&&total>=2?'Rotation-informed':'History-based';
  return {name:name,group:selected,reason:reason.trim(),latest:latest,options:opts,confidence:confidence,scores:scores,slot:slot,evidenceCount:recent.length};
 }
@@ -1776,7 +1795,7 @@ function nextWorkoutSelection(){
  var o=nextWorkoutAnalysis();
  if(NEXT_WORKOUT_OVERRIDE){
   var match=o.options.find(function(x){return x.name===NEXT_WORKOUT_OVERRIDE});
-  if(match)return {name:match.name,group:match.group,reason:'You selected this routine manually. LiftIQ would otherwise suggest '+o.name+'. Your choice does not change your Hevy history, weekly schedule, or mesocycle.',manual:true,analysis:o};
+  if(match)return {name:match.name,group:match.group,reason:'You selected this completed Hevy workout title manually. LiftIQ would otherwise suggest '+o.name+'. Your choice does not change your Hevy history, weekly schedule, or mesocycle.',manual:true,analysis:o};
   NEXT_WORKOUT_OVERRIDE='';
  }
  return {name:o.name,group:o.group,reason:o.reason,manual:false,analysis:o};
@@ -1789,7 +1808,7 @@ function nextWorkoutCard(){
  if(pick.analysis.latest)h+="<div class='next-workout-last'>Last recorded · "+v3Safe(pick.analysis.latest.name)+" · "+v3Safe(uiLongDate(pick.analysis.latest.date))+"</div>";
  h+="<label class='next-workout-label' for='nextWorkoutSelect'>Choose a different session</label><select id='nextWorkoutSelect' onchange='nextWorkoutOverride(this.value)'><option value=''>Use recommendation</option>";
  options.forEach(function(x){h+="<option value='"+v3Safe(x.name)+"'"+(pick.manual&&x.name===pick.name?' selected':'')+">"+v3Safe(x.name)+"</option>";});
- h+="</select>"+(options.length?"":"<div class='next-workout-note'>No routine choices yet. Use Sync all history to rebuild routine titles.</div>")+"<div class='next-workout-note'>Based on recorded routines, not a confirmed workout calendar. This choice does not modify Hevy or your mesocycle.</div></div>";
+ h+="</select>"+(options.length?"":"<div class='next-workout-note'>No completed workout titles in this imported history. Use Sync all history to expand your choices.</div>")+"<div class='next-workout-note'>Based on recorded routines, not a confirmed workout calendar. This choice does not modify Hevy or your mesocycle.</div></div>";
  return h;
 }
 // ── Next Session Coach (Gym tab — actionable before opening Hevy) ──
@@ -1851,7 +1870,7 @@ function renderNextSessionCoach(){
  }else{
    var pick=nextWorkoutSelection(),options=pick.analysis.options;
    html+='<section class="today-panel today-next"><div class="today-kicker">BEFORE YOUR WORKOUT <span class="today-small-chip">'+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+'</span></div><h3>'+v3Safe(pick.name)+'</h3><p class="today-muted">'+v3Safe(pick.reason)+'</p>';
-   html+='<div class="today-picker"><label for="nextWorkoutSelect">Another routine in your history</label><select id="nextWorkoutSelect" onchange="nextWorkoutOverride(this.value)"><option value="">Use LiftIQ recommendation</option>';
+   html+='<div class="today-picker"><label for="nextWorkoutSelect">Choose from your completed Hevy workout titles</label><select id="nextWorkoutSelect" onchange="nextWorkoutOverride(this.value)"><option value="">Use LiftIQ recommendation</option>';
    options.forEach(function(x){html+='<option value="'+v3Safe(x.name)+'"'+(pick.manual&&pick.name===x.name?' selected':'')+'>'+v3Safe(x.name)+'</option>';});
    html+='</select></div><p class="today-disclaimer">Suggested from completed Hevy sessions, not a confirmed calendar. Choosing a routine here never changes Hevy or your training plan.</p></section>';
    html+='<section class="today-panel"><div class="today-panel-heading"><div><div class="today-kicker">EXERCISE FOCUS</div><h3>What to review</h3></div><button class="today-link" onclick="todayOpenTargets()" type="button">All targets →</button></div>'+todayFocusHTML(pick)+'</section>';
