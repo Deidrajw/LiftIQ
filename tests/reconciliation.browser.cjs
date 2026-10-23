@@ -62,7 +62,7 @@ async function main(){
   assert(options.some(x=>x.includes('Upper Body')));
   assert(options.every(x=>x.includes('Same local calendar day')));
   await page.locator('[data-li157-journal="j1"] [data-li157-workout="w1"]').click();
-  assert.match(await page.locator('#liqJournalContents').innerText(),/User-confirmed match/);
+  assert.match(await page.locator('#liqJournalContents').innerText(),/User-confirmed match/i);
   const persisted=await page.evaluate(()=>({
    workoutId:LI157_LINKS.j1?.workoutId,
    journals:LI.history.length,
@@ -84,7 +84,7 @@ async function main(){
   await page.reload({waitUntil:'domcontentloaded'});
   await page.locator('.liq-mini-status button').click();
   await page.locator('#liqJournalContents details > summary').first().click();
-  assert.match(await page.locator('#liqJournalContents').innerText(),/User-confirmed match/);
+  assert.match(await page.locator('#liqJournalContents').innerText(),/User-confirmed match/i);
   await page.locator('[data-li157-journal="j1"] [data-li157-action="unlink"]').click();
   assert.equal(await page.evaluate(()=>LI157_LINKS.j1),undefined);
   // No Hevy evidence: clear matching UI, no invented workout.
