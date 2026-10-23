@@ -56,3 +56,9 @@ Date, commit/PR, affected files, what changed, reason/decision, user-facing outc
 - Adds small, collapsed contextual Training Memory disclosure to the existing Today Next Workout card only when relevant explicitly saved unresolved flags exist; provides user-confirmed resolution without deleting journal observations.
 - Does not change source-of-truth Hevy completion, routine ranking, mesocycle, AI prompt, or existing localStorage keys. No migrations.
 - Testing: frontend JS syntax and focused deterministic checks passed; real-app browser and authenticated regressions not run.
+
+
+### V15.8.1 — Progress confidence/mobile clearance preview only (2026-10-23)
+- Draft PR #5 (not merged/deployed). Require four separate comparable training dates and use median early-vs-recent estimated 1RM trend, ±5% threshold; replace overconfident `Progressing` badges in priority-lift rows with qualified labels.
+- Improve evidence disclosure, explicitly noting estimated strengths use dated daily best sets rather than all workout sets.
+- Increase page bottom padding above fixed navigation. No data migration, storage-key or backend changes. Device QA and CI confirmation pending.
