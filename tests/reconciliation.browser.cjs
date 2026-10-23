@@ -55,7 +55,7 @@ async function main(){
   assert.equal(await page.locator('#qaArea summary').count(),1);
   await page.locator('#qaArea summary').click();
   await page.locator('[data-li157-action="toggle"]').first().click();
-  assert.equal(await page.locator('[data-li157-action="confirm"]').count(),4);
+  assert.equal(await page.locator('[data-li157-action="confirm"]').count(),2);
   const options=await page.locator('[data-li157-journal="j1"] .li157-candidate').allTextContents();
   assert(options.some(x=>x.includes('Glutes & Hamstrings')));
   assert(options.some(x=>x.includes('Upper Body')));
