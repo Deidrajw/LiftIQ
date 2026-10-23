@@ -1976,7 +1976,7 @@ function v10TrendAssessment(name,days){
  if(!rows.length)return {status:'No comparable records',rows:rows,evidence:'No qualifying dated weighted sets for this movement in this '+days+'-day window.'};
  var first=rows[0],last=rows[rows.length-1];
  var endpoints=uiLongDate(first.date)+': '+first.weightLb+' lb × '+first.reps+' → '+uiLongDate(last.date)+': '+last.weightLb+' lb × '+last.reps;
- if(rows.length<3)return {status:'Limited evidence',rows:rows,evidence:endpoints+' · '+rows.length+' training dates. At least 3 comparable dates needed to assess a trend.'};
+ if(rows.length<4)return {status:'Limited evidence',rows:rows,evidence:endpoints+' · '+rows.length+' training dates. At least 4 comparable dates needed to assess a trend.'};
  // Compare the first and last halves of dated estimated-strength readings;
  // avoid labeling a single anomalous last session a confirmed progression.
  var count=Math.max(1,Math.floor(rows.length/2));
