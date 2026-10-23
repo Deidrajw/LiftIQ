@@ -35,3 +35,8 @@ Priority definitions: **P0** correctness/data-integrity or release blocker; **P1
 ## Next exact action
 
 Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; then create/execute a **V15.7 regression suite with fictional Hevy workout IDs and journal timestamps**, recording passed/failed/not-run in `TEST_MATRIX.md`. Fix defects before proposing V15.8.
+
+
+### V15.8 development update — 2026-10-23
+- **In development only** on `feature/v15-8-training-memory-preview`: collapsed saved-flag context on Today. Uses previously approved active flags, never scans unsolicited private journal notes. Matching is exercise-focus heuristic, not verified medical or workout evidence. Resolution retains original journal notes.
+- **Blocking**: signed-in V15.7.1 acceptance and iOS Safari checks; then V15.8 browser acceptance; user approval to deploy.

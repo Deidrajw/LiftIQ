@@ -58,3 +58,11 @@
 ## Handoff checklist (CONTINUE LIFTIQ)
 
 Record the **last verified application and docs commits**, Netlify deployed SHA/state, changed paths, confirmed behavior, incomplete work, test environments and outcomes, known bugs, approved/rejected decisions, and one exact next action. Never state that unperformed tests passed or unsaved work was saved.
+
+
+## V15.8 Training Memory preview — 2026-10-23 (branch only)
+- Branch: `feature/v15-8-training-memory-preview`, code commit `b49832e4e90ebc694a5a7a897782b2757bfe91ac`.
+- Based on unmerged V15.7.1 QA branch; **neither V15.7.1 nor V15.8 is deployed** as of creation.
+- Today contains a collapsed, contextual list of explicitly saved, unresolved Training Mode flags for the current recognized recommended workout group. A flag can be marked resolved after confirmation; notes are not shown verbatim, rankings and user data sources remain unchanged.
+- Source script syntax and 10 targeted source-derived logic/privacy checks passed after correcting one overbroad test assertion against the generic phrase 'reported notes'. No signed-in Hevy, iOS Safari or production regression performed for V15.8.
+- Exact next step: verify existing app Today render and journal memory on mobile Chromium and iOS Safari, then produce release preview and prepare approval. Do not merge pending branch into main without user approval.

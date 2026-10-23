@@ -49,3 +49,10 @@ Created the five continuity files: `PROJECT_STATE.md`, `DECISION_LOG.md`, `BACKL
 ## Every future entry must include
 
 Date, commit/PR, affected files, what changed, reason/decision, user-facing outcome, storage/schema/migration impact, actual test results vs untested, deployment SHA/state, known bugs and next priority.
+
+
+### V15.8 — development preview only (2026-10-23)
+- Branch commit `b49832e4e90ebc694a5a7a897782b2757bfe91ac` (not on main).
+- Adds small, collapsed contextual Training Memory disclosure to the existing Today Next Workout card only when relevant explicitly saved unresolved flags exist; provides user-confirmed resolution without deleting journal observations.
+- Does not change source-of-truth Hevy completion, routine ranking, mesocycle, AI prompt, or existing localStorage keys. No migrations.
+- Testing: frontend JS syntax and focused deterministic checks passed; real-app browser and authenticated regressions not run.
