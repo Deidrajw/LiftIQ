@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LiftIQ · V15.7 preview</title>
+<title>LiftIQ · V15.7.1 QA preview</title>
 <meta name="theme-color" content="#0a0b0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4218,7 +4218,20 @@ function liFinish(){if(!confirm('Finish the journal? Save your workout in Hevy s
 function liAdd(){var note=document.getElementById('liNote').value.trim();if(!note)return;LI.active.events.push({id:'e'+Date.now(),type:document.getElementById('liType').value,ex:document.getElementById('liEx').value.trim().slice(0,100),note:note.slice(0,1000),at:new Date().toISOString()});liSave();renderNextSessionCoach()}
 function liEdit(id){var x=LI.active?.events.find(e=>e.id===id);if(!x)return;var v=prompt('Edit note',x.note);if(v&&v.trim()){x.note=v.trim().slice(0,1000);liSave();renderNextSessionCoach()}}
 function liDelete(id){if(!confirm('Delete this note?'))return;LI.active.events=LI.active.events.filter(x=>x.id!==id);liSave();renderNextSessionCoach()}
-function liDeleteSession(id){if(!confirm('Delete this finished journal?'))return;LI.history=LI.history.filter(x=>x.id!==id);li157ForgetJournal(id);liSave();renderNextSessionCoach()}
+function liDeleteSession(id){
+ if(!LI.history.some(function(x){return x&&x.id===id}))return;
+ if(!confirm('Delete this finished journal?'))return;
+ var original=LI.history;
+ LI.history=LI.history.filter(function(x){return x.id!==id});
+ try{liSave()}
+ catch(e){LI.history=original;alert('Could not save the journal deletion; nothing was deleted.');return}
+ if(!li157ForgetJournal(id)){
+  LI.history=original;
+  try{liSave()}catch(e){alert('Could not restore the journal after link storage failed. Reload and review your saved journals.')}
+  return;
+ }
+ renderNextSessionCoach();
+}
 function liCoach(id,old){var a=old?LI.history.find(x=>x.id===id):LI.active;if(!a?.events?.length)return;if(!confirm('Prepare a Gemini question containing these notes? You will review it before submission.'))return;_aiQuestion=('During '+a.name+' I observed: '+a.events.slice(-3).map(x=>(x.ex?x.ex+': ':'')+x.note).join(' | ')+'. Using my completed training history, what cautious adjustments might be appropriate? Do not diagnose pain.').slice(0,350);uiNavigate('coach');renderAICoach();var e=document.getElementById('aiQuestion');if(e){e.value=_aiQuestion;e.focus()}}
 
 /* V15.7 · User-confirmed journal↔Hevy reconciliation.
@@ -4251,7 +4264,10 @@ function li157CaptureHevy(workouts){
    var k=title.toLowerCase();
    if(title&&!exSeen.has(k)&&exercises.length<80){exSeen.add(k);exercises.push(title)}
   });
-  sessions.push({id:id,name:name,date:dateInfo.dateKey,exercises:exercises});
+  var rawStart=String(w.start_time||'').trim();
+  var parsedStart=new Date(rawStart);
+  var startedAt=/^\d{4}-\d{2}-\d{2}T/.test(rawStart)&&Number.isFinite(parsedStart.getTime())?parsedStart.toISOString():'';
+  sessions.push({id:id,name:name,date:dateInfo.dateKey,startedAt:startedAt,exercises:exercises});
  });
  sessions.sort(function(a,b){return b.date.localeCompare(a.date)});
  sessions=sessions.slice(0,250);
@@ -4268,13 +4284,24 @@ function li157DayDistance(a,b){
  return Math.abs((Date.parse(a+'T12:00:00Z')-Date.parse(b+'T12:00:00Z'))/86400000);
 }
 function li157Norm(s){return normalizeExerciseName(String(s||'').trim()).toLowerCase().replace(/\s+/g,' ')}
+function li157SessionDay(workout){
+ if(!workout)return '';
+ // When Hevy includes a valid timestamp, use the same viewer-local date convention
+ // as the journal. Old cached records without time retain the original source date.
+ return li157LocalDay(workout.startedAt)||workout.date||'';
+}
+function li157SessionTime(workout){
+ if(!workout||!workout.startedAt)return '';
+ var d=new Date(workout.startedAt);
+ return Number.isFinite(d.getTime())?d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'';
+}
 function li157Candidates(journal){
  if(!journal)return [];
  var date=li157LocalDay(journal.at),name=li157Norm(journal.name);
- return LI157_SESSIONS.filter(function(w){return li157DayDistance(date,w.date)<=1}).map(function(w){
-  var delta=li157DayDistance(date,w.date),sameTitle=!!name&&li157Norm(w.name)===name;
+ return LI157_SESSIONS.filter(function(w){return li157DayDistance(date,li157SessionDay(w))<=1}).map(function(w){
+  var delta=li157DayDistance(date,li157SessionDay(w)),sameTitle=!!name&&li157Norm(w.name)===name;
   return {workout:w,delta:delta,sameTitle:sameTitle,rank:(delta===0?4:0)+(sameTitle?3:0)};
- }).sort(function(a,b){return b.rank-a.rank||a.workout.date.localeCompare(b.workout.date)||a.workout.name.localeCompare(b.workout.name)}).slice(0,8);
+ }).sort(function(a,b){return b.rank-a.rank||li157SessionDay(b.workout).localeCompare(li157SessionDay(a.workout))||String(b.workout.startedAt||'').localeCompare(String(a.workout.startedAt||''))||a.workout.name.localeCompare(b.workout.name)}).slice(0,8);
 }
 function li157Persist(){
  try{localStorage.setItem(LI157_LINKS_KEY,JSON.stringify(LI157_LINKS));return true}
@@ -4286,9 +4313,10 @@ function li157Confirm(journalId,workoutId){
  if(!match)return false;
  var claimed=Object.keys(LI157_LINKS).some(function(id){return id!==journalId&&LI157_LINKS[id]&&LI157_LINKS[id].workoutId===workoutId});
  if(claimed){alert('This Hevy workout is already matched to another journal. Unlink it there before continuing.');return false}
- if(!confirm('Link this journal to "'+match.workout.name+'" on '+match.workout.date+'? Confirm using your own workout history. This does not edit Hevy or your plan.'))return false;
+ var labelDate=li157SessionDay(match.workout),labelTime=li157SessionTime(match.workout);
+ if(!confirm('Link this journal to "'+match.workout.name+'" on '+labelDate+(labelTime?' at '+labelTime:'')+'? Confirm using your own workout history. This does not edit Hevy or your plan.'))return false;
  var former=LI157_LINKS[journalId];
- LI157_LINKS[journalId]={workoutId:workoutId,workoutName:match.workout.name,workoutDate:match.workout.date,confirmedAt:new Date().toISOString()};
+ LI157_LINKS[journalId]={workoutId:workoutId,workoutName:match.workout.name,workoutDate:match.workout.date,workoutStartedAt:match.workout.startedAt||'',confirmedAt:new Date().toISOString()};
  if(!li157Persist()){if(former)LI157_LINKS[journalId]=former;else delete LI157_LINKS[journalId];return false}
  LI157_OPEN=journalId;renderNextSessionCoach();return true;
 }
@@ -4299,8 +4327,12 @@ function li157Unlink(journalId){
  LI157_OPEN=journalId;renderNextSessionCoach();return true;
 }
 function li157ForgetJournal(id){
- if(LI157_LINKS[id]){delete LI157_LINKS[id];li157Persist()}
+ if(LI157_LINKS[id]){
+  var prior=LI157_LINKS[id];delete LI157_LINKS[id];
+  if(!li157Persist()){LI157_LINKS[id]=prior;return false}
+ }
  if(LI157_OPEN===id)LI157_OPEN='';
+ return true;
 }
 function li157Comparison(journal,workout){
  if(!workout||!Array.isArray(workout.exercises))return '<p class="li157-caution">This workout is not in the latest Hevy evidence cache. Re-sync before comparing exercises. The confirmed link remains yours.</p>';
@@ -4326,7 +4358,9 @@ function li157ReviewHTML(journal){
  var h='<div class="li157-review" data-li157-journal="'+liEsc(id)+'">';
  if(record){
   var workout=LI157_SESSIONS.find(function(w){return w.id===record.workoutId});
-  h+='<div class="li157-head"><span class="li157-ok">User-confirmed match</span><strong>'+liEsc(record.workoutName)+' · '+liEsc(record.workoutDate)+'</strong></div>';
+  var label=workout?li157SessionDay(workout):(li157LocalDay(record.workoutStartedAt)||record.workoutDate);
+  var time=workout?li157SessionTime(workout):li157SessionTime({startedAt:record.workoutStartedAt});
+  h+='<div class="li157-head"><span class="li157-ok">User-confirmed match</span><strong>'+liEsc(record.workoutName)+' · '+liEsc(label)+(time?' · '+liEsc(time):'')+'</strong></div>';
   h+=li157Comparison(journal,workout);
   h+='<button type="button" class="li157-action li157-secondary" data-li157-action="unlink" data-li157-id="'+liEsc(id)+'">Remove match</button>';
  }else{
@@ -4339,7 +4373,8 @@ function li157ReviewHTML(journal){
    else {
     if(matches.length>1)h+='<p class="li157-caution">Multiple possible workouts found. Check the correct session carefully.</p>';
     matches.forEach(function(c){
-     h+='<div class="li157-candidate"><div><strong>'+liEsc(c.workout.name)+'</strong><span>'+liEsc(c.workout.date)+' · '+(c.sameTitle?'Name matches journal':'Different routine title')+(c.delta?' · Adjacent day':' · Same calendar day')+'</span></div><button type="button" class="li157-action" data-li157-action="confirm" data-li157-id="'+liEsc(id)+'" data-li157-workout="'+liEsc(c.workout.id)+'">Confirm</button></div>';
+     var localDate=li157SessionDay(c.workout),localTime=li157SessionTime(c.workout);
+     h+='<div class="li157-candidate"><div><strong>'+liEsc(c.workout.name)+'</strong><span>'+liEsc(localDate)+(localTime?' · '+liEsc(localTime):'')+' · '+(c.sameTitle?'Name matches journal':'Different routine title')+(c.delta?' · Adjacent calendar day':' · Same local calendar day')+'</span></div><button type="button" class="li157-action" data-li157-action="confirm" data-li157-id="'+liEsc(id)+'" data-li157-workout="'+liEsc(c.workout.id)+'">Confirm</button></div>';
     });
    }
    h+='</div>';

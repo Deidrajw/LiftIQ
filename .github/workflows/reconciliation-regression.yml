@@ -1,0 +1,42 @@
+name: Reconciliation regression
+
+on:
+  push:
+    branches:
+      - qa/v15-7-1-reconciliation-hardening
+  pull_request:
+    paths:
+      - public/index.html
+      - tests/reconciliation.test.cjs
+      - .github/workflows/reconciliation-regression.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify V15.7 reconciliation without user data
+        run: node --test tests/reconciliation.test.cjs
+
+  browser-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium browser test dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Smoke test actual LiftIQ frontend with fictional records
+        run: node tests/reconciliation.browser.cjs
