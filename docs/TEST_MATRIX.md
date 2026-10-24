@@ -72,3 +72,18 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 | Actual app rendered Today + Journal regression | NOT RUN | Needs Chromium browser UI acceptance |
 | Mobile Safari / VoiceOver | NOT RUN | Device-specific testing |
 | Real authenticated Hevy & Gemini regression | NOT RUN | Requires signed-in environment |
+
+
+## Cloudflare Pages migration preview
+| Test | Status |
+|---|---|
+| Frontend inline JS syntax | PASS (source-derived during API-path change) |
+| Functions ES module syntax | PASS (source-derived syntax inspection during migration) |
+| API key source never in static frontend | NOT VERIFIED with runtime |
+| New API route runtime / Cloudflare Pages compilation | NOT VERIFIED |
+| GitHub Actions smoke test | NOT VERIFIED |
+| Signed-in Google allowlist session | NOT RUN |
+| Hevy end-to-end all-history sync | NOT RUN |
+| Gemini real coached response | NOT RUN |
+| Browser localStorage export/import to new origin | NOT IMPLEMENTED |
+| Data keys, Hevy/mesocycle mutations | No intentional changes |
