@@ -1077,13 +1077,16 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .li158-entry button{font-size:11px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2);border-radius:8px;min-height:38px;padding:6px 11px}
 .li158-entry button:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
 
+
+/* Keep the application header aligned with the approved touch icon. */
+img.obs-monogram{object-fit:contain;background:transparent;letter-spacing:normal;box-shadow:none;}
 </style>
 </head>
 <body class="today-active">
 <input type="file" id="csvIn" accept=".csv" style="display:none" onchange="onFileSelect(event)">
 
 <header class="obs-header">
-  <div class="obs-brand"><div class="obs-monogram" aria-hidden="true">L<span>·</span></div><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
+  <div class="obs-brand"><img class="obs-monogram" src="/apple-touch-icon.png" width="38" height="38" alt="" aria-hidden="true"><div><div class="obs-wordmark">Lift<span>IQ</span></div><div class="obs-subbrand">TRAINING INTELLIGENCE</div></div></div>
   <div class="obs-edition"><span class="obs-status-dot"></span> OBSIDIAN <span class="obs-edition-no">/ 04</span></div>
   <div class="ux-utility-actions"><button type="button" class="ux-utility-btn ux-search-direct" onclick="liOpenSearch()">Search</button><details class="ux-more-menu" id="uxMoreMenu"><summary>More ▾</summary><div class="ux-more-list"><button onclick="liqJournalOpen();uxMoreMenu.open=false">Journal</button><button onclick="uiNavigate('sync');uxMoreMenu.open=false">Sync Hevy</button><button onclick="uiNavigate('settings');uxMoreMenu.open=false">Settings</button></div></details>
 </div>
