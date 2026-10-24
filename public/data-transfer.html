@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LiftIQ · Data transfer</title>
+<style>
+:root{color-scheme:dark;--bg:#101114;--panel:#1c2026;--bd:#39414b;--tx:#f0f3f6;--muted:#aeb9c7;--accent:#9fb8d1}
+*{box-sizing:border-box}body{font:15px/1.6 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);max-width:720px;margin:0 auto;padding:24px 18px 70px}
+h1{font-size:26px;line-height:1.2}h2{font-size:19px;margin:0 0 8px}p{margin:8px 0 14px;color:var(--muted)}
+.card{border:1px solid var(--bd);border-radius:16px;padding:20px;margin:18px 0;background:var(--panel)}
+button,.button{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#a9c1d9;color:#10151b;padding:11px 17px;border:0;border-radius:9px;font:700 14px system-ui;min-height:44px}
+button.secondary{background:#343d48;color:var(--tx);border:1px solid #5e6b79}
+button:disabled{opacity:.5;cursor:not-allowed}
+input[type=file]{width:100%;padding:10px 0;color:var(--tx)}
+label{display:block;margin:12px 0}
+small,.small{font-size:12px;color:var(--muted)}
+#report,#incoming{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:250px;overflow:auto;color:var(--muted)}
+#feedback{margin:14px 0;padding:10px;border-left:3px solid var(--accent);background:#24303b}
+a{color:var(--accent)}:focus-visible{outline:3px solid #bfd6ed;outline-offset:3px}
+.warning{border-left:3px solid #e6b975;padding-left:12px;color:#eed9b7}
+</style></head>
+<body>
+<a href="./index.html">← LiftIQ</a>
+<h1>Transfer LiftIQ data</h1>
+<p>Move browser-saved training records between LiftIQ domains. This tool runs entirely in this browser. It never uploads your export file to Hevy, Gemini, Cloudflare, or another server.</p>
+<p class="warning">Open this page on the <strong>same device and browser profile</strong> where your saved records live. An export from the Cloudflare address cannot see the old Netlify domain's records.</p>
+<section class="card" aria-labelledby="export-heading"><h2 id="export-heading">1. Export this site's data</h2>
+<p>Save a JSON backup of known LiftIQ browser storage keys. It includes app state, saved training data, journal, cycles, settings and chats if present in this browser. It excludes credentials and other unrelated storage.</p>
+<button type="button" id="export">Export LiftIQ backup</button>
+<div id="report" aria-live="polite"></div>
+</section>
+<section class="card" aria-labelledby="import-heading"><h2 id="import-heading">2. Import a backup</h2>
+<p>Select the JSON you exported from your previous LiftIQ site. You'll see the keys before anything changes.</p>
+<label for="file">Backup file (.json)</label><input id="file" type="file" accept="application/json,.json">
+<div id="incoming" aria-live="polite"></div>
+<label><input id="confirm" type="checkbox"> I understand imported keys will replace matching existing LiftIQ keys on <strong>this domain only</strong>. An automatic backup will download first.</label>
+<button type="button" id="import" disabled>Back up and import</button>
+<div id="feedback" role="status" aria-live="polite">No changes made.</div>
+</section>
+<p class="small">Refresh LiftIQ after importing. Sign in again on the new site: authentication tokens are deliberately not transferred. Hevy remains the source of completed workout facts. The transfer cannot create missing Hevy records.</p>
+<script>
+(function(){
+'use strict';
+var FILE_LIMIT=20*1024*1024, MAX_ENTRIES=150, BACKUP_VERSION=1;
+var safeKey=/^(?:ti_|liftiq_)[A-Za-z0-9_.:-]{1,100}$/;
+var unsafe=/(?:token|secret|credential|password|api[_-]?key|auth[_-]?bearer|oauth)/i;
+function allowed(k){return safeKey.test(k)&&!unsafe.test(k);}
+function collect(){
+ var out={};
+ for(var i=0;i<localStorage.length;i++){
+  var k=localStorage.key(i);
+  if(!allowed(k))continue;
+  var v=localStorage.getItem(k);
+  if(typeof v==='string')out[k]=v;
+ }
+ return out;
+}
+function pack(entries){return {format:'liftiq-localstorage-backup',version:BACKUP_VERSION,exportedAt:new Date().toISOString(),origin:location.origin,entries:entries};}
+function download(obj,label){
+ var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+ var url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=label;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(function(){URL.revokeObjectURL(url)},3000);
+}
+function filename(prefix){return prefix+'-'+new Date().toISOString().slice(0,10)+'.json';}
+function info(id,message){document.getElementById(id).textContent=message;}
+function entriesFrom(p){
+ if(!p||p.format!=='liftiq-localstorage-backup'||p.version!==BACKUP_VERSION||typeof p.entries!=='object'||Array.isArray(p.entries)||!p.entries)throw Error('Not a supported LiftIQ transfer backup.');
+ var names=Object.keys(p.entries);
+ if(!names.length||names.length>MAX_ENTRIES)throw Error('Backup has no keys or too many keys.');
+ for(var i=0;i<names.length;i++){
+  if(!allowed(names[i])||typeof p.entries[names[i]]!=='string')throw Error('Backup has an unsupported key or value: '+names[i]);
+ }
+ return p.entries;
+}
+var selected=null;
+document.getElementById('export').addEventListener('click',function(){
+ try{
+  var entries=collect(),names=Object.keys(entries);
+  if(!names.length){info('report','No LiftIQ records found on this domain and browser. Check the address and browser profile.');return;}
+  download(pack(entries),filename('liftiq-backup'));
+  info('report','Exported '+names.length+' keys from '+location.origin+':\n'+names.sort().join('\n'));
+ }catch(e){info('report','Export failed: '+e.message);}
+});
+document.getElementById('file').addEventListener('change',async function(){
+ selected=null;document.getElementById('import').disabled=true;
+ var f=this.files&&this.files[0];if(!f)return;
+ if(f.size>FILE_LIMIT){info('incoming','File is too large for this transfer tool.');return;}
+ try{
+  var p=JSON.parse(await f.text()),e=entriesFrom(p);
+  selected=e;
+  var names=Object.keys(e).sort(),current=collect();
+  var conflicts=names.filter(function(k){return Object.prototype.hasOwnProperty.call(current,k)}).length;
+  info('incoming',names.length+' keys found; '+conflicts+' match current keys and would be replaced.\nExported from '+String(p.origin||'unknown origin')+' at '+String(p.exportedAt||'unknown time')+'\n\n'+names.join('\n'));
+  document.getElementById('import').disabled=!document.getElementById('confirm').checked;
+ }catch(err){info('incoming','Import validation failed: '+err.message);}
+});
+document.getElementById('confirm').addEventListener('change',function(){
+ document.getElementById('import').disabled=!this.checked||!selected;
+});
+document.getElementById('import').addEventListener('click',function(){
+ if(!selected||!document.getElementById('confirm').checked)return;
+ var before=collect(),names=Object.keys(selected);
+ try{
+  download(pack(before),filename('liftiq-before-import'));
+ }catch(e){info('feedback','Could not create existing-data backup. Nothing changed: '+e.message);return;}
+ var snapshot={};
+ names.forEach(function(k){snapshot[k]=localStorage.getItem(k)});
+ var written=[];
+ try{
+  names.forEach(function(k){localStorage.setItem(k,selected[k]);written.push(k)});
+  info('feedback','Imported '+names.length+' LiftIQ keys successfully. An existing-data backup was downloaded. Now reopen LiftIQ and check your journals, history, cycles, settings and Coach history.');
+ }catch(e){
+  try{written.forEach(function(k){if(snapshot[k]===null)localStorage.removeItem(k);else localStorage.setItem(k,snapshot[k])});}
+  catch(rollbackError){info('feedback','Import failed and rollback was incomplete. Use the downloaded before-import backup. '+rollbackError.message);return;}
+  info('feedback','Import failed; changes rolled back. Existing-data backup was downloaded. '+e.message);
+ }
+});
+})();
+</script></body></html>
