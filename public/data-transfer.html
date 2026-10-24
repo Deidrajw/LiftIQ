@@ -4,7 +4,7 @@
 <title>LiftIQ · Data transfer</title>
 <style>
 :root{color-scheme:dark;--bg:#101114;--panel:#1c2026;--bd:#39414b;--tx:#f0f3f6;--muted:#aeb9c7;--accent:#9fb8d1}
-*{box-sizing:border-box}body{font:15px/1.6 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);max-width:720px;margin:0 auto;padding:24px 18px 70px}
+*{box-sizing:border-box}body{font:15px/1.6 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);max-width:720px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top, 0px)) 18px calc(70px + env(safe-area-inset-bottom, 0px))}
 h1{font-size:26px;line-height:1.2}h2{font-size:19px;margin:0 0 8px}p{margin:8px 0 14px;color:var(--muted)}
 .card{border:1px solid var(--bd);border-radius:16px;padding:20px;margin:18px 0;background:var(--panel)}
 button,.button{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#a9c1d9;color:#10151b;padding:11px 17px;border:0;border-radius:9px;font:700 14px system-ui;min-height:44px}
@@ -15,11 +15,11 @@ label{display:block;margin:12px 0}
 small,.small{font-size:12px;color:var(--muted)}
 #report,#incoming{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:250px;overflow:auto;color:var(--muted)}
 #feedback{margin:14px 0;padding:10px;border-left:3px solid var(--accent);background:#24303b}
-a{color:var(--accent)}:focus-visible{outline:3px solid #bfd6ed;outline-offset:3px}
+a{color:var(--accent)}.back-link{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;margin:0 0 14px -12px;border-radius:10px;text-decoration:none;font-weight:650}.back-link:hover{background:#252d36}:focus-visible{outline:3px solid #bfd6ed;outline-offset:3px}
 .warning{border-left:3px solid #e6b975;padding-left:12px;color:#eed9b7}
 </style></head>
 <body>
-<a href="./index.html">← LiftIQ</a>
+<a class="back-link" href="./index.html" aria-label="Back to LiftIQ">← Back to LiftIQ</a>
 <h1>Transfer LiftIQ data</h1>
 <p>Move browser-saved training records between LiftIQ domains. This tool runs entirely in this browser. It never uploads your export file to Hevy, Gemini, Cloudflare, or another server.</p>
 <p class="warning">Open this page on the <strong>same device and browser profile</strong> where your saved records live. An export from the Cloudflare address cannot see the old Netlify domain's records.</p>
