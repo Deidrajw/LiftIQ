@@ -51,3 +51,19 @@ test('trend labels are explicitly estimated rather than generic progressing',()=
  assert.match(html,/Est\. strength up/);
  assert.match(html,/early vs recent median/);
 });
+
+test('Today recommendation presents concise summary and collapsible detailed evidence',()=>{
+ assert.match(html,/Review evidence below for the full rationale/);
+ assert.match(html,/<details class="liq156-context liq156-details"><summary>Why this workout\?/);
+ assert.doesNotMatch(html,/<details class="liq156-context liq156-details" open/);
+});
+test('Progress groups priority lifts under one heading',()=>{
+ assert.match(html,/Priority lift progress/);
+ assert.match(html,/Show remaining priority lifts/);
+ assert.doesNotMatch(html,/<h3>Recent priority-lift trends<\/h3>/);
+ assert.doesNotMatch(html,/'More priority-lift trends'/);
+});
+test('active journal is clearly described as unfinished, never a completed Hevy session',()=>{
+ assert.match(html,/Journal in progress:/);
+ assert.match(html,/only completed Hevy sessions count as performed workouts/);
+});
