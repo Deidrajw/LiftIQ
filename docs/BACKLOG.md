@@ -45,3 +45,9 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 ### Active QA — October 23, 2026
 - **P0 In progress**: Progress confidence gate on `fix/progress-confidence-and-mobile-clearance` (draft PR #5). Verify realistic exercise histories against labels and iPhone bottom-nav clearance before merging.
 - **P1 Next**: Consolidate repeated Next Workout explanation into one collapsed evidence disclosure; make plan/cycle context actionable, then unify priority trend rows. Avoid unnecessary redesign.
+
+
+### Next after V15.8.1 preview (2026-10-23)
+- P0: Verify Progress strength trend classifications with real comparable Hevy sets and iPhone bottom navigation reachability.
+- P1: Validate collapsed evidence in Today and merged priority Progress section at mobile widths, keyboard focus, and light/dark mode.
+- P1: Decide whether to replace the routine selector with searchable disclosure only after the current titles behavior passes real use; avoid changing approved routing.
