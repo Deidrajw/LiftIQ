@@ -62,3 +62,10 @@ Date, commit/PR, affected files, what changed, reason/decision, user-facing outc
 - Draft PR #5 (not merged/deployed). Require four separate comparable training dates and use median early-vs-recent estimated 1RM trend, ±5% threshold; replace overconfident `Progressing` badges in priority-lift rows with qualified labels.
 - Improve evidence disclosure, explicitly noting estimated strengths use dated daily best sets rather than all workout sets.
 - Increase page bottom padding above fixed navigation. No data migration, storage-key or backend changes. Device QA and CI confirmation pending.
+
+
+### V15.8.1 preview — UX follow-on (not deployed)
+- Today: short recommendation summary and collapsed “Why this workout?” evidence with previous facts/limitations retained; journal context clarified.
+- Progress: one priority-lift header and a smaller remaining-lifts disclosure, preserving exercise-detail navigation.
+- Added source-level tests for UX and confidence requirements. 8/8 targeted static checks passed; browser, signed-in and CI results not verified.
+- No new localStorage keys, Hevy writes, serverless changes, plan/goal migrations or release to main.
