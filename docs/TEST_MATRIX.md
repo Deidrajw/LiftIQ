@@ -87,3 +87,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 | Gemini real coached response | NOT RUN |
 | Browser localStorage export/import to new origin | NOT IMPLEMENTED |
 | Data keys, Hevy/mesocycle mutations | No intentional changes |
+
+
+## Data portability preview — Oct 2026
+- Active branch `feature/local-data-transfer-v1582`; portable `public/data-transfer.html` and Settings link provide a local-only JSON backup/import utility for browser-local `ti_*` and `liftiq_*` keys. Known credential-like names are excluded; import validates the format/keys/strings, previews collisions, downloads a current backup, replaces only selected keys, rolls back successful writes on failure. No changes to Hevy backend or data model.
+- Migration between `liftiqtrainingtracker.netlify.app` and `liftiq.pages.dev` is **cross-origin**. The new Cloudflare transfer page cannot read Netlify localStorage; user must perform a same-origin export on old Netlify host. If Netlify is suspended and cannot deploy the new transfer page, a browser developer-console one-time exporter is required on the old domain, or Netlify service must be restored to publish this UI there.
+- Static test: HTML/JS compiles; 8 targeted source checks passed, no network fetch. **Not run**: real old Netlify-origin export, large user data, mobile Safari import, quota/rollback browser failure simulation.
+- Migration branch not deployed; do not merge/publish without approval. Next exact step: test import on Cloudflare preview with fictional data, then provide old-domain export and verify real user history safely.
