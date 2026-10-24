@@ -1,7 +1,7 @@
 // Secure, read-only Hevy Pro bridge for a personal Netlify site.
 // Configure HEVY_API_KEY, GOOGLE_CLIENT_ID, ALLOWED_GOOGLE_EMAIL in Cloudflare.
 // Never expose the Hevy API key in index.html or ship a .env file.
-import {reply,verifyUser} from './_auth.js';
+import {reply,verifyUser} from '../../cloudflare/auth.js';
 export async function onRequest(context){
  const env=context.env;
  const event={httpMethod:context.request.method,headers:Object.fromEntries(context.request.headers),queryStringParameters:Object.fromEntries(new URL(context.request.url).searchParams),body:context.request.method==='POST'?await context.request.text():''};
