@@ -93,3 +93,11 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Added `tests/progress-confidence.test.cjs` and GitHub Actions workflow on branch. Full frontend inline JS syntax passed; five fictional-data trend cases were checked interactively in development, one revealed initial 3-date outlier risk and prompted 4-date revision. Do not claim GitHub CI passed before confirming workflow result.
 - Remaining P0: real-browser iPhone viewport and end-of-document nav clearance test; real Hevy historical examples, cross-variation audit, signed-in production regressions; verify CI.
 - Next priority after P0: consolidate redundant Next Workout evidence (collapsed by default) and Progress priority-lift sections, avoiding new cards/tabs.
+
+
+### Latest draft Progress/Today UX QA (2026-10-23)
+- Draft PR #5 branch `fix/progress-confidence-and-mobile-clearance`; latest frontend UX commit `ea14c29021dda57f8541f099352f37631632d1b6` with additional regression tests `e2f96d57f6b38d5e0f99294d00a4f121824de2ba`.
+- Today recommendation shows a concise next planned day/manual reason; original evidence is preserved in a `details` disclosure collapsed by default. The journal is described as in progress rather than as a database warning.
+- Progress renamed duplicate headings to one `Priority lift progress` section plus `Show remaining priority lifts`; retains all exercise history click actions.
+- Existing proposed P0 confidence and bottom navigation fixes still on branch. Eight static/source-derived checks passed including script compilation. GitHub CI and actual iPhone Safari verification not confirmed; not published.
+- NEXT: run repeatable Node/browser QA, test actual Today and Progress screens at 320/375/390 px including bottom-of-page reachability, then prepare an approval-ready PR. Do not deploy without request.
