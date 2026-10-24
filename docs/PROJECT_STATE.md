@@ -93,3 +93,10 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - User must configure Google OAuth authorized JavaScript origin and Cloudflare Pages Variables and Secrets, preserve old origin, then verify signed-in behavior. LocalStorage is origin-specific; export/import plan required before replacing original Netlify URL.
 - Separate prior draft PR #5 for Progress confidence/mobile clearance remains open and is not part of this migration.
 - Detailed migration checklist: `docs/CLOUDFLARE_MIGRATION.md`.
+
+
+## Cloudflare API migration merged — October 23/24, 2026
+- PR #6 merged to `main` at GitHub commit `13b3cb6192c22e9adf1aa917f0282161aacaf510`, triggering expected GitHub-connected Cloudflare Pages deployment; **Cloudflare deployment and runtime cannot be independently verified from available tooling**. User previously reported `https://liftiq.pages.dev` successfully initialized and has configured API keys and Google OAuth origin.
+- Cloudflare Pages Functions in `functions/api/` implement `auth-config`, `auth-session`, `hevy-sync`, `ai-coach`; shared auth `cloudflare/auth.js`, API function routing `public/_routes.json`. Frontend chooses `/api/` on Cloudflare, old `/.netlify/functions/` on original Netlify hostname. Original Netlify backend preserved.
+- Nine targeted source checks passed: syntax of 5 backend modules + frontend scripts, routes JSON, old-host routing, Google allowlist source guard. **Not run:** Pages build logs, actual endpoint HTTP status, signed-in Hevy and Gemini, full iOS Safari, stored data export/import, Cloudflare matching production commit. The accessible public host couldn't be reached from this tool session. Do not call migration fully operational yet.
+- **Next exact step:** check Cloudflare project deployment shows latest GitHub commit `13b3cb6` and visit `https://liftiq.pages.dev/api/auth-config` for configured client ID (public identifier). Validate Google sign-in, Hevy sync and Gemini in browser, without sharing tokens/keys; perform data export/import before treating Cloudflare as permanent source of saved journals/cycles/chats. Progress UX draft PR #5 remains separate.
