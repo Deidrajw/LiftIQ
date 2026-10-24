@@ -83,3 +83,16 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 | iPhone Safari can reach bottom-most interactive controls | NOT RUN | Requires actual viewport/browser scroll testing |
 | Signed-in Hevy data/variation accuracy | NOT RUN | No private Hevy records in test environment |
 | Authenticated Coach/Plan regression | NOT RUN | No signed-in production session |
+
+
+### Follow-on UX check 2026-10-23 (draft PR #5)
+| Assertion | Result | Limits |
+|---|---|---|
+| Full modified frontend inline JS compiles | PASS | Static syntax only |
+| Today evidence is native details, closed by default | PASS | Source assertion, not live UI |
+| Today's summary is concise and retains detailed evidence | PASS | Static source inspection |
+| Active journal described as user-reported, still unfinished | PASS | Static source inspection |
+| Progress heading consolidated and extra lifts retained | PASS | Source assertion |
+| Bottom padding and four-date threshold persisted | PASS | Source assertion |
+| Actual iOS Safari, scrolling, signed-in Hevy/Gemini | NOT RUN | Needs device/session |
+| GitHub Actions automated CI | NOT VERIFIED | Workflow result not yet observed |
