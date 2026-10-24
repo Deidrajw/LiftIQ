@@ -1,4 +1,4 @@
-import {reply,verifyUser} from './_auth.js';
+import {reply,verifyUser} from '../../cloudflare/auth.js';
 export async function onRequest(context){
  const env=context.env;
  const event={httpMethod:context.request.method,headers:Object.fromEntries(context.request.headers),queryStringParameters:Object.fromEntries(new URL(context.request.url).searchParams),body:context.request.method==='POST'?await context.request.text():''};
