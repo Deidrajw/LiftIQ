@@ -230,7 +230,7 @@ body[data-theme="light"] .phase-card.phase-active{background:#edf1f5}
   --or:#cbd2da;--bl:#a8c0d6;--gr:#78bf9d;--re:#ee877e;--am:#e9bf79;
 }
 html{scroll-behavior:smooth}
-body{max-width:620px;min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse 85% 24% at 50% -4%,rgba(173,188,209,.09),transparent 72%),var(--bg);color:var(--tx);padding-bottom:108px;font-family:'DM Sans',sans-serif;font-size:14px}
+body{max-width:620px;min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse 85% 24% at 50% -4%,rgba(173,188,209,.09),transparent 72%),var(--bg);color:var(--tx);padding-bottom:calc(168px + env(safe-area-inset-bottom, 0px));font-family:'DM Sans',sans-serif;font-size:14px}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.10;background-image:radial-gradient(#a2aab5 .42px,transparent .45px);background-size:8px 8px;z-index:-1}
 button,input,textarea{font-family:'DM Sans',sans-serif}
 button{touch-action:manipulation}
@@ -1075,6 +1075,15 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 .li158-entry button{font-size:11px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2);border-radius:8px;min-height:38px;padding:6px 11px}
 .li158-entry button:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
 
+
+/* Evidence stays collapsed by default; retain the existing Today card. */
+.liq156-details{display:block;margin-top:12px}
+.liq156-details>summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.liq156-details>summary:focus-visible{outline:2px solid var(--bl);outline-offset:3px}
+.liq156-caption{font-weight:500;font-size:11px;color:var(--t2)}
+.liq156-detail-body{padding-top:8px}
+@media(max-width:375px){.liq156-details>summary{align-items:flex-start;flex-direction:column;gap:3px}}
+
 </style>
 </head>
 <body class="today-active">
@@ -1869,7 +1878,7 @@ function renderNextSessionCoach(){
    html='<section class="today-panel"><div class="today-kicker">START WITH YOUR HISTORY</div><h3>Connect your completed workouts</h3><p class="today-muted">Sign in and sync Hevy in Intelligence → Sync. LiftIQ will show your usual rotation and priorities here. Your workouts will still be logged in Hevy.</p><button class="today-button today-primary" type="button" onclick="todayOpenSync()">Go to Hevy Sync →</button></section>';
  }else{
    var pick=nextWorkoutSelection(),options=pick.analysis.options;
-   html+='<section class="today-panel today-next"><div class="today-kicker">BEFORE YOUR WORKOUT <span class="today-small-chip">'+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+'</span></div><h3>'+v3Safe(pick.name)+'</h3><p class="today-muted">'+v3Safe(pick.reason)+'</p>';
+   html+='<section class="today-panel today-next"><div class="today-kicker">BEFORE YOUR WORKOUT <span class="today-small-chip">'+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+'</span></div><h3>'+v3Safe(pick.name)+'</h3><p class="today-muted">'+v3Safe(pick.manual?'Manual choice from completed Hevy workout titles':pick.analysis.slot?'Next preferred day: '+pick.analysis.slot.day+' · '+uiLongDate(pick.analysis.slot.date):'Suggested from recent completed Hevy training')+'. <span class="today-muted">Review evidence below for the full rationale.</span></p>';
    html+='<div class="today-picker"><label for="nextWorkoutSelect">Choose from your completed Hevy workout titles</label><select id="nextWorkoutSelect" onchange="nextWorkoutOverride(this.value)"><option value="">Use LiftIQ recommendation</option>';
    options.forEach(function(x){html+='<option value="'+v3Safe(x.name)+'"'+(pick.manual&&pick.name===x.name?' selected':'')+'>'+v3Safe(x.name)+'</option>';});
    html+='</select></div><p class="today-disclaimer">Suggested from completed Hevy sessions, not a confirmed calendar. Choosing a routine here never changes Hevy or your training plan.</p></section>';
@@ -1974,15 +1983,24 @@ function v10ComparableHistory(name,days){
 function v10TrendAssessment(name,days){
  var rows=v10ComparableHistory(name,days);
  if(!rows.length)return {status:'No comparable records',rows:rows,evidence:'No qualifying dated weighted sets for this movement in this '+days+'-day window.'};
- if(rows.length===1)return {status:'One training date',rows:rows,evidence:'Only one qualifying training date in the '+days+'-day window.'};
- var first=rows[0],last=rows[rows.length-1],delta=last.e1rmLb-first.e1rmLb;
- var sameLoad=Math.abs(first.weightLb-last.weightLb)<.25;
- var improved=delta>Math.max(2,first.e1rmLb*.025),declined=delta<-Math.max(2,first.e1rmLb*.025);
- var status=improved?'Progressing':declined?'Needs context':'Stable / mixed';
- var evidence=uiLongDate(first.date)+': '+first.weightLb+' lb × '+first.reps+' → '+uiLongDate(last.date)+': '+last.weightLb+' lb × '+last.reps+' · '+rows.length+' dated performances.';
- if(sameLoad&&last.reps>first.reps){status='Rep progression';}
- // This is a comparison signal, not a diagnosis of a plateau or fatigue.
- return {status:status,rows:rows,delta:Math.round(delta),evidence:evidence};
+ var first=rows[0],last=rows[rows.length-1];
+ var endpoints=uiLongDate(first.date)+': '+first.weightLb+' lb × '+first.reps+' → '+uiLongDate(last.date)+': '+last.weightLb+' lb × '+last.reps;
+ if(rows.length<4)return {status:'Limited evidence',rows:rows,evidence:endpoints+' · '+rows.length+' training dates. At least 4 comparable dates needed to assess a trend.'};
+ // Compare the first and last halves of dated estimated-strength readings;
+ // avoid labeling a single anomalous last session a confirmed progression.
+ var count=Math.max(1,Math.floor(rows.length/2));
+ function median(values){
+  var sorted=values.slice().sort(function(a,b){return a-b});
+  var mid=Math.floor(sorted.length/2);
+  return sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
+ }
+ var early=median(rows.slice(0,count).map(function(x){return x.e1rmLb}));
+ var late=median(rows.slice(-count).map(function(x){return x.e1rmLb}));
+ var pct=early>0?100*(late-early)/early:0;
+ var status=pct>=5?'Est. strength up':pct<=-5?'Est. strength down':'Stable / mixed';
+ var estimate=' · '+rows.length+' comparable training dates · estimated-strength trend '+(pct>0?'+':'')+pct.toFixed(1)+'% (early vs recent median).';
+ var caution=' Estimate from daily best comparable sets; not a confirmed strength gain, and not a full set-volume analysis.';
+ return {status:status,rows:rows,delta:Math.round(late-early),evidence:endpoints+estimate+caution};
 }
 
 
@@ -2167,7 +2185,7 @@ function v127Label(action,label){
  if(label){var cleaned=String(label).replace('HOLD — ','Hold · ').replace('INJURY — ','Injury · ');return cleaned==='STALLED'?'Stalled':cleaned==='BUILDING'?'Building':cleaned==='INCREASE'?'Increase':cleaned;}
  return ({stall:'Stalled',increase:'Increase',hold:'Hold',building:'Building',injury:'Review injury',reduce:'Reduce',tracked:'Tracked',pinned:'Pinned'})[action]||'Review';
 }
-function v127TrendTone(label){var value=String(label||'').toLowerCase();return value.includes('rep progression')?'building':value.includes('progressing')?'increase':value.includes('mixed')||value.includes('stable')?'hold':'baseline';}
+function v127TrendTone(label){var value=String(label||'').toLowerCase();return value.includes('rep progression')?'building':value.includes('est. strength up')||value.includes('progressing')?'increase':value.includes('est. strength down')?'reduce':value.includes('mixed')||value.includes('stable')?'hold':'baseline';}
 function v127StatusChip(action,label){
  var tone=v127Tone(action);
  return '<span class="state-chip state-tone--'+tone+'">'+v3Safe(v127Label(tone,label))+'</span>';
@@ -2198,7 +2216,7 @@ function v3ProgressTop(){
  var h="<div class='v3-hero'><div class='v3-eyebrow'>Performance snapshot</div><div class='v3-h1'>Your progress at a glance</div><div class='v3-sub'>Actionable targets appear first. Comparisons follow below.</div></div>";
  h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+pushes+"</strong><span>Ready to progress</span></div><div class='v3-kpi'><strong>"+holds+"</strong><span>Building / hold</span></div><div class='v3-kpi'><strong>"+flagged+"</strong><span>Need review</span></div></div>";
  h+=v125NextSessionTargets(target);
- h+="<div class='v3-titlebar'><h3>Recent priority-lift trends</h3><span class='v3-muted'>Last 84 days</span></div>";
+ h+="<div class='v3-titlebar'><h3>Priority lift progress</h3><span class='v3-muted'>84-day trends · Tap a lift for history</span></div>";
  var trendInfo=trainingTrends(),history=trendInfo.windows['84d'].priorityLiftHistory||{};
  var stored=STATE.exerciseHistory||{},anchor=trendInfo.anchorDate||v3Today();
  var edge=new Date(anchor+'T12:00:00').getTime()-83*86400000;
@@ -2215,7 +2233,7 @@ function v3ProgressTop(){
   return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status state-chip state-tone--"+v127TrendTone(status)+"'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View progression →</span></button></div>";
  }
  h+='<div class="v3-rows ui-small-rows">'+trendNames.slice(0,3).map(trendRow).join('')+'</div>';
- if(trendNames.length>3)h+=uiFold('progress-more-trends','More priority-lift trends','Additional lifts with clickable all-time charts','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' lifts');
+ if(trendNames.length>3)h+=uiFold('progress-more-trends','Show remaining priority lifts','Same progress assessment · Full history available on tap','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' more');
  var families=Object.keys(movementGroups()).length;
  h+=uiFold('progress-movements','Movement families','Explore related variations without combining their working weights',renderMovementPanel(),false,families+' families');
  h+=renderHistoryLibrary();
@@ -4870,17 +4888,17 @@ v11CyclePanel=function(c){
 function liq156Context(){
  var a=nextWorkoutAnalysis(),cycle=v3ActiveCycle(),sync=Number(localStorage.getItem('ti_hevy_synced_at')||0);
  var journal=(typeof LI!=='undefined'&&LI&&LI.active)?LI.active:null;
- var parts=['<strong>Why this session is suggested</strong>','<span class="liq156-chip">Completed Hevy workouts</span>','<span class="liq156-chip">'+v3Safe(a.confidence||'History-based')+'</span>'];
+ var parts=['<span class="liq156-chip">Completed Hevy workouts</span>','<span class="liq156-chip">'+v3Safe(a.confidence||'History-based')+'</span>'];
  if(a.latest)parts.push('<p>Latest recognized strength session: '+v3Safe(a.latest.name)+' · '+v3Safe(a.latest.date)+'. Based on '+a.evidenceCount+' recent recognizable strength records.</p>');
  else parts.push('<p>No recognizable completed strength sessions yet. Sync Hevy before following a recommendation.</p>');
  if(a.slot){
   parts.push('<p><strong>Saved schedule:</strong> '+v3Safe(a.slot.day)+' · '+v3Safe(uiLongDate(a.slot.date))+(a.slot.focus?' · '+v3Safe(a.slot.focus):' · focus from history')+'. This is a preference, not a calendar appointment.</p>');
  }else parts.push('<p><strong>No weekly schedule saved.</strong> Set training days in Settings to make the recommendation day-aware.</p>');
  if(cycle)parts.push('<p><strong>Training block:</strong> '+v3Safe(cycle.label)+' · '+v3Safe(cycle.name)+(v3Paused(cycle)?' (paused; no changes applied)':'')+'.</p>');
- if(journal)parts.push('<p><strong>Unreconciled journal:</strong> Your current notes are not a completed Hevy workout. Review relevant limitations or discomfort before training.</p>');
+ if(journal)parts.push('<p><strong>Journal in progress:</strong> You have unfinished training notes. Review or finish your journal before relying on them as post-workout context; only completed Hevy sessions count as performed workouts.</p>');
  if(sync){var age=Math.max(0,Math.round((Date.now()-sync)/86400000));if(Date.now()-sync>72*60*60*1000)parts.push('<p>Last Hevy sync was '+age+' days ago (over 72 hours). Recent workouts may be missing.</p>')}
  parts.push('<p>No program, schedule, cycle, or Hevy data is modified by this recommendation or its manual override.</p>');
- return '<div class="liq156-context">'+parts.join('')+'</div>';
+ return '<details class="liq156-context liq156-details"><summary>Why this workout? <span class="liq156-caption">Training evidence and limitations</span></summary><div class="liq156-detail-body">'+parts.join('')+'</div></details>';
 }
 var liq156OldCard=nextWorkoutCard;
 nextWorkoutCard=function(){

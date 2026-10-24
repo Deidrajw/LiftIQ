@@ -72,3 +72,27 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 | Actual app rendered Today + Journal regression | NOT RUN | Needs Chromium browser UI acceptance |
 | Mobile Safari / VoiceOver | NOT RUN | Device-specific testing |
 | Real authenticated Hevy & Gemini regression | NOT RUN | Requires signed-in environment |
+
+
+## Progress evidence and navigation QA — draft PR #5
+| Scenario | Status | Evidence / limitation |
+|---|---|---|
+| Full inline JS syntax after targeted changes | PASS | Source compiled without syntax errors |
+| Mixed / sustained increase / decrease / low-date source tests | PARTIAL | Five source-derived fictional cases run; three-date outlier false confidence observed and corrected to four-date gate; repeatable test source committed; CI not yet verified |
+| Fixed bottom navigation has reserved document space | PASS static | CSS `padding-bottom:calc(168px + env(safe-area-inset-bottom, 0px))` |
+| iPhone Safari can reach bottom-most interactive controls | NOT RUN | Requires actual viewport/browser scroll testing |
+| Signed-in Hevy data/variation accuracy | NOT RUN | No private Hevy records in test environment |
+| Authenticated Coach/Plan regression | NOT RUN | No signed-in production session |
+
+
+### Follow-on UX check 2026-10-23 (draft PR #5)
+| Assertion | Result | Limits |
+|---|---|---|
+| Full modified frontend inline JS compiles | PASS | Static syntax only |
+| Today evidence is native details, closed by default | PASS | Source assertion, not live UI |
+| Today's summary is concise and retains detailed evidence | PASS | Static source inspection |
+| Active journal described as user-reported, still unfinished | PASS | Static source inspection |
+| Progress heading consolidated and extra lifts retained | PASS | Source assertion |
+| Bottom padding and four-date threshold persisted | PASS | Source assertion |
+| Actual iOS Safari, scrolling, signed-in Hevy/Gemini | NOT RUN | Needs device/session |
+| GitHub Actions automated CI | NOT VERIFIED | Workflow result not yet observed |

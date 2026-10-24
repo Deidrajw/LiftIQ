@@ -1,0 +1,22 @@
+name: LiftIQ progress accuracy QA
+on:
+  pull_request:
+    paths:
+      - public/index.html
+      - tests/progress-confidence.test.cjs
+      - .github/workflows/progress-accuracy.yml
+  push:
+    branches:
+      - fix/progress-confidence-and-mobile-clearance
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  trend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/progress-confidence.test.cjs
