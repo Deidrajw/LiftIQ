@@ -1,5 +1,5 @@
 // Gemini interpretation of already-computed training metrics. No direct write to Hevy.
-import {reply,verifyUser} from './_auth.js';
+import {reply,verifyUser} from '../../cloudflare/auth.js';
 const ALLOWED_ACTIONS=new Set(['hold','increase','reduce']);
 function cleanText(v,n=250){return String(v??'').replace(/[\u0000-\u001f]/g,' ').slice(0,n);}
 function finite(v,min,max){const n=Number(v);return Number.isFinite(n)&&n>=min&&n<=max?n:null;}
