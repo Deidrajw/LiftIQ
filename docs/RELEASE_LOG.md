@@ -56,3 +56,9 @@ Date, commit/PR, affected files, what changed, reason/decision, user-facing outc
 - Adds small, collapsed contextual Training Memory disclosure to the existing Today Next Workout card only when relevant explicitly saved unresolved flags exist; provides user-confirmed resolution without deleting journal observations.
 - Does not change source-of-truth Hevy completion, routine ranking, mesocycle, AI prompt, or existing localStorage keys. No migrations.
 - Testing: frontend JS syntax and focused deterministic checks passed; real-app browser and authenticated regressions not run.
+
+
+### Cloudflare Pages migration — PREVIEW, not a release (2026-10-23)
+- Added four Cloudflare Pages Functions and shared Google identity verifier ported from Netlify with environment bindings; client API calls moved from `/.netlify/functions/` to `/api/`.
+- Existing Netlify functions remain unchanged on `main` and in branch; no storage keys or user data intentionally modified.
+- No production merge, Cloudflare runtime or authenticated functional verification yet. Local browser data portability must be resolved before switch.

@@ -1,0 +1,24 @@
+name: Cloudflare migration smoke checks
+on:
+  pull_request:
+    paths:
+      - functions/**
+      - cloudflare/**
+      - public/index.html
+      - tests/cloudflare-migration.cjs
+      - .github/workflows/cloudflare-migration.yml
+  push:
+    branches:
+      - feature/cloudflare-pages-backend-migration
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cloudflare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --experimental-vm-modules tests/cloudflare-migration.cjs

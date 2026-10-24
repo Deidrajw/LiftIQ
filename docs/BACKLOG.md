@@ -40,3 +40,10 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 ### V15.8 development update — 2026-10-23
 - **In development only** on `feature/v15-8-training-memory-preview`: collapsed saved-flag context on Today. Uses previously approved active flags, never scans unsolicited private journal notes. Matching is exercise-focus heuristic, not verified medical or workout evidence. Resolution retains original journal notes.
 - **Blocking**: signed-in V15.7.1 acceptance and iOS Safari checks; then V15.8 browser acceptance; user approval to deploy.
+
+
+### Active infrastructure priority: Cloudflare Pages migration
+- Implement preview Pages Functions and `/api` routing on isolated branch; tests and continuity docs.
+- Validate Cloudflare build, auth, Gemini and Hevy sync with secure server-side secrets. Verify Google OAuth new origin.
+- Migrate browser-origin local data safely and establish rollback before switching.
+- Keep draft Progress/Today QA PR #5 isolated until ready.

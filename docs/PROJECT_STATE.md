@@ -84,3 +84,12 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Today contains a collapsed, contextual list of explicitly saved, unresolved Training Mode flags for the current recognized recommended workout group. A flag can be marked resolved after confirmation; notes are not shown verbatim, rankings and user data sources remain unchanged.
 - Source script syntax and 10 targeted source-derived logic/privacy checks passed after correcting one overbroad test assertion against the generic phrase 'reported notes'. No signed-in Hevy, iOS Safari or production regression performed for V15.8.
 - Exact next step: verify existing app Today render and journal memory on mobile Chromium and iOS Safari, then produce release preview and prepare approval. Do not merge pending branch into main without user approval.
+
+
+## Cloudflare Pages migration in progress (2026-10-23)
+- User confirmed desired Cloudflare Pages address: `https://liftiq.pages.dev` (reported successful initial deployment, not independently accessible from this environment).
+- Active branch: `feature/cloudflare-pages-backend-migration`. Adds Cloudflare Pages Functions for auth-config, auth-session, hevy-sync, ai-coach and a shared secure auth helper; switches client API URLs to `/api/`; preserves original Netlify functions as fallback.
+- Added dedicated smoke tests and workflow; CI/runtime and signed-in Hevy/Gemini remain unverified. **Do not merge or deploy to production until user approval**.
+- User must configure Google OAuth authorized JavaScript origin and Cloudflare Pages Variables and Secrets, preserve old origin, then verify signed-in behavior. LocalStorage is origin-specific; export/import plan required before replacing original Netlify URL.
+- Separate prior draft PR #5 for Progress confidence/mobile clearance remains open and is not part of this migration.
+- Detailed migration checklist: `docs/CLOUDFLARE_MIGRATION.md`.

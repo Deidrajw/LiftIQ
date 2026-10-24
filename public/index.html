@@ -3816,12 +3816,12 @@ async function askAI(mode){
  _aiBusy=true;renderAICoach();
  try{
  var requestText=coachRequestBody(mode,_aiQuestion,23000);
- var res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},body:requestText});
+ var res=await fetch(liftIQApiPath('ai-coach'),{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},body:requestText});
  // Some hosting gateways may enforce a lower payload ceiling. Automatically
  // retry a single time with an even shorter summary, preserving the question.
  if(res.status===413){
   requestText=coachRequestBody(mode,_aiQuestion,10500);
-  res=await fetch('/.netlify/functions/ai-coach',{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},body:requestText});
+  res=await fetch(liftIQApiPath('ai-coach'),{method:'POST',headers:{'Authorization':'Bearer '+_googleIdToken,'Content-Type':'application/json'},body:requestText});
   if(res.ok)_aiNotice='LiftIQ used a smaller evidence summary to fit the hosting request limit.';
  }
  var data;try{data=await res.json();}catch(e){throw new Error(res.status===413?'The Coach summary exceeded the server limit. Try again with a more specific question.':'AI server returned an unreadable response (HTTP '+res.status+').');}
@@ -3854,7 +3854,7 @@ async function handleGoogleCredential(result){
   try{
     var token=result&&result.credential;
     if(!token)throw new Error('Google did not return a sign-in token.');
-    var verify=await fetch('/.netlify/functions/auth-session',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+    var verify=await fetch(liftIQApiPath('auth-session'),{headers:{Authorization:'Bearer '+token},cache:'no-store'});
     var data=await verify.json();
     if(!verify.ok)throw new Error(data.error||'Sign-in was rejected.');
     _googleIdToken=token;_googleSignedInEmail=data.email;
@@ -3864,7 +3864,7 @@ async function handleGoogleCredential(result){
 async function initializeGoogleLogin(){
   if(!_googleClientId){
     try{
-      var response=await fetch('/.netlify/functions/auth-config',{cache:'no-store'});
+      var response=await fetch(liftIQApiPath('auth-config'),{cache:'no-store'});
       var config=await response.json();
       if(!response.ok)throw new Error(config.error||'Unable to load sign-in configuration.');
       _googleClientId=config.clientId;
@@ -3901,8 +3901,9 @@ function hevyWorkoutsToCSV(workouts){
   });
   return rows.map(function(row){return row.map(hevyCsvEscape).join(",");}).join("\n");
 }
+function liftIQApiPath(name){return (location.hostname==='liftiqtrainingtracker.netlify.app'? '/.netlify/functions/' : '/api/')+name;}
 async function getHevyPage(page){
-  var response=await fetch("/.netlify/functions/hevy-sync?page="+page,{
+  var response=await fetch(liftIQApiPath("hevy-sync")+"?page="+page,{
     method:"GET",
     headers:{"Authorization":"Bearer "+_googleIdToken},
     cache:"no-store"
