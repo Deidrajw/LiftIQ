@@ -132,3 +132,10 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - User confirmed Cloudflare Pages preview deployments exist and approved them as LiftIQ's default testing environment. `main` → production `https://liftiq.pages.dev`, feature branches → isolated previews. This decision is recorded in DECISION_LOG D-014.
 - V15.9 draft PR #10 remains open and unmerged on `feature/coach-readable-v159-preview`. Fictional-data demo path: `/demo-coach-v159.html` on the actual Cloudflare branch preview host. The exact preview URL and running deployment SHA have not been read from Cloudflare in this tool session.
 - Next: open Cloudflare deployment dashboard for this branch, confirm commit and preview URL, test mobile Coach typography and collapsed evidence there, then continue structured response schema work without production merge.
+
+
+### V15.9 structured readability continuation — 2026-10-25
+- Draft PR #10 updated on `feature/coach-readable-v159-preview`. Frontend displays explicit exercise bullets as separate compact rows in Coach Takeaway/Recommendation, not inferred from arbitrary weights. Evidence and Limits stay collapsed, past unstructured chat messages retain safe fallback, HTML is escaped; preserved storage keys and conversation content.
+- Both Cloudflare and Netlify Gemini prompt contracts now request concise Takeaway/Recommendation/Evidence/Limits and explicit grounded exercise bullet lines when applicable; existing JSON response envelope and Hevy/Gemini behavior unchanged.
+- Automated `tests/coach-readability-v159.test.cjs` with GitHub Actions `.github/workflows/coach-readability-v159.yml` added. CI queued at workflow run 40241513739; confirm result before claiming pass. Tests cover HTML escaping, historical messages, collapsed evidence, optional rows, no network in renderer and matching backend instructions.
+- No main merge/deployment. Cloudflare preview URL/SHA not independently verified; iPhone Safari and authenticated functional tests still pending. Next: confirm CI and real branch preview, inspect 320/375/390 layouts then request approval to publish.
