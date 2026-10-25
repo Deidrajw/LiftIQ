@@ -62,3 +62,9 @@ Date, commit/PR, affected files, what changed, reason/decision, user-facing outc
 - Added four Cloudflare Pages Functions and shared Google identity verifier ported from Netlify with environment bindings; client API calls moved from `/.netlify/functions/` to `/api/`.
 - Existing Netlify functions remain unchanged on `main` and in branch; no storage keys or user data intentionally modified.
 - No production merge, Cloudflare runtime or authenticated functional verification yet. Local browser data portability must be resolved before switch.
+
+
+### V15.9 Preview continuation (not published)
+- Coach response display handles explicit newline exercise bullets as compact, escaped rows. Does not infer or invent loads from free-form text.
+- Gemini system prompts on both Netlify and Cloudflare ask for concise labeled sections and exercise bullets, without altering the existing JSON contract or auto-approving any changes.
+- Added repeatable Node regression suite + CI. No migrations or storage-key modifications. Browser and authenticated QA pending.
