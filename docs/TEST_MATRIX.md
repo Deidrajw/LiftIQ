@@ -111,3 +111,9 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 ### V15.9 Coach content hierarchy executable regressions
 - Automated tests committed on feature branch; **CI queued, not yet passed** when written. Assertions: all frontend scripts parse; Takeaway/Recommendation rows; collapsed Evidence/Limits; HTML-escaped exercise text; plain-text fallback; no localStorage/network in renderer; both hosts follow same Gemini response instructions.
 - Browser viewport mobile, Gemini live outputs, PWA, auth and saved old real chat export: NOT RUN. Fictional standalone `public/demo-coach-v159.html` exists; its actual Pages preview URL remains unverified.
+
+
+### V15.9 hierarchy pass — Today/Progress and responsive checks (2026-10-25)
+- Preview PR #10 updated: Today Next Workout reason shortened (no longer dumps full analysis first); separate native `<details>` “Why this workout?” preserves prior Hevy/schedule/cycle/journal evidence, initially collapsed. Progress uses a single “Priority lift progress” heading and “Show remaining priority lifts” disclosure, keeping existing exercise drilldowns.
+- Frontend JS compilation passed during source edit. Fictional-data Chromium test `tests/coach-responsive-v159.browser.cjs` added for 320, 375, 390, and 960px, scripted Coach rows, collapsed Evidence/Limits and Today details, horizontal overflow, demo and page errors; workflow updated to run it. GitHub run `40241886767` in progress when documentation recorded; confirm actual pass/fail before claiming responsive validation.
+- Cloudflare preview route `feature-coach-readable-v159-preview.liftiq.pages.dev` could not be accessed from web verification environment; actual Cloudflare deployment SHA, iPhone Safari and authenticated behavior remain unverified. No production merge. Next verify CI/browser output, obtain Cloudflare preview deployment SHA and inspect on real iPhone, then user approval before release.
