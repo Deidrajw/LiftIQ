@@ -1080,6 +1080,17 @@ body[data-theme=light] .ux-dest.active{background:#e3e8ef}
 
 /* Keep the application header aligned with the approved touch icon. */
 img.obs-monogram{object-fit:contain;background:transparent;letter-spacing:normal;box-shadow:none;}
+
+/* V15.9 Coach reading hierarchy; the existing chat bubble layout is preserved. */
+.li159-structured{display:grid;gap:12px;font-size:14px;line-height:1.58}
+.li159-section{padding:0}
+.li159-primary{border-left:2px solid #92b5cb;padding-left:12px}
+.li159-label{font-size:11px;font-weight:750;letter-spacing:.09em;text-transform:uppercase;color:#aac6d9;margin-bottom:5px}
+.li159-section p,.li159-detail p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.li159-plain{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.li159-detail{border-top:1px solid var(--bd2);padding:9px 0}
+.li159-detail summary{font-size:12px;color:var(--t2);font-weight:700;cursor:pointer;min-height:38px;display:flex;align-items:center}
+.li159-detail p{font-size:13px;color:var(--tx);padding:8px 0 0}
 </style>
 </head>
 <body class="today-active">
@@ -3795,7 +3806,7 @@ function renderAICoach(){
  if(STATE.imported){html+=uiFold('coach-evidence','Workout evidence sent to Gemini','Inspect dated best-set observations by exercise',"<div class='v3-muted'>Up to 4 recent best sets per priority exercise over 84 days are sent in the standard compact AI request. This inspector shows the full local evidence.</div>"+smartActivePriorityNames().slice(0,12).map(function(name){var t=v10TrendAssessment(name,84);return "<details style='border-top:1px solid var(--bd);padding:10px 0'><summary style='font-size:12px;cursor:pointer'>"+aiSafe(shortName(name))+" · "+aiSafe(t.status)+"</summary><div class='v3-muted'>"+aiSafe(t.evidence)+"</div></details>";}).join(''),false,smartActivePriorityNames().length+' lifts');}
  if(_aiError)html+="<div class='cc' style='color:var(--re)'>"+aiSafe(_aiError)+"</div>";
  if(_aiNotice)html+="<div class='cc' style='color:var(--gr)'>"+aiSafe(_aiNotice)+"</div>";
- if(_aiResult){html+="<div class='cc'><div class='cl'>Coach interpretation</div><div class='ai-result'>"+aiSafe(_aiResult.answer||_aiResult.summary)+"</div>";
+ if(_aiResult){html+="<div class='cc'><div class='cl'>Coach interpretation</div><div class='ai-result'>"+li159CoachHTML(_aiResult.answer||_aiResult.summary)+"</div>";
  if(_aiResult.answer&&_aiResult.summary)html+="<div class='ai-feedback'>"+aiSafe(_aiResult.summary)+"</div>";
  (_aiResult.insights||[]).forEach(function(x){html+="<div class='ir'>• "+aiSafe(x)+"</div>";});html+='</div>';
  if((_aiResult.proposals||[]).length){html+="<div class='cl'>Proposed changes — approve individually</div>";
@@ -4478,9 +4489,36 @@ function liqChatNew(){var id='t'+Date.now();LIQ_CHAT.threads.unshift({id:id,titl
 function liqChatOpen(id){if(_aiBusy)return;LIQ_CHAT.active=id;_aiResult=null;_aiQuestion='';liqChatSave();renderAICoach()}
 function liqChatDelete(id){if(!confirm('Delete this saved conversation?'))return;LIQ_CHAT.threads=LIQ_CHAT.threads.filter(function(t){return t.id!==id});if(LIQ_CHAT.active===id)LIQ_CHAT.active=LIQ_CHAT.threads[0]?.id||null;_aiResult=null;_aiQuestion='';liqChatSave();renderAICoach()}
 function liqChatContext(){var t=liqChatActive();return (t?.messages||[]).slice(-6).map(function(m){return {role:m.role,text:String(m.text).slice(0,600)}})}
+
+// V15.9 · Visual hierarchy for structured Coach prose (display-only).
+function li159CoachHTML(raw){
+ var value=String(raw==null?'':raw).trim();
+ if(!value)return '';
+ var names=['Takeaway','Evidence','Recommendation','Limits'];
+ var matches=[...value.matchAll(/(?:^|\s)(Takeaway|Evidence|Recommendation|Limits)\s*:/gi)];
+ if(matches.length<2)return '<p class="li159-plain">'+aiSafe(value)+'</p>';
+ var sections=[];
+ matches.forEach(function(m,i){
+  var start=m.index+m[0].length,end=i+1<matches.length?matches[i+1].index:value.length;
+  var text=value.slice(start,end).trim();
+  if(text)sections.push({name:names.find(function(n){return n.toLowerCase()===m[1].toLowerCase()})||m[1],text:text});
+ });
+ if(!sections.length)return '<p class="li159-plain">'+aiSafe(value)+'</p>';
+ var result='<div class="li159-structured">';
+ sections.forEach(function(sec){
+  var key=sec.name.toLowerCase(),escaped=aiSafe(sec.text);
+  if(key==='evidence'||key==='limits'){
+    result+='<details class="li159-detail"><summary>'+aiSafe(sec.name)+'</summary><p>'+escaped+'</p></details>';
+  }else{
+    result+='<div class="li159-section '+(key==='takeaway'?'li159-primary':'')+'"><div class="li159-label">'+aiSafe(sec.name)+'</div><p>'+escaped+'</p></div>';
+  }
+ });
+ return result+'</div>';
+}
+
 function liqChatHTML(){var t=liqChatActive(),h='<section class="cc"><div class="cl">Saved Coach conversations</div><p class="liq-history-note">Stored only in this browser. You can reopen, continue, or delete a conversation. The latest three exchanges are included when you ask a follow-up in the same conversation.</p><div class="liq-thread-actions"><button onclick="liqChatNew()">+ New conversation</button>'+(t?'<button onclick="liqChatDelete(\''+t.id+'\')">Delete current</button>':'')+'</div>';
  h+='<div class="liq-thread-list">';LIQ_CHAT.threads.slice(0,15).forEach(function(x){h+='<button class="'+(x.id===LIQ_CHAT.active?'active':'')+'" onclick="liqChatOpen(\''+x.id+'\')">'+aiSafe(x.title)+'</button>'});h+='</div>';
- if(t&&t.messages.length){h+='<details open><summary>Conversation · '+t.messages.length+' messages</summary>';t.messages.slice(-16).forEach(function(m){h+='<div class="liq-message '+(m.role==='user'?'user':'assistant')+'"><strong>'+(m.role==='user'?'You':'LiftIQ Coach')+'</strong><div>'+aiSafe(m.text)+'</div><p class="liq-history-note">'+new Date(m.at).toLocaleString('en-CA',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</p></div>'});h+='</details>'}
+ if(t&&t.messages.length){h+='<details open><summary>Conversation · '+t.messages.length+' messages</summary>';t.messages.slice(-16).forEach(function(m){h+='<div class="liq-message '+(m.role==='user'?'user':'assistant')+'"><strong>'+(m.role==='user'?'You':'LiftIQ Coach')+'</strong><div>'+li159CoachHTML(m.text)+'</div><p class="liq-history-note">'+new Date(m.at).toLocaleString('en-CA',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</p></div>'});h+='</details>'}
  return h+'</section>'}
 var liqOldRenderAI=renderAICoach;
 renderAICoach=function(){liqOldRenderAI();var pane=document.getElementById('t-ai');if(!pane)return;var first=pane.firstElementChild; if(first)first.insertAdjacentHTML('beforebegin',liqChatHTML());};
