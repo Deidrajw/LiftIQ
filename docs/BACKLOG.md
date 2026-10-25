@@ -60,3 +60,11 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 - Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
 - Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
 - Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
+
+
+### Approved release workflow — Cloudflare Pages previews
+- [x] Adopt separate feature-branch previews, production only from `main` after approval.
+- [ ] Confirm PR #10 Cloudflare preview URL and deployed commit SHA.
+- [ ] Test `demo-coach-v159.html` on mobile and actual branch preview (fictional content, no credential access).
+- [ ] Validate existing saved/unstructured Coach messages and Gemini response hierarchy, then pursue safe structured schema and full five-tab readability audit.
+- [ ] Merge after approval and independently verify Cloudflare production matching commit.
