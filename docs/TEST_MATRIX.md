@@ -100,3 +100,9 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - Branch `feature/google-silent-signin-v1583`, frontend source commit `9f90c9b2116e42204fb3878a65c5b598b90cc3e3`; not deployed. Google Identity Services initialized with `auto_select:true` and one `prompt()` call at app startup to attempt restoring a Google session. Existing server-side Google token validation and single-email allowlist remain authoritative.
 - No Google ID tokens, API keys, or credentials are stored persistently; sign-out still invokes `disableAutoSelect()`. This is a best-effort convenience, **not a persistent backend session**. iOS Home Screen Safari may decline automatic sign-in if Google's cookies or FedCM permissions are unavailable; a real browser test is necessary.
 - Full frontend inline JS syntax passed; authenticated iPhone/Google, Gemini, Hevy, logout, and no-session tests not run. Do not merge without user approval or test sign-in states first.
+
+
+## Coach readability v15.9 preview (Oct 2026)
+- Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
+- Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
+- Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
