@@ -106,3 +106,8 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
 - Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
 - Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
+
+
+### V15.9 Coach content hierarchy executable regressions
+- Automated tests committed on feature branch; **CI queued, not yet passed** when written. Assertions: all frontend scripts parse; Takeaway/Recommendation rows; collapsed Evidence/Limits; HTML-escaped exercise text; plain-text fallback; no localStorage/network in renderer; both hosts follow same Gemini response instructions.
+- Browser viewport mobile, Gemini live outputs, PWA, auth and saved old real chat export: NOT RUN. Fictional standalone `public/demo-coach-v159.html` exists; its actual Pages preview URL remains unverified.
