@@ -1096,6 +1096,14 @@ img.obs-monogram{object-fit:contain;background:transparent;letter-spacing:normal
 .li159-exercise-row{padding:10px 12px;border:1px solid var(--bd2);border-radius:10px;background:var(--bg2);font-size:13px;line-height:1.45;overflow-wrap:anywhere}
 .li159-structured .li159-primary .li159-exercise-row{background:transparent}
 @media(max-width:375px){.li159-exercise-row{padding:9px 10px}}
+
+/* V15.9: Today rationale stays accessible but secondary. */
+.liq156-context.li159-why{margin-top:14px;padding:0 13px}
+.li159-why>summary{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:48px;cursor:pointer;font-weight:700;font-size:13px}
+.li159-why>summary span{font-weight:500;font-size:11px;color:var(--t2)}
+.li159-why-content{padding:0 0 13px;line-height:1.5}
+.li159-why-content p{margin-top:10px}
+@media(max-width:375px){.li159-why>summary{align-items:flex-start;flex-direction:column;gap:2px;padding:8px 0}}
 </style>
 </head>
 <body class="today-active">
@@ -1890,7 +1898,7 @@ function renderNextSessionCoach(){
    html='<section class="today-panel"><div class="today-kicker">START WITH YOUR HISTORY</div><h3>Connect your completed workouts</h3><p class="today-muted">Sign in and sync Hevy in Intelligence → Sync. LiftIQ will show your usual rotation and priorities here. Your workouts will still be logged in Hevy.</p><button class="today-button today-primary" type="button" onclick="todayOpenSync()">Go to Hevy Sync →</button></section>';
  }else{
    var pick=nextWorkoutSelection(),options=pick.analysis.options;
-   html+='<section class="today-panel today-next"><div class="today-kicker">BEFORE YOUR WORKOUT <span class="today-small-chip">'+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+'</span></div><h3>'+v3Safe(pick.name)+'</h3><p class="today-muted">'+v3Safe(pick.reason)+'</p>';
+   html+='<section class="today-panel today-next"><div class="today-kicker">BEFORE YOUR WORKOUT <span class="today-small-chip">'+v3Safe(pick.manual?'MANUAL CHOICE':pick.analysis.confidence)+'</span></div><h3>'+v3Safe(pick.name)+'</h3><p class="today-muted">'+v3Safe(pick.manual?'Manually selected from completed Hevy workout titles.':(pick.analysis.slot?'Next preferred day: '+pick.analysis.slot.day+' · '+uiLongDate(pick.analysis.slot.date):'Suggested from recent completed Hevy history.'))+'</p>';
    html+='<div class="today-picker"><label for="nextWorkoutSelect">Choose from your completed Hevy workout titles</label><select id="nextWorkoutSelect" onchange="nextWorkoutOverride(this.value)"><option value="">Use LiftIQ recommendation</option>';
    options.forEach(function(x){html+='<option value="'+v3Safe(x.name)+'"'+(pick.manual&&pick.name===x.name?' selected':'')+'>'+v3Safe(x.name)+'</option>';});
    html+='</select></div><p class="today-disclaimer">Suggested from completed Hevy sessions, not a confirmed calendar. Choosing a routine here never changes Hevy or your training plan.</p></section>';
@@ -2219,7 +2227,7 @@ function v3ProgressTop(){
  var h="<div class='v3-hero'><div class='v3-eyebrow'>Performance snapshot</div><div class='v3-h1'>Your progress at a glance</div><div class='v3-sub'>Actionable targets appear first. Comparisons follow below.</div></div>";
  h+="<div class='v3-kpis'><div class='v3-kpi'><strong>"+pushes+"</strong><span>Ready to progress</span></div><div class='v3-kpi'><strong>"+holds+"</strong><span>Building / hold</span></div><div class='v3-kpi'><strong>"+flagged+"</strong><span>Need review</span></div></div>";
  h+=v125NextSessionTargets(target);
- h+="<div class='v3-titlebar'><h3>Recent priority-lift trends</h3><span class='v3-muted'>Last 84 days</span></div>";
+ h+="<div class='v3-titlebar'><h3>Priority lift progress</h3><span class='v3-muted'>Last 84 days · Select an exercise</span></div>";
  var trendInfo=trainingTrends(),history=trendInfo.windows['84d'].priorityLiftHistory||{};
  var stored=STATE.exerciseHistory||{},anchor=trendInfo.anchorDate||v3Today();
  var edge=new Date(anchor+'T12:00:00').getTime()-83*86400000;
@@ -2236,7 +2244,7 @@ function v3ProgressTop(){
   return "<div class='v3-row'><button class='history-launch' type='button' data-history='"+v3Safe(n)+"' onclick='openExerciseHistory(this.dataset.history)'><div class='v3-line'><strong>"+v3Safe(shortName(n))+"</strong><span class='history-status state-chip state-tone--"+v127TrendTone(status)+"'>"+v3Safe(status)+"</span></div><div class='v3-muted'>"+v3Safe(!t.rows.length&&full.length?('Older history available · Last recorded '+historyDate(full[full.length-1].date)+' · '+full.length+' historical training dates.'):t.evidence)+"</div><span class='history-affordance'>View progression →</span></button></div>";
  }
  h+='<div class="v3-rows ui-small-rows">'+trendNames.slice(0,3).map(trendRow).join('')+'</div>';
- if(trendNames.length>3)h+=uiFold('progress-more-trends','More priority-lift trends','Additional lifts with clickable all-time charts','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' lifts');
+ if(trendNames.length>3)h+=uiFold('progress-more-trends','Show remaining priority lifts','All exercise histories remain available','<div class="v3-rows">'+trendNames.slice(3).map(trendRow).join('')+'</div>',false,(trendNames.length-3)+' lifts');
  var families=Object.keys(movementGroups()).length;
  h+=uiFold('progress-movements','Movement families','Explore related variations without combining their working weights',renderMovementPanel(),false,families+' families');
  h+=renderHistoryLibrary();
@@ -4929,7 +4937,7 @@ v11CyclePanel=function(c){
 function liq156Context(){
  var a=nextWorkoutAnalysis(),cycle=v3ActiveCycle(),sync=Number(localStorage.getItem('ti_hevy_synced_at')||0);
  var journal=(typeof LI!=='undefined'&&LI&&LI.active)?LI.active:null;
- var parts=['<strong>Why this session is suggested</strong>','<span class="liq156-chip">Completed Hevy workouts</span>','<span class="liq156-chip">'+v3Safe(a.confidence||'History-based')+'</span>'];
+ var parts=['<span class="liq156-chip">Completed Hevy workouts</span>','<span class="liq156-chip">'+v3Safe(a.confidence||'History-based')+'</span>'];
  if(a.latest)parts.push('<p>Latest recognized strength session: '+v3Safe(a.latest.name)+' · '+v3Safe(a.latest.date)+'. Based on '+a.evidenceCount+' recent recognizable strength records.</p>');
  else parts.push('<p>No recognizable completed strength sessions yet. Sync Hevy before following a recommendation.</p>');
  if(a.slot){
@@ -4939,7 +4947,7 @@ function liq156Context(){
  if(journal)parts.push('<p><strong>Unreconciled journal:</strong> Your current notes are not a completed Hevy workout. Review relevant limitations or discomfort before training.</p>');
  if(sync){var age=Math.max(0,Math.round((Date.now()-sync)/86400000));if(Date.now()-sync>72*60*60*1000)parts.push('<p>Last Hevy sync was '+age+' days ago (over 72 hours). Recent workouts may be missing.</p>')}
  parts.push('<p>No program, schedule, cycle, or Hevy data is modified by this recommendation or its manual override.</p>');
- return '<div class="liq156-context">'+parts.join('')+'</div>';
+ return '<details class="liq156-context li159-why"><summary>Why this workout? <span>Evidence and limitations</span></summary><div class="li159-why-content">'+parts.join('')+'</div></details>';
 }
 var liq156OldCard=nextWorkoutCard;
 nextWorkoutCard=function(){
