@@ -113,3 +113,10 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Branch `feature/google-silent-signin-v1583`, frontend source commit `9f90c9b2116e42204fb3878a65c5b598b90cc3e3`; not deployed. Google Identity Services initialized with `auto_select:true` and one `prompt()` call at app startup to attempt restoring a Google session. Existing server-side Google token validation and single-email allowlist remain authoritative.
 - No Google ID tokens, API keys, or credentials are stored persistently; sign-out still invokes `disableAutoSelect()`. This is a best-effort convenience, **not a persistent backend session**. iOS Home Screen Safari may decline automatic sign-in if Google's cookies or FedCM permissions are unavailable; a real browser test is necessary.
 - Full frontend inline JS syntax passed; authenticated iPhone/Google, Gemini, Hevy, logout, and no-session tests not run. Do not merge without user approval or test sign-in states first.
+
+
+## Automatic Google sign-in rollout — October 25, 2026
+- User explicitly approved production publishing. PR #9 merged into `main` at commit `510ba8896bec60986fee9edfdac3976d998efe73`.
+- Google Identity Services initializes `auto_select:true` and prompts once on startup; server still verifies Google ID tokens and the permitted account, sign-out disables auto-select, and no credentials are persisted in localStorage.
+- Verification: source assertions and full frontend inline JS syntax passed. **Unverified:** deployed Cloudflare matching commit; Cloudflare URL could not be accessed with available web tool. Netlify latest visible deployment remains `9b7bb0fe...` (ready, older than release), not matching GitHub main. Actual iPhone PWA restoration, sign-out and Hevy/Gemini regressions not performed.
+- Next exact action: confirm Cloudflare Pages deployment includes GitHub `510ba889`, test reopen after Home Screen close, test explicit logout remains logged out and check Hevy/Gemini authorization; investigate browser/GIS restrictions if prompt cannot silently restore.
