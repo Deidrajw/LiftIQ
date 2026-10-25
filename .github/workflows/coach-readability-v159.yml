@@ -1,0 +1,24 @@
+name: Coach V15.9 Readability QA
+on:
+  push:
+    branches:
+      - feature/coach-readable-v159-preview
+  pull_request:
+    paths:
+      - public/index.html
+      - functions/api/ai-coach.js
+      - netlify/functions/ai-coach.js
+      - tests/coach-readability-v159.test.cjs
+      - .github/workflows/coach-readability-v159.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  coach-readability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/coach-readability-v159.test.cjs
