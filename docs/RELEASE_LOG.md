@@ -68,3 +68,9 @@ Date, commit/PR, affected files, what changed, reason/decision, user-facing outc
 - Coach response display handles explicit newline exercise bullets as compact, escaped rows. Does not infer or invent loads from free-form text.
 - Gemini system prompts on both Netlify and Cloudflare ask for concise labeled sections and exercise bullets, without altering the existing JSON contract or auto-approving any changes.
 - Added repeatable Node regression suite + CI. No migrations or storage-key modifications. Browser and authenticated QA pending.
+
+
+### V15.9 hierarchy pass — Today/Progress and responsive checks (2026-10-25)
+- Preview PR #10 updated: Today Next Workout reason shortened (no longer dumps full analysis first); separate native `<details>` “Why this workout?” preserves prior Hevy/schedule/cycle/journal evidence, initially collapsed. Progress uses a single “Priority lift progress” heading and “Show remaining priority lifts” disclosure, keeping existing exercise drilldowns.
+- Frontend JS compilation passed during source edit. Fictional-data Chromium test `tests/coach-responsive-v159.browser.cjs` added for 320, 375, 390, and 960px, scripted Coach rows, collapsed Evidence/Limits and Today details, horizontal overflow, demo and page errors; workflow updated to run it. GitHub run `40241886767` in progress when documentation recorded; confirm actual pass/fail before claiming responsive validation.
+- Cloudflare preview route `feature-coach-readable-v159-preview.liftiq.pages.dev` could not be accessed from web verification environment; actual Cloudflare deployment SHA, iPhone Safari and authenticated behavior remain unverified. No production merge. Next verify CI/browser output, obtain Cloudflare preview deployment SHA and inspect on real iPhone, then user approval before release.
