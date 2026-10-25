@@ -4523,9 +4523,9 @@ function li159CoachHTML(raw){
  sections.forEach(function(sec){
   var key=sec.name.toLowerCase(),body=li159SectionBody(sec.text);
   if(key==='evidence'||key==='limits'){
-    result+='<details class="li159-detail"><summary>'+aiSafe(sec.name)+'</summary><p>'+escaped+'</p></details>';
+    result+='<details class="li159-detail"><summary>'+aiSafe(sec.name)+'</summary><div class="li159-copy">'+body+'</div></details>';
   }else{
-    result+='<div class="li159-section '+(key==='takeaway'?'li159-primary':'')+'"><div class="li159-label">'+aiSafe(sec.name)+'</div><p>'+escaped+'</p></div>';
+    result+='<div class="li159-section '+(key==='takeaway'?'li159-primary':'')+'"><div class="li159-label">'+aiSafe(sec.name)+'</div><div class="li159-copy">'+body+'</div></div>';
   }
  });
  return result+'</div>';
