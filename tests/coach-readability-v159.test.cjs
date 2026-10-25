@@ -45,3 +45,12 @@ test('prompt aligns across Cloudflare and Netlify',()=>{
   assert.match(src,/Do not assume a load change implies a specific RPE/);
  }
 });
+
+test('Today provides concise reason with collapsed rationale and Progress has one priority group',()=>{
+ assert.match(source,/Why this workout\?/);
+ assert.match(source,/li159-why-content/);
+ assert.match(source,/Next preferred day:/);
+ assert.match(source,/Priority lift progress/);
+ assert.match(source,/Show remaining priority lifts/);
+ assert.doesNotMatch(source,/<h3>Recent priority-lift trends<\/h3>/);
+});
