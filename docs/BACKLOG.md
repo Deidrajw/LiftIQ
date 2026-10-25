@@ -54,3 +54,9 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 - Migration between `liftiqtrainingtracker.netlify.app` and `liftiq.pages.dev` is **cross-origin**. The new Cloudflare transfer page cannot read Netlify localStorage; user must perform a same-origin export on old Netlify host. If Netlify is suspended and cannot deploy the new transfer page, a browser developer-console one-time exporter is required on the old domain, or Netlify service must be restored to publish this UI there.
 - Static test: HTML/JS compiles; 8 targeted source checks passed, no network fetch. **Not run**: real old Netlify-origin export, large user data, mobile Safari import, quota/rollback browser failure simulation.
 - Migration branch not deployed; do not merge/publish without approval. Next exact step: test import on Cloudflare preview with fictional data, then provide old-domain export and verify real user history safely.
+
+
+## Coach readability v15.9 preview (Oct 2026)
+- Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
+- Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
+- Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
