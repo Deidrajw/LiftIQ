@@ -126,3 +126,9 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
 - Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
 - Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
+
+
+### Preview workflow adopted (2026-10-25)
+- User confirmed Cloudflare Pages preview deployments exist and approved them as LiftIQ's default testing environment. `main` → production `https://liftiq.pages.dev`, feature branches → isolated previews. This decision is recorded in DECISION_LOG D-014.
+- V15.9 draft PR #10 remains open and unmerged on `feature/coach-readable-v159-preview`. Fictional-data demo path: `/demo-coach-v159.html` on the actual Cloudflare branch preview host. The exact preview URL and running deployment SHA have not been read from Cloudflare in this tool session.
+- Next: open Cloudflare deployment dashboard for this branch, confirm commit and preview URL, test mobile Coach typography and collapsed evidence there, then continue structured response schema work without production merge.
