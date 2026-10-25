@@ -120,3 +120,9 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Google Identity Services initializes `auto_select:true` and prompts once on startup; server still verifies Google ID tokens and the permitted account, sign-out disables auto-select, and no credentials are persisted in localStorage.
 - Verification: source assertions and full frontend inline JS syntax passed. **Unverified:** deployed Cloudflare matching commit; Cloudflare URL could not be accessed with available web tool. Netlify latest visible deployment remains `9b7bb0fe...` (ready, older than release), not matching GitHub main. Actual iPhone PWA restoration, sign-out and Hevy/Gemini regressions not performed.
 - Next exact action: confirm Cloudflare Pages deployment includes GitHub `510ba889`, test reopen after Home Screen close, test explicit logout remains logged out and check Hevy/Gemini authorization; investigate browser/GIS restrictions if prompt cannot silently restore.
+
+
+## Coach readability v15.9 preview (Oct 2026)
+- Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
+- Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
+- Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
