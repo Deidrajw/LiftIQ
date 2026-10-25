@@ -22,3 +22,9 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/coach-readability-v159.test.cjs
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test Coach and Today across iPhone widths with fictional data
+        run: node tests/coach-responsive-v159.browser.cjs
