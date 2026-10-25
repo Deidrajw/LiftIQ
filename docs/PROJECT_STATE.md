@@ -107,3 +107,9 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Migration between `liftiqtrainingtracker.netlify.app` and `liftiq.pages.dev` is **cross-origin**. The new Cloudflare transfer page cannot read Netlify localStorage; user must perform a same-origin export on old Netlify host. If Netlify is suspended and cannot deploy the new transfer page, a browser developer-console one-time exporter is required on the old domain, or Netlify service must be restored to publish this UI there.
 - Static test: HTML/JS compiles; 8 targeted source checks passed, no network fetch. **Not run**: real old Netlify-origin export, large user data, mobile Safari import, quota/rollback browser failure simulation.
 - Migration branch not deployed; do not merge/publish without approval. Next exact step: test import on Cloudflare preview with fictional data, then provide old-domain export and verify real user history safely.
+
+
+## Google automatic re-sign-in preview (Oct 2026)
+- Branch `feature/google-silent-signin-v1583`, frontend source commit `9f90c9b2116e42204fb3878a65c5b598b90cc3e3`; not deployed. Google Identity Services initialized with `auto_select:true` and one `prompt()` call at app startup to attempt restoring a Google session. Existing server-side Google token validation and single-email allowlist remain authoritative.
+- No Google ID tokens, API keys, or credentials are stored persistently; sign-out still invokes `disableAutoSelect()`. This is a best-effort convenience, **not a persistent backend session**. iOS Home Screen Safari may decline automatic sign-in if Google's cookies or FedCM permissions are unavailable; a real browser test is necessary.
+- Full frontend inline JS syntax passed; authenticated iPhone/Google, Gemini, Hevy, logout, and no-session tests not run. Do not merge without user approval or test sign-in states first.
