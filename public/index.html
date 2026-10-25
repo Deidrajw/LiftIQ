@@ -3879,7 +3879,7 @@ async function initializeGoogleLogin(){
     if(!_googleReady){setTimeout(initializeGoogleLogin,500);}
     return;
   }
-  if(!_googleReady){google.accounts.id.initialize({client_id:_googleClientId,callback:handleGoogleCredential,auto_select:false});_googleReady=true;}
+  if(!_googleReady){google.accounts.id.initialize({client_id:_googleClientId,callback:handleGoogleCredential,auto_select:true,cancel_on_tap_outside:true});_googleReady=true;try{google.accounts.id.prompt();}catch(err){console.warn('Optional Google automatic sign-in unavailable:',err);}}
   var holder=document.getElementById('googleButton');
   if(holder){holder.replaceChildren();google.accounts.id.renderButton(holder,{theme:'filled_black',size:'large',text:'signin_with',width:225});}
   signedInUI();
