@@ -1105,6 +1105,16 @@ img.obs-monogram{object-fit:contain;background:transparent;letter-spacing:normal
 .li159-why-content p{margin-top:10px}
 @media(max-width:375px){.li159-why>summary{align-items:flex-start;flex-direction:column;gap:2px;padding:8px 0}}
 
+
+/* Shared hierarchy for the five destinations; no new components or navigation. */
+#gym .today-panel,#t-progress .v3-hero,#t-next .cc,#t-map .cc,#t-ai .cc{border-radius:16px}
+#gym .today-kicker,#t-progress .v3-eyebrow,#t-next .cl,#t-map .cl,#t-ai .cl{font-size:11px;line-height:1.4;font-weight:750;letter-spacing:.075em}
+#t-progress .ux-page-heading h2,#t-next .ux-page-heading h2,#t-map .ux-page-heading h2,#t-ai .ux-page-heading h2{line-height:1.2;letter-spacing:-.025em}
+#t-progress .v3-titlebar,#t-next .v3-titlebar,#t-map .v3-titlebar{align-items:baseline;flex-wrap:wrap;row-gap:4px}
+#t-progress .v3-rows .v3-muted,#t-next .v3-muted,#t-map .v3-muted,#t-ai .ai-feedback{line-height:1.55;overflow-wrap:anywhere}
+#gym button,#t-progress button,#t-next button,#t-map button,#t-ai button{touch-action:manipulation}
+#t-progress .history-launch,#t-next button,#t-map button,#t-ai .ai-btn{min-height:var(--liux-touch)}
+
 /* UX refinement preview: shared safe-area and type rhythm, mobile first. */
 :root{--liux-space-1:6px;--liux-space-2:12px;--liux-space-3:18px;--liux-space-4:24px;--liux-touch:44px}
 .liq-journal-overlay{padding:calc(env(safe-area-inset-top,0px) + 16px) 12px calc(env(safe-area-inset-bottom,0px) + 24px);overscroll-behavior:contain}
