@@ -40,7 +40,7 @@ async function main(){
    assert.equal(await page.locator('#liqJournalContents .liq-review h4').filter({hasText:'Completed Hevy workouts'}).count(),1);
    await page.locator('#liqJournalClose').click();
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
-   await page.evaluate(()=>{LI.active=null;LI.history=[];LI157_SESSIONS=[];liqJournalOpen();});
+   await page.evaluate(()=>{LI.active=null;LI.history=[];LI157_SESSIONS=[];STATE.dailyLog={'2026-10-24':{sets:3,ex:{}}};liqJournalOpen();});
    const overlay=page.locator('#liqJournalOverlay');
    assert.equal(await overlay.count(),1);
    assert.equal(await overlay.locator('#liqJournalClose').count(),1);
