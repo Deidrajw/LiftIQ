@@ -4647,17 +4647,21 @@ liqJournalRefresh=function(){liq146JournalRefresh();var root=document.getElement
 /* V14.7: show dated Hevy activity next to journals without assuming a match */
 function liq147RecentHevy(){
  var dates=Object.keys(STATE.dailyLog||{}).sort().reverse();
- if(!dates.length)return '<p>No completed Hevy sessions in local history. Sync after finishing your workout.</p>';
- var out='<div class="liq-review"><h4>Recent completed Hevy workouts</h4><p>For comparison only. LiftIQ has not automatically matched these workouts to a journal.</p>';
- dates.slice(0,4).forEach(function(date){var items=STATE.dailyLog[date]||[];var count=Array.isArray(items)?items.length:0;out+='<div class="liq-review-row"><strong>'+liEsc(uiLongDate(date))+'</strong><p>'+count+' recorded entries · Check Hevy for the precise performed exercise list.</p></div>'});
- return out+'</div>';
+ if(!dates.length)return '<section class="liq-review"><h4>Completed Hevy workouts</h4><p>No completed Hevy sessions available in this browser. Sync after training.</p></section>';
+ var out='<section class="liq-review"><h4>Completed Hevy workouts</h4><p>Recent dates from completed Hevy history · Not automatically matched to journals.</p>';
+ dates.slice(0,4).forEach(function(date){
+  var matched=(STATE.workoutTitles||[]).filter(function(w){return w&&w.date===date&&w.name;});
+  var label=matched.length===1?matched[0].name:matched.length>1?matched.length+' workouts on this date':'Session details unavailable';
+  out+='<div class="liq-review-row"><strong>'+liEsc(uiLongDate(date))+'</strong><p>'+liEsc(label)+'</p></div>';
+ });
+ return out+'</section>';
 }
 function liq147JournalNotes(){
- var a=LI.active,history=LI.history||[],out='<div class="liq-review"><h4>Journal & workout review</h4>';
- if(a)out+='<p class="liq-session-indicator">Journal in progress: '+liEsc(a.name)+'. Your sets remain in Hevy.</p>';
- else if(history.length){var j=history[0];out+='<p>Most recent journal: '+liEsc(j.name)+' · '+new Date(j.at).toLocaleDateString()+'</p><p>'+j.events.length+' observations saved. Review the corresponding workout in Hevy before applying coaching changes.</p>'}
- else out+='<p>No saved journal yet. Start one when training to record why an exercise was swapped, stopped, or changed.</p>';
- return out+'</div>'+liq147RecentHevy();
+ var a=LI.active,history=LI.history||[],out='<section class="liq-review"><h4>Journal review</h4>';
+ if(a)out+='<div class="liux-journal-summary"><strong>'+liEsc(a.name)+'</strong><span>In progress · Sets are logged in Hevy</span></div>';
+ else if(history.length){var j=history[0];out+='<div class="liux-journal-summary"><strong>'+liEsc(j.name)+'</strong><span>'+liEsc(new Date(j.at).toLocaleDateString())+' · '+j.events.length+' observation'+(j.events.length===1?'':'s')+'</span></div><p class="liux-subtle">Review the matching Hevy workout before using journal notes to adjust training.</p>'}
+ else out+='<p>No saved journal yet. Record substitutions or decisions during a workout.</p>';
+ return out+'</section>'+liq147RecentHevy();
 }
 var liq147RefreshJournal=liqJournalRefresh;
 liqJournalRefresh=function(){liq147RefreshJournal();var root=document.getElementById('liqJournalContents');if(root){var panel=document.createElement('div');panel.innerHTML=liq147JournalNotes();root.appendChild(panel)}};
