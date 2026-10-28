@@ -68,3 +68,14 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 - [ ] Test `demo-coach-v159.html` on mobile and actual branch preview (fictional content, no credential access).
 - [ ] Validate existing saved/unstructured Coach messages and Gemini response hierarchy, then pursue safe structured schema and full five-tab readability audit.
 - [ ] Merge after approval and independently verify Cloudflare production matching commit.
+
+
+### V15.9.1 mini UX preview
+- [x] Journal header safe-area code and aligned 44px Close button
+- [x] Reusable spacing/touch hierarchy baseline across five tabs
+- [x] Condense Journal review and completed Hevy history, preserve unknown details honestly
+- [x] Add Journal overlay checks to 320/375/390/960 Chromium QA
+- [ ] Confirm new CI results and fix any failures
+- [ ] Verify preview branch deployment SHA and iPhone Safari screenshots (safe area, light/dark, scroll, keyboard)
+- [ ] Review remaining five-tab density and adjust only demonstrable issues
+- [ ] Obtain user acceptance before merge or production deployment
