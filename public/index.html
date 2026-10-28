@@ -1104,6 +1104,33 @@ img.obs-monogram{object-fit:contain;background:transparent;letter-spacing:normal
 .li159-why-content{padding:0 0 13px;line-height:1.5}
 .li159-why-content p{margin-top:10px}
 @media(max-width:375px){.li159-why>summary{align-items:flex-start;flex-direction:column;gap:2px;padding:8px 0}}
+
+/* UX refinement preview: shared safe-area and type rhythm, mobile first. */
+:root{--liux-space-1:6px;--liux-space-2:12px;--liux-space-3:18px;--liux-space-4:24px;--liux-touch:44px}
+.liq-journal-overlay{padding:calc(env(safe-area-inset-top,0px) + 16px) 12px calc(env(safe-area-inset-bottom,0px) + 24px);overscroll-behavior:contain}
+.liq-journal-overlay.open{display:block}
+.liq-journal-content{max-width:660px;margin:0 auto;min-width:0}
+.liq-ux-header{position:relative;display:flex;align-items:center;gap:12px;justify-content:space-between;min-height:64px;padding:12px 14px;border-radius:14px;background:var(--bg2);border:1px solid var(--bd2);margin-bottom:14px}
+.liq-ux-header-title{display:flex;flex-direction:column;gap:3px;min-width:0}
+.liq-ux-header-title strong{font-size:17px;line-height:1.25;color:var(--tx)}
+.liq-ux-header-title span{font-size:12px;line-height:1.35;color:var(--t2)}
+.liq-ux-header #liqJournalClose{flex:none;min-width:64px;min-height:var(--liux-touch);color:var(--tx);background:var(--bg3);border:1px solid var(--bd2);font-weight:650}
+#liqJournalContents{display:grid;gap:var(--liux-space-2);min-width:0}
+#liqJournalContents .li-panel,#liqJournalContents .liq-review{margin:0;padding:16px;border:1px solid var(--bd2);border-radius:14px;background:var(--bg2)}
+#liqJournalContents h3,#liqJournalContents h4{font-size:16px;line-height:1.3;margin:0 0 8px}
+#liqJournalContents p{font-size:13px;line-height:1.55;color:var(--t2)}
+#liqJournalContents button{min-height:var(--liux-touch)}
+#liqJournalContents .liq-review-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd2)}
+#liqJournalContents .liq-review-row strong{font-size:13px;font-weight:700;flex:none}
+#liqJournalContents .liq-review-row p{font-size:12px;text-align:right}
+#liqJournalContents .liux-subtle{font-size:12px;color:var(--t2);margin-top:10px}
+#liqJournalContents .liux-journal-summary{font-size:13px;line-height:1.5}
+#liqJournalContents .liux-journal-summary strong{color:var(--tx);display:block;font-size:14px}
+#liqJournalContents .liux-journal-summary span{color:var(--t2)}
+#liqJournalContents details>summary{min-height:var(--liux-touch)}
+.today-panel h3,.v3-titlebar h3,.cc>.cl{line-height:1.3;letter-spacing:-.015em}
+.today-panel,.cc,.v3-hero{min-width:0;overflow-wrap:anywhere}
+@media(max-width:375px){.liq-journal-overlay{padding-left:10px;padding-right:10px}.liq-ux-header{padding:10px 12px}.liq-ux-header-title strong{font-size:16px}#liqJournalContents .liq-review-row{display:block}#liqJournalContents .liq-review-row p{text-align:left;margin:3px 0 0}}
 </style>
 </head>
 <body class="today-active">
@@ -1128,7 +1155,7 @@ img.obs-monogram{object-fit:contain;background:transparent;letter-spacing:normal
     <div class="v3-titlebar"><h3>Dated best sets</h3><span class="v3-muted">Tap chart points for details</span></div><div id="historyRows" class="history-rows"></div>
   </div>
 </div>
-<div class="li-search" id="liSearch" role="dialog" aria-label="Exercise search"><div class="li-searchbox"><h3>Exercise search</h3><button onclick="liCloseSearch()">Close</button><input id="liQuery" type="search" aria-label="Exercise name" placeholder="Reverse lunge…" oninput="liRenderSearch()"><div id="liResults"></div></div></div><div id="liqJournalOverlay" class="liq-journal-overlay" role="dialog" aria-modal="true" aria-label="Training journal"><div class="liq-journal-content"><div class="liq-journal-top"><strong>Workout journal &amp; training memory</strong><button id="liqJournalClose" onclick="liqJournalClose()">Close</button></div><div id="liqJournalContents"></div></div></div><!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
+<div class="li-search" id="liSearch" role="dialog" aria-label="Exercise search"><div class="li-searchbox"><h3>Exercise search</h3><button onclick="liCloseSearch()">Close</button><input id="liQuery" type="search" aria-label="Exercise name" placeholder="Reverse lunge…" oninput="liRenderSearch()"><div id="liResults"></div></div></div><div id="liqJournalOverlay" class="liq-journal-overlay" role="dialog" aria-modal="true" aria-label="Training journal"><div class="liq-journal-content"><div class="liq-journal-top liq-ux-header"><div class="liq-ux-header-title"><strong>Training journal</strong><span>Workout decisions &amp; training memory</span></div><button id="liqJournalClose" type="button" aria-label="Close training journal" onclick="liqJournalClose()">Close</button></div><div id="liqJournalContents"></div></div></div><!-- ═══ TODAY: your pre/post-workout companion. Logging stays in Hevy. ═══ -->
 <div id="gym" class="today-mode">
   <div class="today-intro"><span class="obs-eyebrow">YOUR TRAINING COMPANION</span><h2>Today, in focus.</h2><p>Prepare here. Log your workout in Hevy. Come back for a data-backed review.</p></div>
   <div class="coach-card" id="coachCard"></div>
