@@ -139,3 +139,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 ### V15.9.1 CI verification update
 - Source commit `e270d26ed7c8990ca3ee98a3b68b5874c7981ac5` GitHub Actions ALL SUCCESS: Coach/readability + Chromium responsive including Journal overlay `40704396525`; reconciliation JS + browser `40704396369`; Cloudflare smoke `40704396392`.
 - Responsive checks are Chromium simulated at 320/375/390/960, **not iPhone Safari**, Dynamic Island hardware or the hosted branch preview. No production merge.
+
+
+### V15.9.1 Journal refinement — 2026-10-28 (preview only)
+- On PR #10 branch, applied iOS safe-area top/bottom padding, a compact header and >=44px Close button using shared `--liux-*` spacing/touch tokens; refined Training Mode copy and primary action; recent Hevy dates use a collapsed disclosure. No API/storage schema/Hevy matching changes.
+- Existing finished journals, note editing and reconciliation remain in original workflow; summary data says session details unavailable where titles cannot be confidently identified rather than asserting zero performed sets.
+- Browser test `tests/coach-responsive-v159.browser.cjs` now asserts Journal overlay close-button geometry, horizontal overflow, collapsed recent sessions and close interaction at 320/375/390/960px. CI run initiated for commit `0d5bf5b`; results not confirmed yet. Real iPhone safe-area and Cloudflare branch preview commit verification remain pending.
+- Next: evaluate CI and fix any regressions; verify real iPhone preview and obtain release approval. Production untouched.
