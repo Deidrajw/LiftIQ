@@ -40,6 +40,18 @@ async function main(){
    assert.equal(await page.locator('#liqJournalContents .liq-review h4').filter({hasText:'Completed Hevy workouts'}).count(),1);
    await page.locator('#liqJournalClose').click();
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
+   await page.evaluate(()=>{LI.active=null;LI.history=[];LI157_SESSIONS=[];liqJournalOpen();});
+   const overlay=page.locator('#liqJournalOverlay');
+   assert.equal(await overlay.count(),1);
+   assert.equal(await overlay.locator('#liqJournalClose').count(),1);
+   const safe=await page.evaluate(()=>{const o=document.getElementById('liqJournalOverlay'),b=document.getElementById('liqJournalClose');const a=b.getBoundingClientRect(),top=o.getBoundingClientRect();return {top:a.top,width:a.width,overlayTop:top.top,innerWidth,scroll:o.scrollWidth,client:o.clientWidth}});
+   assert(safe.top>=14,'Journal close clipped at '+width+': '+JSON.stringify(safe));
+   assert(safe.width>=44,'Journal close touch target too narrow');
+   assert(safe.scroll<=safe.client+1,'Journal overlay overflow '+width);
+   assert.equal(await overlay.locator('.liux-hevy-list').count(),1);
+   assert.equal(await overlay.locator('.liux-hevy-list:not([open])').count(),1);
+   await overlay.locator('#liqJournalClose').click();
+   assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
