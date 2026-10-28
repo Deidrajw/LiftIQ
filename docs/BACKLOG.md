@@ -79,3 +79,9 @@ Read `docs/PROJECT_STATE.md` and source `public/index.html`, verify Netlify; the
 - [ ] Verify preview branch deployment SHA and iPhone Safari screenshots (safe area, light/dark, scroll, keyboard)
 - [ ] Review remaining five-tab density and adjust only demonstrable issues
 - [ ] Obtain user acceptance before merge or production deployment
+
+
+### V15.9.1 mini UX implementation (2026-10-28; preview only)
+- Existing draft PR #10: Journal overlay now applies iOS safe-area top/bottom padding, compact title/subtitle, aligned 44px+ Close button, consistent spacing tokens and journal section typography. Existing Training Mode actions and notes preserved; primary start-note action emphasized. Finished journals remain expandable. Journal review condensed and recent Hevy dates grouped in a collapsed disclosure; missing exercise evidence explicitly labeled unavailable, not zero completed exercises. No storage keys or real Hevy records changed.
+- Shared 44px control/spacing rhythm applied cautiously across Today, Progress, Goals, Plan, Coach; existing functionality/navigation retained. New browser assertions exercise the actual Journal overlay and Close geometry at 320/375/390/960px with fictional local state. This run is not yet verified; iOS Safari and actual Cloudflare branch preview still pending.
+- No merge or production deployment authorized. Next: confirm GitHub Actions, correct any failures, verify Cloudflare preview deployment SHA, obtain iPhone review and explicit merge approval.
