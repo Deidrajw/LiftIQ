@@ -124,3 +124,13 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - GitHub Actions passed: Coach V15.9 Readability QA run `40242025808` (includes fictional-data Chromium at 320, 375, 390, and 960px), reconciliation regression run `40242025810` (after fixing stale title-only assertion), Cloudflare migration smoke checks run `40242025814`.
 - These are headless Chromium simulated tests, NOT actual iPhone Safari or live Cloudflare preview verification. Cloudflare preview exact address / deployment SHA inaccessible in available tooling. Keep PR #10 draft; production `main` untouched.
 - Remaining sign-off: view Cloudflare Pages branch preview on real iPhone at 320/375/390 equivalents, review Coach collapsed evidence and recommendations, Today recommendation detail, Progress expanded priority history; verify authenticated Gemini/Hevy behavior only if intended, then obtain user approval before merge.
+
+
+### V15.9.1 Journal and five-tab mini-UX
+- Source parse: PASS (inline JS compiled after code edits)
+- Journal header safe-area and 44px Close: code implemented; Chromium CI checks added, currently QUEUED
+- 320/375/390/960 headless mobile QA: QUEUED
+- Journal reconciled data and storage: existing logic preserved; full signed-in regression NOT RUN
+- iOS Safari real device, VoiceOver, dynamic island and keyboard, light-mode: NOT RUN
+- Cloudflare live preview URL/commit: NOT VERIFIED
+- Production: NOT DEPLOYED
