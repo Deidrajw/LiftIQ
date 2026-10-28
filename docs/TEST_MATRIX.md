@@ -134,3 +134,8 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - iOS Safari real device, VoiceOver, dynamic island and keyboard, light-mode: NOT RUN
 - Cloudflare live preview URL/commit: NOT VERIFIED
 - Production: NOT DEPLOYED
+
+
+### V15.9.1 CI verification update
+- Source commit `e270d26ed7c8990ca3ee98a3b68b5874c7981ac5` GitHub Actions ALL SUCCESS: Coach/readability + Chromium responsive including Journal overlay `40704396525`; reconciliation JS + browser `40704396369`; Cloudflare smoke `40704396392`.
+- Responsive checks are Chromium simulated at 320/375/390/960, **not iPhone Safari**, Dynamic Island hardware or the hosted branch preview. No production merge.
