@@ -52,6 +52,19 @@ async function main(){
    assert.equal(await overlay.locator('.liux-hevy-list:not([open])').count(),1);
    await overlay.locator('#liqJournalClose').click();
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
+   // Real existing journal overlay, with fictional local data and no external calls.
+   await page.evaluate(()=>{LI.active=null;LI.history=[];if(typeof STATE!=='undefined')STATE.dailyLog={};liqJournalOpen();});
+   const close=page.locator('#liqJournalClose');
+   assert.equal(await close.isVisible(),true,'journal Close visible at '+width);
+   const geo=await close.boundingBox();
+   assert(geo&&geo.y>=0&&geo.x>=0&&geo.x+geo.width<=width+1,'journal Close clipped at '+width+': '+JSON.stringify(geo));
+   assert(geo.width>=44&&geo.height>=44,'journal Close touch target too small '+width);
+   assert.equal(await page.locator('#liqJournalOverlay .liux-ux-header').count(),0);
+   assert.equal(await page.locator('#liqJournalOverlay .liq-ux-header').count(),1);
+   assert.equal(await page.locator('#liqJournalContents .liux-primary-action').count(),1);
+   assert.equal(await page.evaluate(()=>{const x=document.getElementById('liqJournalOverlay');return x.scrollWidth<=x.clientWidth+1}),true,'journal horizontal overflow '+width);
+   await close.click();
+   assert.equal(await page.locator('#liqJournalOverlay.open').count(),0,'journal did not close');
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
