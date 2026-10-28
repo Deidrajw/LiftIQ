@@ -167,3 +167,10 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Existing finished journals, note editing and reconciliation remain in original workflow; summary data says session details unavailable where titles cannot be confidently identified rather than asserting zero performed sets.
 - Browser test `tests/coach-responsive-v159.browser.cjs` now asserts Journal overlay close-button geometry, horizontal overflow, collapsed recent sessions and close interaction at 320/375/390/960px. CI run initiated for commit `0d5bf5b`; results not confirmed yet. Real iPhone safe-area and Cloudflare branch preview commit verification remain pending.
 - Next: evaluate CI and fix any regressions; verify real iPhone preview and obtain release approval. Production untouched.
+
+
+### V15.9.1 Journal CI verification (2026-10-28)
+- Latest implementation/test commit: `99d27fcf2c80de80e9eb9c28b52aaa9f7222cb03` on development branch. `main` remains unchanged.
+- GitHub Actions PASSED: Coach V15.9 Readability QA run `40713230879` (responsive Chromium 320/375/390/960 incl. journal header/Close geometry, populated Hevy disclosure, overflow, and modal close), reconciliation regression run `40713228314`, and Cloudflare migration smoke checks run `40713228323`.
+- First new Chromium run failed due to empty fictional history test expecting a populated Hevy details element; corrected fixture to include a fictional completed training day; rerun passed. No production data used.
+- Pending: physical iOS Safari check for Dynamic Island/safe area, exact Cloudflare branch deployment URL/commit verification, visual review of light mode, and user approval prior to merge. The wider global five-screen hierarchy audit remains underway, not complete.
