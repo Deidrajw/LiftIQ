@@ -27,6 +27,19 @@ async function main(){
    const widths=await page.locator('#v159-browser-test').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));
    assert(widths.scroll<=widths.client+1,'Coach content overflows at '+width+': '+JSON.stringify(widths));
    assert.deepEqual(errors,[],'page errors at '+width);
+   await page.evaluate(()=>{
+    document.getElementById('liqJournalOverlay').classList.add('open');
+    liqJournalRefresh();
+   });
+   const journalHeader=await page.locator('.liq-journal-top').boundingBox();
+   const closeButton=await page.locator('#liqJournalClose').boundingBox();
+   assert(journalHeader&&closeButton,'journal header missing at '+width);
+   assert(closeButton.y>=journalHeader.y && closeButton.y+closeButton.height<=journalHeader.y+journalHeader.height+1,'Close clipped at '+width);
+   assert(closeButton.height>=44,'Close touch height below 44 at '+width);
+   assert(closeButton.x+closeButton.width<=width+1,'Close horizontally clipped at '+width);
+   assert.equal(await page.locator('#liqJournalContents .liq-review h4').filter({hasText:'Completed Hevy workouts'}).count(),1);
+   await page.locator('#liqJournalClose').click();
+   assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
