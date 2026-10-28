@@ -160,3 +160,10 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Applied shared typography/spacing/touch-size refinements across Today, Progress, Goals, Plan, Coach, preserving existing navigation, history, interactions, and storage.
 - Regression: added mobile Chromium checks to `tests/coach-responsive-v159.browser.cjs` for Journal Close visibility, ≥44px tap height, overlay closing and Hevy section. Frontend script syntax passed during edits. GitHub workflows queued at latest commit `e270d26ed7c8990ca3ee98a3b68b5874c7981ac5` when documented; confirm outcome before marking passed.
 - Cloudflare branch preview URL is not accessible via available verification tool. Real iPhone Safari, production, authenticated API, and screenshot acceptance NOT verified. No merge to `main` without user approval. Next exact step: inspect CI jobs, resolve failures, verify real Cloudflare preview on iPhone, then iterate UX review before production signoff.
+
+
+### V15.9.1 Journal refinement — 2026-10-28 (preview only)
+- On PR #10 branch, applied iOS safe-area top/bottom padding, a compact header and >=44px Close button using shared `--liux-*` spacing/touch tokens; refined Training Mode copy and primary action; recent Hevy dates use a collapsed disclosure. No API/storage schema/Hevy matching changes.
+- Existing finished journals, note editing and reconciliation remain in original workflow; summary data says session details unavailable where titles cannot be confidently identified rather than asserting zero performed sets.
+- Browser test `tests/coach-responsive-v159.browser.cjs` now asserts Journal overlay close-button geometry, horizontal overflow, collapsed recent sessions and close interaction at 320/375/390/960px. CI run initiated for commit `0d5bf5b`; results not confirmed yet. Real iPhone safe-area and Cloudflare branch preview commit verification remain pending.
+- Next: evaluate CI and fix any regressions; verify real iPhone preview and obtain release approval. Production untouched.
