@@ -111,6 +111,43 @@ async function main(){
     for(const [name,passed] of Object.entries(lifecycle))assert.equal(passed,true,'Journal lifecycle '+name+' failed');
     assert.deepEqual(errors,[],'Journal lifecycle page errors');
    }
+   if(width===390){
+    const matching=await page.evaluate(()=>{
+     const originalConfirm=window.confirm,originalAlert=window.alert;
+     let allow=false,writeOK=true,confirms=0,alerts=[];
+     window.confirm=()=>{confirms++;return allow};
+     window.alert=(msg)=>alerts.push(String(msg));
+     const realPersist=li157Persist;
+     try{
+      LI.active=null;
+      LI.history=[{id:'fictional-journal-1',name:'Lower body',at:'2026-10-24T16:00:00-04:00',events:[]},{id:'fictional-journal-2',name:'Lower body',at:'2026-10-24T17:00:00-04:00',events:[]}];
+      LI157_LINKS={};
+      LI157_SESSIONS=[
+       {id:'fake-hevy-a',name:'Lower body',date:'2026-10-24',startedAt:'2026-10-24T16:00:00-04:00',exercises:['Fictional RDL']},
+       {id:'fake-hevy-b',name:'Upper body',date:'2026-10-24',startedAt:'2026-10-24T18:00:00-04:00',exercises:['Fictional row']}
+      ];
+      const candidates=li157Candidates(LI.history[0]);
+      const ambiguous=candidates.length===2;
+      const declined=li157Confirm('fictional-journal-1','fake-hevy-a')===false&&!LI157_LINKS['fictional-journal-1'];
+      allow=true;
+      const linked=li157Confirm('fictional-journal-1','fake-hevy-a')===true&&LI157_LINKS['fictional-journal-1']?.workoutId==='fake-hevy-a';
+      const duplicateBlocked=li157Confirm('fictional-journal-2','fake-hevy-a')===false&&!LI157_LINKS['fictional-journal-2'];
+      const missingBlocked=li157Confirm('fictional-journal-2','fake-hevy-missing')===false;
+      const unlink=li157Unlink('fictional-journal-1')===true&&!LI157_LINKS['fictional-journal-1'];
+      li157Persist=()=>false;
+      const failedLinkRollback=li157Confirm('fictional-journal-1','fake-hevy-b')===false&&!LI157_LINKS['fictional-journal-1'];
+      li157Persist=realPersist;
+      li157Confirm('fictional-journal-1','fake-hevy-a');
+      li157Persist=()=>false;
+      const failedUnlinkRollback=li157Unlink('fictional-journal-1')===false&&LI157_LINKS['fictional-journal-1']?.workoutId==='fake-hevy-a';
+      li157Persist=realPersist;
+      li157Unlink('fictional-journal-1');
+      return {ambiguous,declined,linked,duplicateBlocked,missingBlocked,unlink,failedLinkRollback,failedUnlinkRollback,confirmationShown:confirms>=4};
+     }finally{li157Persist=realPersist;window.confirm=originalConfirm;window.alert=originalAlert;LI157_LINKS={};LI157_SESSIONS=[];LI.history=[];}
+    });
+    for(const [name,ok] of Object.entries(matching))assert.equal(ok,true,'Journal matching '+name+' failed');
+    assert.deepEqual(errors,[],'Journal matching page errors');
+   }
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
