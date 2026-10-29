@@ -181,3 +181,9 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - **CI status: NOT VERIFIED at commit time**; workflow launch and results require follow-up. Prior Journal lifecycle checks for commit `4121c2e4` all completed SUCCESS in Coach/readability, reconciliation and Cloudflare smoke workflows.
 - **Still NOT RUN:** physical iPhone Safari safe area and VoiceOver, actual signed-in Hevy sync or Gemini, Cloudflare preview deployment SHA, and direct visual acceptance at light/dark mobile widths.
 - Production merge prohibited until explicit user approval.
+
+
+### V15.9.1 Journal background scroll containment — 2026-10-29
+- Browser regression for explicit Journal-to-Hevy match/unmatch (`6d7bb23b`) verified: Coach/responsive QA `40818663270`, reconciliation `40818663223`, and Cloudflare smoke `40818663252` all SUCCESS; fictional tests only.
+- Frontend `0738c073`: opening Journal prevents background page scrolling, closing restores the prior inline body overflow value, without changing records or API paths. Test `d3601220` checks lock and restoration at 320/375/390/960px.
+- **Latest scroll-lock CI: NOT VERIFIED when documented.** Physical iOS Safari/keyboard, Cloudflare preview SHA and signed-in Hevy/Gemini remain unverified. Production not merged or deployed.
