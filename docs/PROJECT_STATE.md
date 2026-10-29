@@ -120,3 +120,63 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - Google Identity Services initializes `auto_select:true` and prompts once on startup; server still verifies Google ID tokens and the permitted account, sign-out disables auto-select, and no credentials are persisted in localStorage.
 - Verification: source assertions and full frontend inline JS syntax passed. **Unverified:** deployed Cloudflare matching commit; Cloudflare URL could not be accessed with available web tool. Netlify latest visible deployment remains `9b7bb0fe...` (ready, older than release), not matching GitHub main. Actual iPhone PWA restoration, sign-out and Hevy/Gemini regressions not performed.
 - Next exact action: confirm Cloudflare Pages deployment includes GitHub `510ba889`, test reopen after Home Screen close, test explicit logout remains logged out and check Hevy/Gemini authorization; investigate browser/GIS restrictions if prompt cannot silently restore.
+
+
+## Coach readability v15.9 preview (Oct 2026)
+- Branch `feature/coach-readable-v159-preview`; current response and saved conversation messages use display-only `li159CoachHTML` for recognized Takeaway / Evidence / Recommendation / Limits prose. Evidence and Limits are collapsed native details; fallback for unstructured old messages preserves escaped text. No Gemini payload, credentials, Hevy history or browser storage keys changed.
+- Separate `public/demo-coach-v159.html` is a standalone, mock-signed-in, fictional-data preview with no network/Google/Hevy/Gemini calls and no localStorage. Cloudflare branch preview availability needs confirmation.
+- Source checks 6/6 passed including inline JS syntax; not run actual iOS Safari/DOM screen or authenticated Gemini response. Proposed next: move toward structured Gemini response schema for reliably formatted per-exercise rows, then review Today/Progress/Goals/Plan hierarchy. No production merge without approval.
+
+
+### Preview workflow adopted (2026-10-25)
+- User confirmed Cloudflare Pages preview deployments exist and approved them as LiftIQ's default testing environment. `main` → production `https://liftiq.pages.dev`, feature branches → isolated previews. This decision is recorded in DECISION_LOG D-014.
+- V15.9 draft PR #10 remains open and unmerged on `feature/coach-readable-v159-preview`. Fictional-data demo path: `/demo-coach-v159.html` on the actual Cloudflare branch preview host. The exact preview URL and running deployment SHA have not been read from Cloudflare in this tool session.
+- Next: open Cloudflare deployment dashboard for this branch, confirm commit and preview URL, test mobile Coach typography and collapsed evidence there, then continue structured response schema work without production merge.
+
+
+### V15.9 structured readability continuation — 2026-10-25
+- Draft PR #10 updated on `feature/coach-readable-v159-preview`. Frontend displays explicit exercise bullets as separate compact rows in Coach Takeaway/Recommendation, not inferred from arbitrary weights. Evidence and Limits stay collapsed, past unstructured chat messages retain safe fallback, HTML is escaped; preserved storage keys and conversation content.
+- Both Cloudflare and Netlify Gemini prompt contracts now request concise Takeaway/Recommendation/Evidence/Limits and explicit grounded exercise bullet lines when applicable; existing JSON response envelope and Hevy/Gemini behavior unchanged.
+- Automated `tests/coach-readability-v159.test.cjs` with GitHub Actions `.github/workflows/coach-readability-v159.yml` added. CI queued at workflow run 40241513739; confirm result before claiming pass. Tests cover HTML escaping, historical messages, collapsed evidence, optional rows, no network in renderer and matching backend instructions.
+- No main merge/deployment. Cloudflare preview URL/SHA not independently verified; iPhone Safari and authenticated functional tests still pending. Next: confirm CI and real branch preview, inspect 320/375/390 layouts then request approval to publish.
+
+
+### V15.9 hierarchy pass — Today/Progress and responsive checks (2026-10-25)
+- Preview PR #10 updated: Today Next Workout reason shortened (no longer dumps full analysis first); separate native `<details>` “Why this workout?” preserves prior Hevy/schedule/cycle/journal evidence, initially collapsed. Progress uses a single “Priority lift progress” heading and “Show remaining priority lifts” disclosure, keeping existing exercise drilldowns.
+- Frontend JS compilation passed during source edit. Fictional-data Chromium test `tests/coach-responsive-v159.browser.cjs` added for 320, 375, 390, and 960px, scripted Coach rows, collapsed Evidence/Limits and Today details, horizontal overflow, demo and page errors; workflow updated to run it. GitHub run `40241886767` in progress when documentation recorded; confirm actual pass/fail before claiming responsive validation.
+- Cloudflare preview route `feature-coach-readable-v159-preview.liftiq.pages.dev` could not be accessed from web verification environment; actual Cloudflare deployment SHA, iPhone Safari and authenticated behavior remain unverified. No production merge. Next verify CI/browser output, obtain Cloudflare preview deployment SHA and inspect on real iPhone, then user approval before release.
+
+
+### V15.9 verified automated preview QA — 2026-10-25
+- Final preview code at branch (prior to this docs update) commit `b976ee3d7496d3d7e806b01f65ea75683d69a400`.
+- GitHub Actions passed: Coach V15.9 Readability QA run `40242025808` (includes fictional-data Chromium at 320, 375, 390, and 960px), reconciliation regression run `40242025810` (after fixing stale title-only assertion), Cloudflare migration smoke checks run `40242025814`.
+- These are headless Chromium simulated tests, NOT actual iPhone Safari or live Cloudflare preview verification. Cloudflare preview exact address / deployment SHA inaccessible in available tooling. Keep PR #10 draft; production `main` untouched.
+- Remaining sign-off: view Cloudflare Pages branch preview on real iPhone at 320/375/390 equivalents, review Coach collapsed evidence and recommendations, Today recommendation detail, Progress expanded priority history; verify authenticated Gemini/Hevy behavior only if intended, then obtain user approval before merge.
+
+
+## V15.9.1 mini UX pass (2026-10-28) — PREVIEW ONLY
+- On draft PR #10 branch `feature/coach-readable-v159-preview`, fixed journal overlay's iOS top safe-area padding and added compact header with properly sized Close action, plus shared spacing/touch-size tokens.
+- Refined Journal: concise Training Mode styles, recent journal summary, collapsed preserved finished journals, and shorter completed Hevy rows that prefer known workout titles; missing detail now says 'Session details unavailable', not misleading '0 recorded entries'. No automatic journal/Hevy matching.
+- Applied shared typography/spacing/touch-size refinements across Today, Progress, Goals, Plan, Coach, preserving existing navigation, history, interactions, and storage.
+- Regression: added mobile Chromium checks to `tests/coach-responsive-v159.browser.cjs` for Journal Close visibility, ≥44px tap height, overlay closing and Hevy section. Frontend script syntax passed during edits. GitHub workflows queued at latest commit `e270d26ed7c8990ca3ee98a3b68b5874c7981ac5` when documented; confirm outcome before marking passed.
+- Cloudflare branch preview URL is not accessible via available verification tool. Real iPhone Safari, production, authenticated API, and screenshot acceptance NOT verified. No merge to `main` without user approval. Next exact step: inspect CI jobs, resolve failures, verify real Cloudflare preview on iPhone, then iterate UX review before production signoff.
+
+
+### V15.9.1 Journal refinement — 2026-10-28 (preview only)
+- On PR #10 branch, applied iOS safe-area top/bottom padding, a compact header and >=44px Close button using shared `--liux-*` spacing/touch tokens; refined Training Mode copy and primary action; recent Hevy dates use a collapsed disclosure. No API/storage schema/Hevy matching changes.
+- Existing finished journals, note editing and reconciliation remain in original workflow; summary data says session details unavailable where titles cannot be confidently identified rather than asserting zero performed sets.
+- Browser test `tests/coach-responsive-v159.browser.cjs` now asserts Journal overlay close-button geometry, horizontal overflow, collapsed recent sessions and close interaction at 320/375/390/960px. CI run initiated for commit `0d5bf5b`; results not confirmed yet. Real iPhone safe-area and Cloudflare branch preview commit verification remain pending.
+- Next: evaluate CI and fix any regressions; verify real iPhone preview and obtain release approval. Production untouched.
+
+
+### V15.9.1 Journal CI verification (2026-10-28)
+- Latest implementation/test commit: `99d27fcf2c80de80e9eb9c28b52aaa9f7222cb03` on development branch. `main` remains unchanged.
+- GitHub Actions PASSED: Coach V15.9 Readability QA run `40713230879` (responsive Chromium 320/375/390/960 incl. journal header/Close geometry, populated Hevy disclosure, overflow, and modal close), reconciliation regression run `40713228314`, and Cloudflare migration smoke checks run `40713228323`.
+- First new Chromium run failed due to empty fictional history test expecting a populated Hevy details element; corrected fixture to include a fictional completed training day; rerun passed. No production data used.
+- Pending: physical iOS Safari check for Dynamic Island/safe area, exact Cloudflare branch deployment URL/commit verification, visual review of light mode, and user approval prior to merge. The wider global five-screen hierarchy audit remains underway, not complete.
+
+
+### V15.9.1 mini UX implementation (2026-10-28; preview only)
+- Existing draft PR #10: Journal overlay now applies iOS safe-area top/bottom padding, compact title/subtitle, aligned 44px+ Close button, consistent spacing tokens and journal section typography. Existing Training Mode actions and notes preserved; primary start-note action emphasized. Finished journals remain expandable. Journal review condensed and recent Hevy dates grouped in a collapsed disclosure; missing exercise evidence explicitly labeled unavailable, not zero completed exercises. No storage keys or real Hevy records changed.
+- Shared 44px control/spacing rhythm applied cautiously across Today, Progress, Goals, Plan, Coach; existing functionality/navigation retained. New browser assertions exercise the actual Journal overlay and Close geometry at 320/375/390/960px with fictional local state. This run is not yet verified; iOS Safari and actual Cloudflare branch preview still pending.
+- No merge or production deployment authorized. Next: confirm GitHub Actions, correct any failures, verify Cloudflare preview deployment SHA, obtain iPhone review and explicit merge approval.

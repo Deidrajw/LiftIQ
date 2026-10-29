@@ -62,3 +62,27 @@ Date, commit/PR, affected files, what changed, reason/decision, user-facing outc
 - Added four Cloudflare Pages Functions and shared Google identity verifier ported from Netlify with environment bindings; client API calls moved from `/.netlify/functions/` to `/api/`.
 - Existing Netlify functions remain unchanged on `main` and in branch; no storage keys or user data intentionally modified.
 - No production merge, Cloudflare runtime or authenticated functional verification yet. Local browser data portability must be resolved before switch.
+
+
+### V15.9 Preview continuation (not published)
+- Coach response display handles explicit newline exercise bullets as compact, escaped rows. Does not infer or invent loads from free-form text.
+- Gemini system prompts on both Netlify and Cloudflare ask for concise labeled sections and exercise bullets, without altering the existing JSON contract or auto-approving any changes.
+- Added repeatable Node regression suite + CI. No migrations or storage-key modifications. Browser and authenticated QA pending.
+
+
+### V15.9 hierarchy pass — Today/Progress and responsive checks (2026-10-25)
+- Preview PR #10 updated: Today Next Workout reason shortened (no longer dumps full analysis first); separate native `<details>` “Why this workout?” preserves prior Hevy/schedule/cycle/journal evidence, initially collapsed. Progress uses a single “Priority lift progress” heading and “Show remaining priority lifts” disclosure, keeping existing exercise drilldowns.
+- Frontend JS compilation passed during source edit. Fictional-data Chromium test `tests/coach-responsive-v159.browser.cjs` added for 320, 375, 390, and 960px, scripted Coach rows, collapsed Evidence/Limits and Today details, horizontal overflow, demo and page errors; workflow updated to run it. GitHub run `40241886767` in progress when documentation recorded; confirm actual pass/fail before claiming responsive validation.
+- Cloudflare preview route `feature-coach-readable-v159-preview.liftiq.pages.dev` could not be accessed from web verification environment; actual Cloudflare deployment SHA, iPhone Safari and authenticated behavior remain unverified. No production merge. Next verify CI/browser output, obtain Cloudflare preview deployment SHA and inspect on real iPhone, then user approval before release.
+
+
+### V15.9.1 mini UX — draft only, 2026-10-28
+- Journal safe-area Close/header fix, compact session review, honest completed-Hevy data labels, spacing and touch-target rules for five destinations.
+- No storage migrations, history mutation, API endpoint changes or publishing. Preview QA pending.
+
+
+### V15.9.1 Journal refinement — 2026-10-28 (preview only)
+- On PR #10 branch, applied iOS safe-area top/bottom padding, a compact header and >=44px Close button using shared `--liux-*` spacing/touch tokens; refined Training Mode copy and primary action; recent Hevy dates use a collapsed disclosure. No API/storage schema/Hevy matching changes.
+- Existing finished journals, note editing and reconciliation remain in original workflow; summary data says session details unavailable where titles cannot be confidently identified rather than asserting zero performed sets.
+- Browser test `tests/coach-responsive-v159.browser.cjs` now asserts Journal overlay close-button geometry, horizontal overflow, collapsed recent sessions and close interaction at 320/375/390/960px. CI run initiated for commit `0d5bf5b`; results not confirmed yet. Real iPhone safe-area and Cloudflare branch preview commit verification remain pending.
+- Next: evaluate CI and fix any regressions; verify real iPhone preview and obtain release approval. Production untouched.
