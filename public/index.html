@@ -4694,6 +4694,8 @@ document.addEventListener('keydown',function(e){
  if(!overlay?.classList.contains('open')||e.key!=='Tab')return;
  var xs=[...overlay.querySelectorAll('button,input,textarea,select,summary,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled&&x.getClientRects().length);
  if(!xs.length)return;
+ // Keep keyboard navigation in the active dialog even if focus escapes during a re-render.
+ if(!overlay.contains(document.activeElement)){e.preventDefault();(e.shiftKey?xs[xs.length-1]:xs[0]).focus();return}
  if(e.shiftKey&&document.activeElement===xs[0]){e.preventDefault();xs[xs.length-1].focus()}
  else if(!e.shiftKey&&document.activeElement===xs[xs.length-1]){e.preventDefault();xs[0].focus()}
 });
