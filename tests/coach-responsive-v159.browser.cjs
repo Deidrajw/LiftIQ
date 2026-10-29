@@ -67,7 +67,7 @@ async function main(){
    await close.focus();
    await page.keyboard.press('Shift+Tab');
    assert.equal(await page.evaluate(()=>document.getElementById('liqJournalOverlay').contains(document.activeElement)),true,'focus escaped dialog at '+width);
-   await page.evaluate(()=>document.body.focus());
+   await page.evaluate(()=>{const outside=document.createElement('button');outside.id='outside-focus-test';outside.textContent='Outside';document.body.append(outside);outside.focus();});
    await page.keyboard.press('Tab');
    assert.equal(await page.evaluate(()=>document.getElementById('liqJournalOverlay').contains(document.activeElement)),true,'escaped focus was not recovered at '+width);
    await close.focus();
