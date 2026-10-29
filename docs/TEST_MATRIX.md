@@ -159,3 +159,11 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - Existing draft PR #10: Journal overlay now applies iOS safe-area top/bottom padding, compact title/subtitle, aligned 44px+ Close button, consistent spacing tokens and journal section typography. Existing Training Mode actions and notes preserved; primary start-note action emphasized. Finished journals remain expandable. Journal review condensed and recent Hevy dates grouped in a collapsed disclosure; missing exercise evidence explicitly labeled unavailable, not zero completed exercises. No storage keys or real Hevy records changed.
 - Shared 44px control/spacing rhythm applied cautiously across Today, Progress, Goals, Plan, Coach; existing functionality/navigation retained. New browser assertions exercise the actual Journal overlay and Close geometry at 320/375/390/960px with fictional local state. This run is not yet verified; iOS Safari and actual Cloudflare branch preview still pending.
 - No merge or production deployment authorized. Next: confirm GitHub Actions, correct any failures, verify Cloudflare preview deployment SHA, obtain iPhone review and explicit merge approval.
+
+
+### V15.9.1 Journal keyboard focus hardening — 2026-10-29 (development only)
+- Frontend commit `1a96919b`: when Tab/Shift+Tab starts with focus outside the open Journal dialog, return focus to first/last visible dialog control. Existing focus restoration and Escape handler retained. No journal or Hevy data changes.
+- Browser test commit `fee35352`: adds simulated checks at 320/375/390/960px for Shift+Tab containment, forced outside-focus recovery, Escape close, and restoration to original opener.
+- **New test run: NOT VERIFIED** as of this entry (workflow runs were not yet visible for latest head). Prior checks at `9dc2597a`: three GitHub workflows SUCCESS, but do not qualify new changes.
+- **NOT RUN:** physical iPhone Safari (Dynamic Island/keyboard/VoiceOver), signed-in data edit/delete and match/unmatch, Cloudflare preview SHA validation, light/dark manual acceptance.
+- No merge, production deployment, or storage migrations authorized.
