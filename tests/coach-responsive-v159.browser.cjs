@@ -85,6 +85,7 @@ async function main(){
      try{
       LI.active=null;LI.history=[];LI157_LINKS={};LI157_SESSIONS=[];
       const hevyBefore=JSON.stringify(STATE.dailyLog||{});
+      liqJournalOpen();
       liStart();
       const journalId=LI.active.id;
       document.getElementById('liType').value='swap';
