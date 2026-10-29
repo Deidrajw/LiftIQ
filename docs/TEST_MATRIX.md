@@ -174,3 +174,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - **New workflow: NOT VERIFIED yet** at documentation time. The previous three workflow runs associated with `fee35352` were SUCCESS.
 - **Still NOT RUN:** user-confirmed journal-to-Hevy match/unmatch browser lifecycle, storage write failure scenarios, real iPhone Safari, Cloudflare preview SHA, signed-in APIs, light/dark manual visual QA.
 - No main merge or production publication.
+
+
+### V15.9.1 fictional Hevy match/unmatch regression — 2026-10-29
+- Commit `6d7bb23b` adds actual app browser assertions at 390px for multiple same-day candidate workouts, declined confirmation, user-confirmed link/unlink, duplicate workout claim rejection, unknown workout ID rejection, and simulated link/unlink persistence-failure rollback. All fixtures are fictional and isolated. No Hevy API calls, production browser data, or altered match logic.
+- **CI status: NOT VERIFIED at commit time**; workflow launch and results require follow-up. Prior Journal lifecycle checks for commit `4121c2e4` all completed SUCCESS in Coach/readability, reconciliation and Cloudflare smoke workflows.
+- **Still NOT RUN:** physical iPhone Safari safe area and VoiceOver, actual signed-in Hevy sync or Gemini, Cloudflare preview deployment SHA, and direct visual acceptance at light/dark mobile widths.
+- Production merge prohibited until explicit user approval.
