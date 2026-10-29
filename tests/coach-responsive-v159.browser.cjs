@@ -63,8 +63,20 @@ async function main(){
    assert.equal(await page.locator('#liqJournalOverlay .liq-ux-header').count(),1);
    assert.equal(await page.locator('#liqJournalContents .liux-primary-action').count(),1);
    assert.equal(await page.evaluate(()=>{const x=document.getElementById('liqJournalOverlay');return x.scrollWidth<=x.clientWidth+1}),true,'journal horizontal overflow '+width);
-   await close.click();
+   // Keyboard focus remains contained and returns to the opening control.
+   await close.focus();
+   await page.keyboard.press('Shift+Tab');
+   assert.equal(await page.evaluate(()=>document.getElementById('liqJournalOverlay').contains(document.activeElement)),true,'focus escaped dialog at '+width);
+   await page.evaluate(()=>document.body.focus());
+   await page.keyboard.press('Tab');
+   assert.equal(await page.evaluate(()=>document.getElementById('liqJournalOverlay').contains(document.activeElement)),true,'escaped focus was not recovered at '+width);
+   await close.focus();
+   await page.keyboard.press('Escape');
+   assert.equal(await page.locator('#liqJournalOverlay.open').count(),0,'Escape did not close journal');
+   await page.evaluate(()=>{const opener=document.createElement('button');opener.id='journal-qa-opener';opener.textContent='Open journal test';document.body.append(opener);opener.focus();liqJournalOpen();});
+   await page.locator('#liqJournalClose').click();
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0,'journal did not close');
+   assert.equal(await page.evaluate(()=>document.activeElement?.id), 'journal-qa-opener','journal focus not restored at '+width);
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
