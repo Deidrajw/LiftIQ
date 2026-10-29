@@ -42,6 +42,7 @@ async function main(){
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
    await page.evaluate(()=>{LI.active=null;LI.history=[];LI157_SESSIONS=[];STATE.dailyLog={'2026-10-24':{sets:3,ex:{}}};liqJournalOpen();});
    const overlay=page.locator('#liqJournalOverlay');
+   assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden','background scroll unlocked at '+width);
    assert.equal(await overlay.count(),1);
    assert.equal(await overlay.locator('#liqJournalClose').count(),1);
    const safe=await page.evaluate(()=>{const o=document.getElementById('liqJournalOverlay'),b=document.getElementById('liqJournalClose');const a=b.getBoundingClientRect(),top=o.getBoundingClientRect();return {top:a.top,width:a.width,overlayTop:top.top,innerWidth,scroll:o.scrollWidth,client:o.clientWidth}});
@@ -51,6 +52,7 @@ async function main(){
    assert.equal(await overlay.locator('.liux-hevy-list').count(),1);
    assert.equal(await overlay.locator('.liux-hevy-list:not([open])').count(),1);
    await overlay.locator('#liqJournalClose').click();
+   assert.equal(await page.evaluate(()=>document.body.style.overflow),'','background scroll not restored at '+width);
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0);
    // Real existing journal overlay, with fictional local data and no external calls.
    await page.evaluate(()=>{LI.active=null;LI.history=[];if(typeof STATE!=='undefined')STATE.dailyLog={};liqJournalOpen();});
