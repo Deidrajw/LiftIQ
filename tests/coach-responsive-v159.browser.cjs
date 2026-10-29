@@ -77,6 +77,39 @@ async function main(){
    await page.locator('#liqJournalClose').click();
    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0,'journal did not close');
    assert.equal(await page.evaluate(()=>document.activeElement?.id), 'journal-qa-opener','journal focus not restored at '+width);
+   if(width===390){
+    // Exercise actual Journal data handlers with fictional records on an isolated origin.
+    const lifecycle=await page.evaluate(()=>{
+     const oldConfirm=window.confirm,oldPrompt=window.prompt;
+     window.confirm=()=>true;window.prompt=()=> 'Edited fictional substitution';
+     try{
+      LI.active=null;LI.history=[];LI157_LINKS={};LI157_SESSIONS=[];
+      const hevyBefore=JSON.stringify(STATE.dailyLog||{});
+      liStart();
+      const journalId=LI.active.id;
+      document.getElementById('liType').value='swap';
+      document.getElementById('liEx').value='Fictional RDL';
+      document.getElementById('liNote').value='Fictional equipment substitution';
+      liAdd();
+      const added=LI.active.events.length===1&&LI.active.events[0].note==='Fictional equipment substitution';
+      const eventId=LI.active.events[0]?.id;
+      liEdit(eventId);
+      const edited=LI.active.events[0].note==='Edited fictional substitution';
+      liDelete(eventId);
+      const deleted=LI.active.events.length===0;
+      liFinish();
+      const finished=LI.active===null&&LI.history[0]?.id===journalId;
+      const notHevy=hevyBefore===JSON.stringify(STATE.dailyLog||{});
+      const notLinked=LI157_LINKS[journalId]===undefined;
+      const persisted=JSON.parse(localStorage.getItem(LI_KEY)||'{}').history?.[0]?.id===journalId;
+      liDeleteSession(journalId);
+      const removed=!LI.history.some(j=>j.id===journalId);
+      return {added,edited,deleted,finished,notHevy,notLinked,persisted,removed};
+     }finally{window.confirm=oldConfirm;window.prompt=oldPrompt}
+    });
+    for(const [name,passed] of Object.entries(lifecycle))assert.equal(passed,true,'Journal lifecycle '+name+' failed');
+    assert.deepEqual(errors,[],'Journal lifecycle page errors');
+   }
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
