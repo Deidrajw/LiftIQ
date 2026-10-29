@@ -4599,8 +4599,16 @@ askAI=async function(mode){var q=document.getElementById('aiQuestion')?.value.tr
 };
 var liqOldCoachRequest=coachRequestBody;
 coachRequestBody=function(mode,question,maxLength){var base=JSON.parse(liqOldCoachRequest(mode,question,maxLength));base.conversationContext=mode==='question'?liqChatContext():[];return JSON.stringify(base)};
-function liqJournalOpen(){document.getElementById('liqJournalOverlay').classList.add('open');liqJournalRefresh();document.getElementById('liqJournalClose').focus()}
-function liqJournalClose(){document.getElementById('liqJournalOverlay').classList.remove('open')}
+var liqJournalPreviousOverflow=null;
+function liqJournalOpen(){
+ var overlay=document.getElementById('liqJournalOverlay');
+ if(!overlay.classList.contains('open')){liqJournalPreviousOverflow=document.body.style.overflow;document.body.style.overflow='hidden'}
+ overlay.classList.add('open');liqJournalRefresh();document.getElementById('liqJournalClose').focus();
+}
+function liqJournalClose(){
+ document.getElementById('liqJournalOverlay').classList.remove('open');
+ if(liqJournalPreviousOverflow!==null){document.body.style.overflow=liqJournalPreviousOverflow;liqJournalPreviousOverflow=null}
+}
 function liqJournalRefresh(){var host=document.getElementById('liqJournalContents');if(host)host.innerHTML=li143OriginalJournalHTML()+li143RenderAdvice()}
 var liqOldJournalHTML=liJournalHTML;
 liJournalHTML=function(){return '<div class="liq-mini-status"><div><strong>'+(LI.active?'Training journal active':'Training journal')+'</strong><p class="today-muted">'+(LI.active?'Capture an observation or finish your journal.':'Record decisions and changes without duplicating Hevy sets.')+'</p></div><button onclick="liqJournalOpen()">'+(LI.active?'Open journal':'Journal')+'</button></div>'};
