@@ -167,3 +167,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - **New test run: NOT VERIFIED** as of this entry (workflow runs were not yet visible for latest head). Prior checks at `9dc2597a`: three GitHub workflows SUCCESS, but do not qualify new changes.
 - **NOT RUN:** physical iPhone Safari (Dynamic Island/keyboard/VoiceOver), signed-in data edit/delete and match/unmatch, Cloudflare preview SHA validation, light/dark manual acceptance.
 - No merge, production deployment, or storage migrations authorized.
+
+
+### V15.9.1 fictional Journal lifecycle regression — 2026-10-29
+- Test source commit `4121c2e4` extends `tests/coach-responsive-v159.browser.cjs` at 390px with the actual Journal functions: start, add note, edit note, delete note, finish journal, verify local persistence, and delete finished journal. Assertions confirm that Hevy dailyLog remains unchanged and no journal-to-Hevy match is created automatically. Fictional isolated browser data and confirm/prompt mocks only; no Gemini or Hevy calls.
+- **New workflow: NOT VERIFIED yet** at documentation time. The previous three workflow runs associated with `fee35352` were SUCCESS.
+- **Still NOT RUN:** user-confirmed journal-to-Hevy match/unmatch browser lifecycle, storage write failure scenarios, real iPhone Safari, Cloudflare preview SHA, signed-in APIs, light/dark manual visual QA.
+- No main merge or production publication.
