@@ -187,3 +187,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - Browser regression for explicit Journal-to-Hevy match/unmatch (`6d7bb23b`) verified: Coach/responsive QA `40818663270`, reconciliation `40818663223`, and Cloudflare smoke `40818663252` all SUCCESS; fictional tests only.
 - Frontend `0738c073`: opening Journal prevents background page scrolling, closing restores the prior inline body overflow value, without changing records or API paths. Test `d3601220` checks lock and restoration at 320/375/390/960px.
 - **Latest scroll-lock CI: NOT VERIFIED when documented.** Physical iOS Safari/keyboard, Cloudflare preview SHA and signed-in Hevy/Gemini remain unverified. Production not merged or deployed.
+
+
+### V15.9.1 light/dark Journal coverage — 2026-11-04 (development only)
+- Verified previous scroll containment test commit `d3601220`: GitHub Actions Coach/responsive `40820388234`, reconciliation `40820388224`, and Cloudflare smoke `40820388226` all SUCCESS. These were simulated runs; not physical Safari.
+- New test commit `6caec7bb` extends `tests/coach-responsive-v159.browser.cjs` at 320/375/390/960px to open Journal in dark and light themes, confirm theme-dependent header background, visible text/background separation, 44px Close, no horizontal overflow, and restoration of a previously nonempty body overflow style. This does not change user settings, app data or backend.
+- **New CI: NOT YET VERIFIED.** These checks are not a complete contrast audit, screenshot review or iPhone Safari validation.
+- Outstanding: physical iPhone safe area and keyboard, Cloudflare branch preview SHA parity, authenticated Hevy/Gemini, visual five-screen acceptance, preview/demo ZIP and explicit merge authorization.
