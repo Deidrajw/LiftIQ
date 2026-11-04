@@ -194,3 +194,9 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - New test commit `6caec7bb` extends `tests/coach-responsive-v159.browser.cjs` at 320/375/390/960px to open Journal in dark and light themes, confirm theme-dependent header background, visible text/background separation, 44px Close, no horizontal overflow, and restoration of a previously nonempty body overflow style. This does not change user settings, app data or backend.
 - **New CI: NOT YET VERIFIED.** These checks are not a complete contrast audit, screenshot review or iPhone Safari validation.
 - Outstanding: physical iPhone safe area and keyboard, Cloudflare branch preview SHA parity, authenticated Hevy/Gemini, visual five-screen acceptance, preview/demo ZIP and explicit merge authorization.
+
+
+### V15.9.1 theme QA failure diagnosed and isolated — 2026-11-04
+- `6caec7bb` Coach/readability run `41808175517` FAILED at 390px: dark-theme test began with a Journal overlay already open, because the preceding simulated note-lifecycle scenario did not close it. As a result scroll-lock and restoration assumptions were invalid. This was a **test isolation problem**, not confirmed product UI failure. Reconciliation `41808176152` and Cloudflare smoke `41808175543` PASSED.
+- Test-only fix `5f3c3613` closes the Journal after the lifecycle scenario and asserts modal/scroll cleanup before starting subsequent matching and theme cases. No app, backend, storage or production change.
+- **New test CI pending**. Light/dark assertions at 320/375/390/960 and physical iPhone/Cloudflare preview parity remain unverified until executed.
