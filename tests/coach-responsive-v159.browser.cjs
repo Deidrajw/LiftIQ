@@ -150,6 +150,42 @@ async function main(){
     for(const [name,ok] of Object.entries(matching))assert.equal(ok,true,'Journal matching '+name+' failed');
     assert.deepEqual(errors,[],'Journal matching page errors');
    }
+   // Validate Journal against both existing app themes without changing saved settings.
+   for(const theme of ['dark','light']){
+    const appearance=await page.evaluate((theme)=>{
+     const prior=document.body.getAttribute('data-theme');
+     if(theme==='light')document.body.setAttribute('data-theme','light');
+     else document.body.removeAttribute('data-theme');
+     const before=document.body.style.overflow;
+     document.body.style.overflow='auto'; // nonempty pre-existing inline value
+     liqJournalOpen();
+     const overlay=document.getElementById('liqJournalOverlay');
+     const header=overlay.querySelector('.liq-ux-header');
+     const btn=overlay.querySelector('#liqJournalClose');
+     const panel=overlay.querySelector('.li-panel');
+     const css=getComputedStyle(header);
+     const result={
+      visible:getComputedStyle(overlay).display!=='none',
+      lock:document.body.style.overflow==='hidden',
+      headerBackground:css.backgroundColor,
+      headerText:getComputedStyle(header.querySelector('strong')).color,
+      panelBackground:panel?getComputedStyle(panel).backgroundColor:null,
+      width:overlay.scrollWidth<=overlay.clientWidth+1,
+      touch:btn.getBoundingClientRect().height>=44
+     };
+     liqJournalClose();
+     result.restored=document.body.style.overflow==='auto';
+     document.body.style.overflow=before;
+     if(prior===null)document.body.removeAttribute('data-theme');
+     else document.body.setAttribute('data-theme',prior);
+     return result;
+    },theme);
+    assert(appearance.visible&&appearance.lock&&appearance.restored&&appearance.width&&appearance.touch,'Journal theme geometry/scroll failed '+theme+' '+width+': '+JSON.stringify(appearance));
+    assert.notEqual(appearance.headerBackground,'rgba(0, 0, 0, 0)','transparent header '+theme);
+    assert.notEqual(appearance.headerBackground,appearance.headerText,'unreadable header '+theme);
+    if(theme==='dark')page.__darkJournalAppearance=appearance;
+    else assert.notEqual(appearance.headerBackground,page.__darkJournalAppearance.headerBackground,'Journal header ignores light theme');
+   }
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
