@@ -111,6 +111,10 @@ async function main(){
      }finally{window.confirm=oldConfirm;window.prompt=oldPrompt}
     });
     for(const [name,passed] of Object.entries(lifecycle))assert.equal(passed,true,'Journal lifecycle '+name+' failed');
+    // Lifecycle operations intentionally leave the modal open; isolate following tests.
+    await page.evaluate(()=>liqJournalClose());
+    assert.equal(await page.locator('#liqJournalOverlay.open').count(),0,'Journal lifecycle cleanup left overlay open');
+    assert.equal(await page.evaluate(()=>document.body.style.overflow),'','Journal lifecycle cleanup left page scroll locked');
     assert.deepEqual(errors,[],'Journal lifecycle page errors');
    }
    if(width===390){
