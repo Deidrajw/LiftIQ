@@ -189,3 +189,11 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - As last checked, new test CI: Cloudflare smoke `41808175543` SUCCESS; Coach/readability `41808175517` and reconciliation `41808176152` IN PROGRESS. Do not mark overall suite passed until completed.
 - Cloudflare branch preview `feature-coach-readable-v159-preview.liftiq.pages.dev` and production site could not be fetched from web verification; do not claim deployment SHA parity.
 - NEXT EXACT ACTION: inspect CI for `6caec7bb`, resolve failures, then execute light/dark Journal and five-primary-screen visual audit with physical iPhone/real Safari or verified Cloudflare preview. Prepare isolated fictional demo and release checklist before asking for user approval. Never merge/deploy without approval.
+
+
+## Continuity checkpoint — 2026-11-04 · responsive-theme test isolation correction
+- Verified previous source baseline on PR #10 branch; no main merge. `6caec7bb` Coach responsive workflow `41808175517` FAILED at 390px because preceding fictional Journal lifecycle left the modal open and the newly added theme test incorrectly expected a fresh scroll-lock transition. Reconciliation `41808176152` and Cloudflare smoke `41808175543` SUCCESS.
+- Test-only fix `5f3c3613` explicitly closes the modal after the lifecycle scenario and asserts clean overlay and unlocked body before the next scenario. No app source/API/storage changes. QA entry in `docs/TEST_MATRIX.md`.
+- GitHub workflow checks for documentation head `a0fabd13`: Cloudflare smoke `41813413277` SUCCESS, Coach/readability `41813413200` and reconciliation `41813413322` in progress at last check.
+- Exact Cloudflare branch preview and physical Safari layout remain unverified. Do not merge PR #10 or publish production without explicit approval.
+- NEXT: verify corrected CI; if passed, prioritize cross-screen visual and keyboard/contrast audit, physical iOS safe-area validation, and isolated fictional-data release preview.
