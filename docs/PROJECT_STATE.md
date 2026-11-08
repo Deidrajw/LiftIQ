@@ -197,3 +197,11 @@ Record the **last verified application and docs commits**, Netlify deployed SHA/
 - GitHub workflow checks for documentation head `a0fabd13`: Cloudflare smoke `41813413277` SUCCESS, Coach/readability `41813413200` and reconciliation `41813413322` in progress at last check.
 - Exact Cloudflare branch preview and physical Safari layout remain unverified. Do not merge PR #10 or publish production without explicit approval.
 - NEXT: verify corrected CI; if passed, prioritize cross-screen visual and keyboard/contrast audit, physical iOS safe-area validation, and isolated fictional-data release preview.
+
+
+## Continuity checkpoint — 2026-11-08 · V15.9.1 five-screen UX smoke
+- Branch `feature/coach-readable-v159-preview`, draft PR #10, no merge or production deployment authorized. Last verified baseline before November 8 changes: `947e3b25`; previous Journal responsive and reconciliation suite all passed.
+- Added `tests/coach-responsive-v159.browser.cjs` real-navigation checks at 320/375/390/960px for Today, Progress, Goals, Plan and Coach; validate active `aria-current`, visible pane, page/pane overflow and JS errors. Commit `5db7c272` (test only).
+- GitHub CI initially blocked by runner upgrade to Ubuntu 26.04: Playwright 1.56.1 refused Chromium installation on `ubuntu-latest`; `42458100875` Coach browser and `42458100952` reconciliation browser marked failure before tests, while JS regression and Cloudflare smoke passed. Do not mislabel as product regression.
+- Pinned both browser-test workflow runners to `ubuntu-24.04` (`976f290b`, `d2efe444`). Latest QA documentation commit `7c74e14f`; fresh CI queued/in progress, no all-green verification yet.
+- NEXT: read latest workflow runs, fix actual navigation/layout failures if surfaced. Then inspect five-screen hierarchy with fictional data, produce isolated HTML preview and package, verify Cloudflare preview SHA and iPhone Safari, obtain explicit approval for any main merge. Never touch production without approval.
