@@ -207,3 +207,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - Test commit `5db7c272` adds real front-end navigation at 320/375/390/960px through Today, Progress, Goals, Plan, Coach. Assert exactly five primary nav controls, unique `aria-current=page`, visible corresponding screen, no pane/document horizontal overflow, no JS page errors. Uses isolated browser origin and no authenticated APIs.
 - **New five-screen CI NOT VERIFIED at documentation time.** These are automated navigation/geometry checks, not complete qualitative visual hierarchy, real iOS, colour contrast or VoiceOver acceptance.
 - Preview branch deployed SHA, real Google/Hevy/Gemini validation, and final release ZIP remain outstanding. No production merge.
+
+
+### V15.9.1 five-screen QA / CI runner compatibility — 2026-11-08
+- Latest November 4 corrected Journal suite verified on `a0fabd13`: Coach/browser `41813413200`, reconciliation `41813413322`, Cloudflare smoke `41813413277` all SUCCESS.
+- New test commit `5db7c272` extends actual app Chromium navigation checks at 320/375/390/960px across Today, Progress, Goals, Plan, Coach (active aria-current, visible pane, overflow, JS errors). Initial CI jobs `42458100875` (Coach) and `42458100952` (reconciliation) FAILED **before browser execution**, because Playwright 1.56.1 Chromium dependencies do not support GitHub's current `ubuntu-latest` Ubuntu 26.04 runner. JS reconciliation job passed; Cloudflare smoke `42458100925` passed. This is an infrastructure block, not a demonstrated app failure.
+- CI-only fixes `976f290b` and `d2efe444` pin `.github/workflows/coach-readability-v159.yml` and `.github/workflows/reconciliation-regression.yml` to `ubuntu-24.04`. No runtime app, user-data, or API changes.
+- **Pinned-run CI result: NOT VERIFIED at documentation time**. Further blocked: actual Cloudflare preview SHA, real iPhone Safari and accessibility, five-screen visual acceptance, release deliverables. Production merge not approved.
