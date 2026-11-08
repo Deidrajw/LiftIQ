@@ -32,7 +32,7 @@ async function main(){
   page.on('pageerror',e=>errors.push(String(e.message)));
   page.on('dialog',async d=>d.accept());
   await page.goto('http://127.0.0.1:'+port+'/',{waitUntil:'domcontentloaded',timeout:20000});
-  assert.match(await page.title(),/V15\.7\.1 QA preview/);
+  assert.match(await page.title(),/^LiftIQ · V15\./);
   await page.evaluate(()=>{
    const journal=(id,name,at,ex)=>({id,name,at,ended:at,events:[{id:id+'e',type:'swap',ex,note:'Equipment changed during workout'}]});
    LI.active=null;

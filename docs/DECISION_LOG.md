@@ -34,3 +34,11 @@ For each meaningful decision record: date, affected screen/function, approved be
 
 ### D-013 — V15.8 context-sensitive training memory (2026-10-23, preview awaiting acceptance)
 Only explicitly saved, unresolved user flags are eligible for compact Today guidance. Show flags relevant to the suggested workout group; keep details collapsed and hide when no relevant flags exist. Provide a reversible/explicit resolution operation; preserve original journal observations. Do not automatically change workout ranking, training plan, targets, completed history or Gemini context. Keep a clear user-reported versus Hevy-evidence distinction.
+
+
+### D-014 — Cloudflare previews as standard LiftIQ development environment (approved 2026-10-25)
+- **Approved:** every development feature branch receives a Cloudflare Pages Git-connected preview build when supported. `main` is the only production branch for `https://liftiq.pages.dev`; merge after user approval, regression checks, and preview review.
+- **Rationale:** test UI and fictional Hevy profiles without publishing experiments or disturbing current signed-in data.
+- **Isolation:** demo sign-in is simulated and clearly labeled; fictional records cannot enter production localStorage, real Hevy, Gemini, or signed-in user history. No mock auth bypass in deployed production. Keep sensitive credentials in backend secrets; preview access to real credentials should be restricted and independently justified.
+- **Gate:** check actual preview URL and source SHA, perform mobile/iOS checks where available, and treat real Google/Gemini/Hevy verification separately. A successful preview build is not proof of authenticated function behavior. Production only on explicit approval.
+- **Rejected:** using the production host as the default testing sandbox; inventing a persistent fake signed-in state for the actual production app.
