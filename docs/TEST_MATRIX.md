@@ -214,3 +214,8 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - New test commit `5db7c272` extends actual app Chromium navigation checks at 320/375/390/960px across Today, Progress, Goals, Plan, Coach (active aria-current, visible pane, overflow, JS errors). Initial CI jobs `42458100875` (Coach) and `42458100952` (reconciliation) FAILED **before browser execution**, because Playwright 1.56.1 Chromium dependencies do not support GitHub's current `ubuntu-latest` Ubuntu 26.04 runner. JS reconciliation job passed; Cloudflare smoke `42458100925` passed. This is an infrastructure block, not a demonstrated app failure.
 - CI-only fixes `976f290b` and `d2efe444` pin `.github/workflows/coach-readability-v159.yml` and `.github/workflows/reconciliation-regression.yml` to `ubuntu-24.04`. No runtime app, user-data, or API changes.
 - **Pinned-run CI result: NOT VERIFIED at documentation time**. Further blocked: actual Cloudflare preview SHA, real iPhone Safari and accessibility, five-screen visual acceptance, release deliverables. Production merge not approved.
+
+
+### V15.9.1 pinned-run CI verification — 2026-11-08
+- On test/workflow commit `d2efe444`, all three workflows completed **SUCCESS**: Coach/readability Chromium including five destination navigation `42458164659`, reconciliation JavaScript/browser `42458164775`, Cloudflare smoke `42458164683`. Ubuntu 24.04 explicitly pinned for Playwright jobs. This validates simulated navigation behaviour and source integration on CI, not hosted preview or physical Safari.
+- The later documentation-only head (`800ef1db`) triggered additional runs; their statuses must be verified independently before claiming latest SHA all-green.
