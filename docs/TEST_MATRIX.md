@@ -200,3 +200,10 @@ Record for each run: UTC timestamp, environment/build SHA, scenario dataset (fic
 - `6caec7bb` Coach/readability run `41808175517` FAILED at 390px: dark-theme test began with a Journal overlay already open, because the preceding simulated note-lifecycle scenario did not close it. As a result scroll-lock and restoration assumptions were invalid. This was a **test isolation problem**, not confirmed product UI failure. Reconciliation `41808176152` and Cloudflare smoke `41808175543` PASSED.
 - Test-only fix `5f3c3613` closes the Journal after the lifecycle scenario and asserts modal/scroll cleanup before starting subsequent matching and theme cases. No app, backend, storage or production change.
 - **New test CI pending**. Light/dark assertions at 320/375/390/960 and physical iPhone/Cloudflare preview parity remain unverified until executed.
+
+
+### V15.9.1 Five-screen navigation regression — 2026-11-08 (development only)
+- Corrected November 4 theme-suite isolation commit `5f3c3613` verified: Coach/responsive `41813413200`, reconciliation `41813413322`, Cloudflare smoke `41813413277` all SUCCESS (fictional-data CI, not physical iPhone).
+- Test commit `5db7c272` adds real front-end navigation at 320/375/390/960px through Today, Progress, Goals, Plan, Coach. Assert exactly five primary nav controls, unique `aria-current=page`, visible corresponding screen, no pane/document horizontal overflow, no JS page errors. Uses isolated browser origin and no authenticated APIs.
+- **New five-screen CI NOT VERIFIED at documentation time.** These are automated navigation/geometry checks, not complete qualitative visual hierarchy, real iOS, colour contrast or VoiceOver acceptance.
+- Preview branch deployed SHA, real Google/Hevy/Gemini validation, and final release ZIP remain outstanding. No production merge.
