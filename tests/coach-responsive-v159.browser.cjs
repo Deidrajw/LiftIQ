@@ -190,6 +190,30 @@ async function main(){
     if(theme==='dark')page.__darkJournalAppearance=appearance;
     else assert.notEqual(appearance.headerBackground,page.__darkJournalAppearance.headerBackground,'Journal header ignores light theme');
    }
+   // Shared navigation smoke: each of the five primary views must activate
+   // without page errors or horizontal overflow at supported viewport widths.
+   await page.evaluate(()=>{if(document.getElementById('liqJournalOverlay').classList.contains('open'))liqJournalClose()});
+   for(const [destination,paneId] of [['today','gym'],['progress','t-progress'],['goals','t-next'],['plan','t-map'],['coach','t-ai']]){
+    await page.locator('.ux-primary-nav [data-destination="'+destination+'"]').click();
+    const navCheck=await page.evaluate(({destination,paneId})=>{
+     const nav=document.querySelector('.ux-primary-nav');
+     const active=[...nav.querySelectorAll('[aria-current="page"]')];
+     const pane=document.getElementById(paneId);
+     const box=pane.getBoundingClientRect();
+     const buttons=[...nav.querySelectorAll('.ux-dest')];
+     return {
+      selected:active.length===1&&active[0].dataset.destination===destination,
+      fiveButtons:buttons.length===5,
+      paneVisible:box.width>0&&getComputedStyle(pane).display!=='none',
+      paneOverflow:pane.scrollWidth>pane.clientWidth+2,
+      pageOverflow:document.documentElement.scrollWidth>innerWidth+2
+     };
+    },{destination,paneId});
+    assert(navCheck.selected&&navCheck.fiveButtons&&navCheck.paneVisible,'primary navigation failed '+destination+' '+width+': '+JSON.stringify(navCheck));
+    assert(!navCheck.paneOverflow&&!navCheck.pageOverflow,'view horizontal overflow '+destination+' '+width+': '+JSON.stringify(navCheck));
+    assert.deepEqual(errors,[],'page errors after '+destination+' at '+width);
+   }
+   await page.locator('.ux-primary-nav [data-destination="today"]').click();
    await page.goto(base+'/demo-coach-v159.html',{waitUntil:'domcontentloaded'});
    assert.match(await page.locator('body').innerText(),/Fictional workouts/);
    assert.equal(await page.locator('details').count(),2);
